@@ -3,61 +3,58 @@
 namespace App\Http\Controllers;
 
 use App\Models\DetailOrder;
-use App\Models\Order;
-use App\Models\Menu;
 use Illuminate\Http\Request;
 
 class DetailOrderController extends Controller
 {
     public function index()
+{
+    $user = auth()->user();
+
+    $detailOrders = DetailOrder::with(['order', 'menu'])
+        ->when($user->role === 'kasir', function ($query) use ($user) {
+            $query->whereHas('order', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            });
+        })
+        ->latest()
+        ->get();
+
+    return view('detail_orders.index', compact('detailOrders'));
+}
+
+
+    public function show($id)
     {
-        $detailOrders = DetailOrder::with(['order', 'menu'])->latest()->get();
-        return view('detail_orders.index', compact('detailOrders'));
+        $detailOrder = DetailOrder::with(['order', 'menu'])->findOrFail($id);
+
+        return view('detail_orders.show', compact('detailOrder'));
     }
+
+    // Menonaktifkan create, store, edit, update, destroy
 
     public function create()
     {
-        $orders = Order::all();
-        $menus = Menu::all();
-        return view('detail_orders.create', compact('orders', 'menus'));
+        abort(403, 'Akses tidak diizinkan.');
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'order_id' => 'required|exists:orders,id',
-            'menu_id' => 'required|exists:menus,id',
-            'jumlah' => 'required|integer|min:1',
-            'subtotal' => 'required|numeric|min:0',
-        ]);
-
-        DetailOrder::create($request->all());
-        return redirect()->route('detail_orders.index')->with('success', 'Detail order berhasil ditambahkan.');
+        abort(403, 'Akses tidak diizinkan.');
     }
 
-    public function edit(DetailOrder $detailOrder)
+    public function edit($id)
     {
-        $orders = Order::all();
-        $menus = Menu::all();
-        return view('detail_orders.edit', compact('detailOrder', 'orders', 'menus'));
+        abort(403, 'Akses tidak diizinkan.');
     }
 
-    public function update(Request $request, DetailOrder $detailOrder)
+    public function update(Request $request, $id)
     {
-        $request->validate([
-            'order_id' => 'required|exists:orders,id',
-            'menu_id' => 'required|exists:menus,id',
-            'jumlah' => 'required|integer|min:1',
-            'subtotal' => 'required|numeric|min:0',
-        ]);
-
-        $detailOrder->update($request->all());
-        return redirect()->route('detail_orders.index')->with('success', 'Detail order berhasil diperbarui.');
+        abort(403, 'Akses tidak diizinkan.');
     }
 
-    public function destroy(DetailOrder $detailOrder)
+    public function destroy($id)
     {
-        $detailOrder->delete();
-        return redirect()->route('detail_orders.index')->with('success', 'Detail order berhasil dihapus.');
+        abort(403, 'Akses tidak diizinkan.');
     }
 }

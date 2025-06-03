@@ -18,10 +18,12 @@ return new class extends Migration
             $table->text('deskripsi')->nullable();
             $table->decimal('harga', 10, 2);
             $table->string('gambar')->nullable(); // Gambar menu
+            $table->integer('stok')->default(0); // ✅ Tambahkan baris ini
             $table->timestamps();
         
             $table->foreign('kategori_id')->references('id')->on('kategoris')->onDelete('cascade');
         });
+        
         
     }
 

@@ -4,88 +4,282 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Menu;
-use Illuminate\Http\Request;
+use App\Models\User;
 use App\Models\DetailOrder;
+use App\Models\Kategori;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
-    public function index()
-{
-    $orders = Order::all();
-    $menus = Menu::latest()->get(); // Ambil semua menu (termasuk yang baru saja dibuat)
+    private function checkRole()
+    {
+        if (auth()->guest() || !in_array(auth()->user()->role, ['kasir', 'user'])) {
+            return redirect()->route('no-access');
+        }
+        return null;
+    }
 
-    return view('orders.index', compact('orders', 'menus'));
+   public function index(Request $request)
+{
+    $query = Menu::query();
+
+    // Filter search nama menu
+    if ($request->has('search') && !empty($request->search)) {
+        $query->where('nama_menu', 'like', '%' . $request->search . '%');
+    }
+
+    // Filter kategori jika dipilih
+    if ($request->has('kategori') && !empty($request->kategori)) {
+        $query->whereHas('kategori', function($q) use ($request) {
+            $q->where('nama_kategori', $request->kategori);
+        });
+    }
+
+    $menus = $query->paginate(10); // atau get(), tergantung kebutuhan
+
+    $kategoris = Kategori::all();
+
+    return view('orders.index', compact('menus', 'kategoris'));
 }
+
+
 
     public function create(Request $request)
     {
+        if ($redirect = $this->checkRole()) return $redirect;
+
         $menus = Menu::all();
-        $selectedMenu = null;
-        $selectedPrice = null;
+        $kasirs = auth()->user()->role === 'kasir' ? User::where('role', 'kasir')->get() : [];
+        $cart = session()->get('cart', []);
 
-        if ($request->has('menu_id')) {
-            $selectedMenu = Menu::find($request->menu_id);
-            if ($selectedMenu) {
-                $selectedPrice = $selectedMenu->harga;
-            }
-        }
-
-        return view('orders.create', compact('menus', 'selectedMenu', 'selectedPrice'));
+        return view('orders.create', compact('menus', 'kasirs', 'cart'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'menu_id' => 'required|exists:menus,id',
+        if ($redirect = $this->checkRole()) return $redirect;
+
+        $rules = [
             'nama_pemesan' => 'required|string|max:255',
-            'jumlah' => 'required|integer|min:1',
-        ]);
+            'jumlah_bayar' => 'required|numeric|min:0',
+        ];
 
-        $menu = Menu::find($request->menu_id);
+        if (auth()->user()->role === 'kasir') {
+            $rules['nama_kasir'] = 'required|string|max:255';
+        }
 
-        $order = new Order();
-        $order->menu_id = $menu->id;
-        $order->nama_menu = $menu->nama_menu;
-        $order->harga_menu = $menu->harga;
-        $order->gambar_menu = $menu->gambar;
-        $order->nama_pemesan = $request->nama_pemesan;
-        $order->save();
+        $request->validate($rules);
 
-        DetailOrder::create([
-            'order_id' => $order->id,
-            'menu_id' => $menu->id,
-            'jumlah' => $request->jumlah,
-            'subtotal' => $menu->harga * $request->jumlah,
-        ]);
+        $cart = session()->get('cart', []);
+        if (empty($cart)) {
+            return back()->with('error', 'Keranjang kosong, silakan tambah menu terlebih dahulu.');
+        }
 
-        return redirect()->route('detail_orders.index')->with('success', 'Order dan detail order berhasil ditambahkan');
+        $menusCache = [];
+        $totalHarga = 0;
+
+        foreach ($cart as $menuId => $item) {
+            $menu = Menu::find($menuId);
+            if (!$menu) return back()->with('error', "Menu ID $menuId tidak ditemukan.");
+            if ($menu->stok < $item['quantity']) return back()->with('error', "Stok tidak cukup untuk {$menu->nama_menu}.");
+
+            $menusCache[$menuId] = $menu;
+            $totalHarga += $menu->harga * $item['quantity'];
+        }
+
+        if ($request->jumlah_bayar < $totalHarga) {
+            return back()->with('error', 'Jumlah bayar tidak boleh kurang dari total harga.');
+        }
+
+        DB::transaction(function () use ($request, $cart, $menusCache, $totalHarga) {
+            $user = auth()->user();
+            $namaKasir = $user->role === 'kasir' ? $request->nama_kasir : $user->name;
+
+            $order = Order::create([
+                'nama_pemesan' => $request->nama_pemesan,
+                'jumlah_bayar' => $request->jumlah_bayar,
+                'kembalian' => $request->jumlah_bayar - $totalHarga,
+                'user_id' => $user->id,
+                'nama_kasir' => $namaKasir,
+                'total_harga' => $totalHarga,
+            ]);
+
+            foreach ($cart as $menuId => $item) {
+                $menu = $menusCache[$menuId];
+                $qty = $item['quantity'];
+
+                DetailOrder::create([
+                    'order_id' => $order->id,
+                    'menu_id' => $menu->id,
+                    'jumlah' => $qty,
+                    'subtotal' => $menu->harga * $qty,
+                ]);
+
+                $menu->decrement('stok', $qty);
+            }
+        });
+
+        session()->forget('cart');
+        return redirect()->route('orders.index')->with('success', 'Pesanan berhasil disimpan dan stok diperbarui.');
     }
 
     public function edit(Order $order)
     {
-        $menus = Menu::all();
-        return view('orders.edit', compact('order', 'menus'));
+        if ($redirect = $this->checkRole()) return $redirect;
+
+        return view('orders.edit', [
+            'order' => $order->load('detailOrders.menu'),
+            'menus' => Menu::all(),
+        ]);
     }
 
     public function update(Request $request, Order $order)
     {
+        if ($redirect = $this->checkRole()) return $redirect;
+
         $request->validate([
-            'menu_id' => 'required|exists:menus,id',
+            'menu_id' => 'required|array|min:1',
+            'menu_id.*' => 'exists:menus,id',
+            'jumlah' => 'required|array|min:1',
+            'jumlah.*' => 'integer|min:1',
         ]);
 
-        $menu = Menu::find($request->menu_id);
-        $order->menu_id = $menu->id;
-        $order->nama_menu = $menu->nama_menu;
-        $order->harga_menu = $menu->harga;
-        $order->gambar_menu = $menu->gambar;
-        $order->save();
+        if (count($request->menu_id) !== count($request->jumlah)) {
+            return back()->with('error', 'Data menu dan jumlah tidak sesuai.');
+        }
+
+        DB::transaction(function () use ($request, $order) {
+            // Restock old menu items
+            foreach ($order->detailOrders as $detail) {
+                $menu = Menu::find($detail->menu_id);
+                if ($menu) $menu->increment('stok', $detail->jumlah);
+            }
+
+            $order->detailOrders()->delete();
+
+            $totalHarga = 0;
+
+            foreach ($request->menu_id as $index => $menuId) {
+                $menu = Menu::findOrFail($menuId);
+                $qty = (int)$request->jumlah[$index];
+
+                if ($menu->stok < $qty) {
+                    throw new \Exception("Stok tidak cukup untuk menu {$menu->nama_menu}.");
+                }
+
+                DetailOrder::create([
+                    'order_id' => $order->id,
+                    'menu_id' => $menu->id,
+                    'jumlah' => $qty,
+                    'subtotal' => $menu->harga * $qty,
+                ]);
+
+                $menu->decrement('stok', $qty);
+                $totalHarga += $menu->harga * $qty;
+            }
+
+            $order->update(['total_harga' => $totalHarga]);
+        });
 
         return redirect()->route('orders.index')->with('success', 'Order berhasil diupdate');
     }
 
     public function destroy(Order $order)
     {
-        $order->delete();
+        if ($redirect = $this->checkRole()) return $redirect;
+
+        DB::transaction(function () use ($order) {
+            foreach ($order->detailOrders as $detail) {
+                $menu = Menu::find($detail->menu_id);
+                if ($menu) $menu->increment('stok', $detail->jumlah);
+            }
+
+            $order->detailOrders()->delete();
+            $order->delete();
+        });
+
         return redirect()->route('orders.index')->with('success', 'Order berhasil dihapus');
     }
+
+    // Perbarui addToCart dengan validasi stok dan sesi keranjang
+    public function addToCart(Request $request)
+{
+    $menu = Menu::findOrFail($request->menu_id);
+    $cart = session()->get('cart', []);
+    $id = $menu->id;
+
+    if (isset($cart[$id])) {
+        if ($cart[$id]['quantity'] < $menu->stok) {
+            $cart[$id]['quantity']++;
+        } else {
+            return response()->json(['status' => 'error', 'message' => 'Stok tidak mencukupi untuk "' . $menu->nama_menu . '".']);
+        }
+    } else {
+        $cart[$id] = [
+            'nama_menu' => $menu->nama_menu,
+            'harga' => $menu->harga,
+            'gambar' => $menu->gambar,
+            'stok' => $menu->stok,
+            'quantity' => 1,
+        ];
+    }
+
+    session()->put('cart', $cart);
+    return response()->json(['status' => 'success', 'message' => 'Menu "' . $menu->nama_menu . '" berhasil ditambahkan ke keranjang!']);
+}
+
+public function removeFromCart(Request $request)
+{
+    $menuId = $request->input('menu_id');
+    $cart = session()->get('cart', []);
+
+    if (isset($cart[$menuId])) {
+        if ($cart[$menuId]['quantity'] > 1) {
+            $cart[$menuId]['quantity']--;
+        } else {
+            unset($cart[$menuId]);
+        }
+        session()->put('cart', $cart);
+        return response()->json(['status' => 'success']);
+    }
+
+    return response()->json(['status' => 'error', 'message' => 'Item tidak ditemukan di keranjang']);
+}
+
+
+    public function show(Order $order)
+    {
+        if ($redirect = $this->checkRole()) return $redirect;
+
+        $order->load('detailOrders.menu.kategori');
+
+        return view('detail_orders.show', compact('order'));
+    }
+
+    public function getMenus(Request $request)
+{
+    $query = Menu::with('kategori');
+
+    if ($request->filled('search')) {
+        $query->where('nama_menu', 'like', '%'.$request->search.'%');
+    }
+
+    if ($request->filled('kategori')) {
+        $query->whereHas('kategori', function ($q) use ($request) {
+            $q->where('nama_kategori', $request->kategori);
+        });
+    }
+
+    return response()->json($query->get());
+}
+
+public function resetCart(Request $request)
+{
+    session()->forget('cart');
+    return response()->json(['status' => 'success', 'message' => 'Keranjang telah direset']);
+}
+
+
+    
 }

@@ -14,12 +14,27 @@ class Order extends Model
         'nama_menu',
         'harga_menu',
         'gambar_menu',
-        'nama_pemesan', 
+        'nama_pemesan',
+        'jumlah_bayar', 
+        'nama_kasir',
+        'user_id', 
+         'kembalian',// ✅ tambahkan ini
     ];
+    
 
     public function menu()
 {
     return $this->belongsTo(Menu::class);
 }
+
+public function detailOrders()
+{
+    return $this->hasMany(DetailOrder::class);
+}
+public function kasir()
+{
+    return $this->belongsTo(User::class, 'user_id');
+}
+
 
 }

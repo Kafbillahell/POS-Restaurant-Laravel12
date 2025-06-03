@@ -9,10 +9,18 @@ class Menu extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['kategori_id', 'nama_menu', 'deskripsi', 'harga', 'gambar'];
+    protected $fillable = [
+        'kategori_id', 'nama_menu', 'deskripsi', 'harga', 'stok', 'gambar'
+    ];
+    
 
     public function kategori()
     {
         return $this->belongsTo(Kategori::class);
     }
+    public function detailOrders()
+{
+    return $this->hasMany(DetailOrder::class);
+}
+
 }           

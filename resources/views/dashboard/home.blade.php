@@ -8,21 +8,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
+    
     <!-- Favicon icon -->
     <link rel="icon" type="image/png" sizes="16x16" href="{{asset('assets/')}}/images/favicon.png">
-    <title>Adminmart Template - The Ultimate Multipurpose admin template</title>
+    <title>Pos Cafe Laravel</title>
     <!-- Custom CSS -->
     <link href="{{asset('assets/')}}/extra-libs/c3/c3.min.css" rel="stylesheet">
     <link href="{{asset('assets/')}}/libs/chartist/dist/chartist.min.css" rel="stylesheet">
     <link href="{{asset('assets/')}}/extra-libs/jvector/jquery-jvectormap-2.0.2.css" rel="stylesheet" />
     <!-- Custom CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
     <link href="{{asset('dist/')}}/css/style.min.css" rel="stylesheet">
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+<!-- Bootstrap JS Bundle (popper & bootstrap) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
     <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
 <![endif]-->
+  @yield('styles')
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 </head>
 
@@ -42,11 +65,16 @@
     <!-- ============================================================== -->
     @include('layouts.allbar')
 
+        
+
     <div class="page-wrapper">
-    <div class="content-wrapper" style="margin-left: 250px; padding: 20px;">
-        @yield('content')
+        <div class="content-wrapper" style="margin-left: 250px; padding: 20px; margin-top: 100px; padding-left: 20px; padding-right: 20px; min-height: 100vh;">
+            @yield('content')
+        </div>
     </div>
-</div>
+
+
+
 
     <!-- ============================================================== -->
     <!-- End Wrapper -->
@@ -74,6 +102,10 @@
     <script src="{{asset('assets/')}}/extra-libs/jvector/jquery-jvectormap-2.0.2.min.js"></script>
     <script src="{{asset('assets/')}}/extra-libs/jvector/jquery-jvectormap-world-mill-en.js"></script>
     <script src="{{asset('dist/')}}/js/pages/dashboards/dashboard1.min.js"></script>
+    <!-- Bootstrap Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+@stack('scripts')
+
 </body>
         
 </html>

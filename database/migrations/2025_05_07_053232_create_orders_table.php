@@ -12,14 +12,32 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->id(); // Menambahkan kolom id
-            $table->unsignedBigInteger('menu_id'); // Kolom menu_id
-            $table->string('nama_menu'); // Kolom nama_menu
-            $table->decimal('harga_menu', 10, 2); // Kolom harga_menu
-            $table->string('gambar_menu')->nullable(); // Kolom gambar_menu (nullable)
-            $table->timestamps(); // Kolom created_at dan updated_at
+            $table->id(); // Kolom id
+            
+            // Bisa nullable karena kita akan pakai kolom detail_order untuk banyak menu
+            $table->unsignedBigInteger('menu_id')->nullable(); 
 
-            // Menambahkan foreign key untuk menu_id
+            // Bisa nullable juga, kalau kamu simpan data menu di detail_order JSON
+            $table->string('nama_menu')->nullable();
+            $table->decimal('harga_menu', 10, 2)->nullable();
+            $table->string('gambar_menu')->nullable();
+
+            $table->string('nama_pemesan'); // Nama pemesan
+            $table->string('nama_kasir'); // Nama kasir
+
+            $table->decimal('jumlah_bayar', 10, 2)->default(0); // Jumlah bayar
+
+            // Kolom JSON untuk menyimpan detail menu dan jumlahnya
+            $table->json('detail_order')->nullable();
+
+            $table->unsignedBigInteger('user_id');
+
+            $table->timestamps();
+
+            // Foreign key untuk user_id
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+
+            // Foreign key untuk menu_id, nullable, jadi tidak wajib
             $table->foreign('menu_id')->references('id')->on('menus')->onDelete('cascade');
         });
     }
@@ -29,7 +47,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Menghapus tabel orders
         Schema::dropIfExists('orders');
     }
 };

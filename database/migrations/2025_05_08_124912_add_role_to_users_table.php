@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
 {
-    Schema::table('orders', function (Blueprint $table) {
-        $table->string('nama_pemesan')->after('menu_id');
+    Schema::table('users', function (Blueprint $table) {
+        $table->enum('role', ['admin', 'kasir', 'user'])->default('user');
     });
 }
 
 public function down(): void
 {
-    Schema::table('orders', function (Blueprint $table) {
-        $table->dropColumn('nama_pemesan');
+    Schema::table('users', function (Blueprint $table) {
+        $table->dropColumn('role');
     });
 }
 
