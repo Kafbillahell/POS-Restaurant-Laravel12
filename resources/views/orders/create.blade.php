@@ -28,13 +28,11 @@
             @csrf
 
             {{-- Nama Kasir --}}
-           {{-- Nama Kasir --}}
             <div class="form-group mb-3">
                 <label for="nama_kasir">Nama Kasir</label>
                 <input type="text" class="form-control" value="{{ auth()->user()->name }}" readonly>
                 <input type="hidden" name="nama_kasir" value="{{ auth()->user()->name }}">
             </div>
-
 
             {{-- Nama Pemesan --}}
             <div class="form-group mb-3">
@@ -82,16 +80,15 @@
 
             {{-- Jumlah Bayar --}}
             <div class="form-group mb-3">
-    <label for="jumlah_bayar">Jumlah Bayar</label>
-    <input type="number" 
-           name="jumlah_bayar" 
-           id="jumlah_bayar" 
-           class="form-control" 
-           placeholder="Masukkan jumlah bayar" 
-           min="{{ $totalHarga }}"
-           value="{{ old('jumlah_bayar') }}">
-</div>
-
+                <label for="jumlah_bayar">Jumlah Bayar</label>
+                <input type="number" 
+                       name="jumlah_bayar" 
+                       id="jumlah_bayar" 
+                       class="form-control" 
+                       placeholder="Masukkan jumlah bayar" 
+                       min="{{ $totalHarga }}"
+                       value="{{ old('jumlah_bayar') }}">
+            </div>
 
             {{-- Kembalian --}}
             <div class="form-group mb-3">
@@ -102,6 +99,31 @@
 
             <button type="submit" class="btn btn-success mt-3">Checkout</button>
         </form>
+
+        {{-- SweetAlert2 --}}
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        @if(session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: "{{ session('success') }}",
+                confirmButtonText: 'OK'
+            });
+        </script>
+        @endif
+
+        @if(session('error'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: "{{ session('error') }}",
+                confirmButtonText: 'OK'
+            });
+        </script>
+        @endif
 
         <script>
             function updateKembalian() {

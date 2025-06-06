@@ -203,19 +203,39 @@ class OrderController extends Controller
     }
 
     // Perbarui addToCart dengan validasi stok dan sesi keranjang
-    public function addToCart(Request $request)
+public function addToCart(Request $request)
 {
     $menu = Menu::findOrFail($request->menu_id);
     $cart = session()->get('cart', []);
     $id = $menu->id;
 
+    // Cek apakah sudah ada di cart
     if (isset($cart[$id])) {
-        if ($cart[$id]['quantity'] < $menu->stok) {
+        // Hitung stok sisa dengan mengurangi quantity di cart dari stok awal
+        $stokSisa = $menu->stok - $cart[$id]['quantity'];
+
+        if ($stokSisa > 0) {
+            // Tambah quantity di cart
             $cart[$id]['quantity']++;
         } else {
-            return response()->json(['status' => 'error', 'message' => 'Stok tidak mencukupi untuk "' . $menu->nama_menu . '".']);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Stok tidak mencukupi untuk "' . $menu->nama_menu . '".',
+                'cart' => $cart,
+                'new_stok' => max(0, $stokSisa),
+            ]);
         }
     } else {
+        // Jika belum ada di cart, cek stok tersedia
+        if ($menu->stok < 1) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Stok tidak mencukupi untuk "' . $menu->nama_menu . '".',
+                'cart' => $cart,
+                'new_stok' => 0,
+            ]);
+        }
+        // Masukkan item baru ke cart dengan quantity 1
         $cart[$id] = [
             'nama_menu' => $menu->nama_menu,
             'harga' => $menu->harga,
@@ -225,14 +245,37 @@ class OrderController extends Controller
         ];
     }
 
+    // Simpan cart yang sudah diupdate ke session
     session()->put('cart', $cart);
-    return response()->json(['status' => 'success', 'message' => 'Menu "' . $menu->nama_menu . '" berhasil ditambahkan ke keranjang!']);
+
+    // Hitung stok sisa setelah ditambahkan ke cart
+    $newStok = $menu->stok - $cart[$id]['quantity'];
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Menu "' . $menu->nama_menu . '" berhasil ditambahkan ke keranjang!',
+        'cart' => $cart,
+        'new_stok' => max(0, $newStok),
+    ]);
 }
+
+
+
+
 
 public function removeFromCart(Request $request)
 {
     $menuId = $request->input('menu_id');
     $cart = session()->get('cart', []);
+
+    $menu = Menu::find($menuId);
+    if (!$menu) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Menu tidak ditemukan',
+            'cart' => $cart,
+        ]);
+    }
 
     if (isset($cart[$menuId])) {
         if ($cart[$menuId]['quantity'] > 1) {
@@ -240,12 +283,30 @@ public function removeFromCart(Request $request)
         } else {
             unset($cart[$menuId]);
         }
+
         session()->put('cart', $cart);
-        return response()->json(['status' => 'success']);
+
+        // Hitung kembali jumlah item ini dalam keranjang
+        $jumlahDiKeranjang = $cart[$menuId]['quantity'] ?? 0;
+
+        // Stok yang bisa ditampilkan ke pengguna adalah stok asli - jumlah di keranjang
+        $newStok = $menu->stok - $jumlahDiKeranjang;
+
+        return response()->json([
+            'status' => 'success',
+            'cart' => $cart,
+            'new_stok' => max(0, $newStok),
+        ]);
     }
 
-    return response()->json(['status' => 'error', 'message' => 'Item tidak ditemukan di keranjang']);
+    return response()->json([
+        'status' => 'error',
+        'message' => 'Item tidak ditemukan di keranjang',
+        'cart' => $cart,
+    ]);
 }
+
+
 
 
     public function show(Order $order)

@@ -39,7 +39,7 @@
 
                 <ul class="navbar-nav float-right">
                     <!-- Search -->
-                    <li class="nav-item d-none d-md-block">
+                    <!-- <li class="nav-item d-none d-md-block">
                         <a class="nav-link" href="javascript:void(0)">
                             <form>
                                 <div class="customize-input">
@@ -49,7 +49,7 @@
                                 </div>
                             </form>
                         </a>
-                    </li>
+                    </li> -->
 
                     <!-- User profile dropdown -->
                     <li class="nav-item dropdown position-relative">

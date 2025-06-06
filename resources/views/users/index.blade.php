@@ -36,10 +36,12 @@
                     <span class="badge rounded-pill px-3 py-2 fw-semibold text-uppercase"
                         style="background-color: {{ 
                             $user->role === 'admin' ? '#0d6efd' : 
-                            ($user->role === 'pemilik' ? '#212529' : '#6c757d') }};
+                            ($user->role === 'pemilik' ? '#212529' : 
+                            ($user->role === 'kasir' ? '#fd7e14' : '#6c757d')) }};
                             color: #fff;">
                         {{ $user->role }}
                     </span>
+
 
                     </td>
                     <td class="text-center">

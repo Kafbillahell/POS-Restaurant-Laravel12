@@ -77,18 +77,23 @@
             </div>
         </div>
 
-        {{-- Tombol Export --}}
-        <div class="mb-3 d-flex gap-2">
-            <a href="{{ route('reports.exportExcel') }}?bulan_tahun={{ $bulanTahun ?? \Carbon\Carbon::now()->format('Y-m') }}"
-                class="btn btn-success rounded-pill shadow-sm">
-                <i data-feather="file-text"></i> Export Excel
-            </a>
+        @php
+    $selectedMonth = request('bulan_tahun') ?? \Carbon\Carbon::now()->format('Y-m');
+@endphp
 
-            <a href="{{ route('reports.export-word', ['bulan_tahun' => $bulanTahun ?? \Carbon\Carbon::now()->format('Y-m')]) }}"
-                class="btn btn-primary rounded-pill shadow-sm">
-                <i data-feather="file"></i> Export Word
-            </a>
-        </div>
+{{-- Tombol Export --}}
+<div class="mb-3 d-flex gap-2">
+    <a href="{{ route('reports.exportExcel') }}?bulan_tahun={{ $selectedMonth }}"
+        class="btn btn-success rounded-pill shadow-sm">
+        <i data-feather="file-text"></i> Export Excel
+    </a>
+
+    <a href="{{ route('reports.export-word', ['bulan_tahun' => $selectedMonth]) }}"
+        class="btn btn-primary rounded-pill shadow-sm">
+        <i data-feather="file"></i> Export Word
+    </a>
+</div>
+
 
         <form method="GET" action="{{ route('reports.index') }}" class="row row-cols-lg-auto g-3 align-items-end mb-4">
             <div class="col">

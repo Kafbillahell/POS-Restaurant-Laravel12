@@ -155,9 +155,9 @@
 <div class="container py-4">
     <div class="page-header">
         <h2>Daftar Detail Orders <span style="font-weight:400;font-size:1.09rem;color:#7c8796;">(Ringkasan per Order)</span></h2>
-        <a href="{{ route('detail_orders.create') }}" class="btn btn-primary shadow-sm">
+        <!-- <a href="{{ route('orders.index') }}" class="btn btn-primary shadow-sm">
             <i class="bi bi-plus-circle"></i> Tambah Detail Order
-        </a>
+        </a> -->
     </div>
 
     @if(session('success'))
