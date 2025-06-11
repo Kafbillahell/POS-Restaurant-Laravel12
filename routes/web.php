@@ -13,11 +13,14 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ProfilePhotoController;
+use App\Http\Controllers\DashboardController;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ReportsExport;
+use App\Http\Controllers\BarcodeController;
 
 
 
+Route::get('/barcode/{id}', [BarcodeController::class, 'generate']);
 
 Route::get('/reports/export-word', [ReportController::class, 'exportWord'])->name('reports.export-word');
 
@@ -111,6 +114,7 @@ Route::get('/orders/cart/reload', function () {
 
 Route::get('/orders/{id}/print', [OrderController::class, 'print'])->name('orders.print');
 Route::post('/orders/cart/reset', [OrderController::class, 'resetCart'])->name('orders.cart.reset');
+Route::get('/orders/{order}/struk', [OrderController::class, 'struk'])->name('orders.struk');
 
 
 

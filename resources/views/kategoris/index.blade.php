@@ -2,91 +2,105 @@
 
 @section('styles')
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
     body, .table, .btn, h2, .card {
         font-family: 'Poppins', sans-serif;
     }
 
+    .kategori-heading {
+        font-size: 1.7rem;
+        font-weight: 700;
+        color: #2a3950;
+        letter-spacing: 0.01em;
+    }
+
     /* --- Table Header --- */
     .table thead th {
-        background-color: #f8f9fa;
-        color: #495057;
+        background: linear-gradient(90deg, #f4f7fb 78%, #e7eefa 100%);
+        color: #284866;
         font-weight: 600;
         border: none;
         padding: 1rem 1.2rem;
-        border-radius: 8px;
+        border-radius: 10px 10px 0 0;
+        font-size: 1rem;
+        letter-spacing: .01em;
     }
 
     /* --- Table Body --- */
     .table tbody tr {
         background: #fff;
-        box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
-        border-radius: 8px;
-        transition: transform 0.2s ease;
+        box-shadow: 0 2px 6px rgb(42 57 80 / 8%);
+        border-radius: 9px;
+        transition: transform 0.17s, box-shadow 0.17s;
     }
     .table tbody tr:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 6px 14px rgb(0 0 0 / 0.15);
+        transform: translateY(-2px) scale(1.01);
+        box-shadow: 0 6px 18px rgb(42 57 80 / 13%);
+        background: #f5fafd;
     }
     .table tbody td {
         vertical-align: middle;
         padding: 1rem 1.2rem;
+        font-size: 1.01rem;
+        color: #284866;
     }
 
     /* --- Button Style --- */
     .btn {
         font-weight: 600;
-        transition: background-color 0.3s ease, color 0.3s ease;
+        border-radius: 1.2rem;
+        transition: background .19s, color .19s, box-shadow .17s, border .13s;
+        font-size: 1rem;
     }
-
     .btn-action {
         display: inline-flex;
         align-items: center;
         gap: 0.3rem;
     }
-
     .btn-action i {
-        font-size: 1rem;
+        font-size: 1.02rem;
     }
-
     .btn-success {
-        background-color: #198754;
-        border-color: #198754;
-        color: #fff;
+        background: #eaf8f0;
+        border: 1.5px solid #b6dfcd;
+        color: #218154 !important;
+        box-shadow: 0 2px 10px #c4f1e11a;
     }
-    .btn-success:hover {
-        background-color: #157347cc;
-        border-color: #157347cc;
-        color: #fff;
+    .btn-success:hover, .btn-success:focus {
+        background: #d2f4e0;
+        color: #16643e !important;
+        border: 1.5px solid #81c7a3;
     }
-
     .btn-warning {
-        background-color: #ffc107;
-        border-color: #ffc107;
-        color: #212529;
+        background: #fff8e1;
+        border: 1.5px solid #ffe9b2;
+        color: #c4861c;
+        box-shadow: 0 2px 10px #ffe9b21a;
     }
-    .btn-warning:hover {
-        background-color: #e0a800cc;
-        border-color: #e0a800cc;
-        color: #212529;
+    .btn-warning:hover, .btn-warning:focus {
+        background: #fff3cd;
+        color: #ad7a0a;
+        border: 1.5px solid #ffde8a;
     }
-
     .btn-danger {
-        background-color: #dc3545;
-        border-color: #dc3545;
-        color: #fff;
+        background: #fff1f0;
+        border: 1.5px solid #f7c2c2;
+        color: #c0392b;
+        box-shadow: 0 2px 10px #f7c2c218;
     }
-    .btn-danger:hover {
-        background-color: #bb2d3bcc;
-        border-color: #bb2d3bcc;
-        color: #fff;
+    .btn-danger:hover, .btn-danger:focus {
+        background: #ffe5e3;
+        color: #a93226;
+        border: 1.5px solid #ffb3b3;
     }
 
     /* --- Card --- */
     .card {
-        border: 1px solid #e3e3e3;
-        border-radius: 12px;
+        border: none;
+        border-radius: 18px;
+        background: #f9fbfd;
+        box-shadow: 0 6px 18px #28486613, 0 2px 8px #d7e0ec0a;
     }
 
     /* --- Toast Success --- */
@@ -97,18 +111,30 @@
         z-index: 2000;
         opacity: 0;
         transition: opacity 0.4s ease;
+        font-size: 1.05rem;
+        border-radius: 1rem;
+        font-weight: 500;
+        background: #e7f7ed;
+        color: #2e6051;
+        border: 1px solid #b9dbcc;
+        box-shadow: 0 2px 10px #b9dbcc55;
     }
     #successToast.show {
         opacity: 1;
+    }
+    @media (max-width: 768px) {
+        .kategori-heading { font-size: 1.13rem; }
+        .btn { font-size: .97rem; }
+        .table th, .table td { padding: .75rem .65rem; }
     }
 </style>
 @endsection
 
 @section('content')
 <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-semibold text-primary">📂 Daftar Kategori</h2>
-        <a href="{{ route('kategoris.create') }}" class="btn btn-success rounded-pill shadow-sm px-4 btn-action">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <h2 class="fw-semibold text-primary kategori-heading mb-0">📂 Daftar Kategori</h2>
+        <a href="{{ route('kategoris.create') }}" class="btn btn-success shadow-sm px-4 btn-action">
             <i class="bi bi-plus-circle me-1"></i> Tambah Kategori
         </a>
     </div>
@@ -136,7 +162,7 @@
                                 <td>{{ $kategori->id }}</td>
                                 <td class="text-start">{{ $kategori->nama_kategori }}</td>
                                 <td>
-                                    <a href="{{ route('kategoris.edit', $kategori->id) }}" class="btn btn-warning btn-sm rounded-pill px-3 btn-action">
+                                    <a href="{{ route('kategoris.edit', $kategori->id) }}" class="btn btn-warning btn-sm px-3 btn-action">
                                         <i class="bi bi-pencil-square"></i> Edit
                                     </a>
                                     <form action="{{ route('kategoris.destroy', $kategori->id) }}" method="POST" class="d-inline">
@@ -144,7 +170,7 @@
                                         @method('DELETE')
                                         <button 
                                             type="submit" 
-                                            class="btn btn-danger btn-sm rounded-pill px-3 btn-action" 
+                                            class="btn btn-danger btn-sm px-3 btn-action" 
                                             onclick="return confirm('Apakah Anda yakin ingin menghapus kategori ini?')"
                                         >
                                             <i class="bi bi-trash"></i> Hapus

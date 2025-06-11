@@ -3,14 +3,12 @@
 
 <head>
     <meta charset="utf-8">
+     <link rel="icon" href="{{ asset('assets/images/favicon.png') }}" type="image/ico">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-    
-    <!-- Favicon icon -->
-    <link rel="icon" type="image/png" sizes="16x16" href="{{asset('assets/')}}/images/favicon.png">
     <title>Pos Cafe Laravel</title>
     <!-- Custom CSS -->
     <link href="{{asset('assets/')}}/extra-libs/c3/c3.min.css" rel="stylesheet">
@@ -104,6 +102,9 @@
     <script src="{{asset('dist/')}}/js/pages/dashboards/dashboard1.min.js"></script>
     <!-- Bootstrap Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/feather-icons"></script>
+<script>feather.replace()</script>
+
 @stack('scripts')
 
 </body>

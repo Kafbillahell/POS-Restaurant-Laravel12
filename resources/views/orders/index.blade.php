@@ -21,30 +21,35 @@
         </div>
     @endif
 
-
+ {{-- Kolom Daftar Menu (kiri) --}}
     <div class="row mt-4">
-        {{-- Kolom Daftar Menu (kiri) --}}
-        <div class="col-md-8">
-            <form action="{{ route('orders.index') }}" method="GET" class="row g-3 mb-3">
-                <div class="col-md-4">
-                    <input type="text" name="search" value="{{ request('search') }}" class="form-control"
-                        placeholder="Cari nama menu...">
-                </div>
-                <div class="col-md-4">
-                    <select name="kategori" class="form-control">
-                        <option value="">-- Semua Kategori --</option>
-                        @foreach($kategoris as $kategori)
-                            <option value="{{ $kategori->nama_kategori }}" {{ request('kategori') == $kategori->nama_kategori ? 'selected' : '' }}>
-                                {{ $kategori->nama_kategori }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-4 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary flex-grow-1">Cari</button>
-                    <a href="{{ route('orders.index') }}" class="btn btn-secondary flex-grow-1">Reset</a>
-                </div>
-            </form>
+       <div class="col-md-8">
+            <form action="{{ route('orders.index') }}" method="GET" class="row g-3 mb-3 align-items-end" style="font-family: 'Poppins', sans-serif;">
+    <div class="col-md-4">
+        <label for="search" class="form-label fw-semibold text-secondary mb-1">Cari Menu</label>
+        <input type="text" name="search" id="search" value="{{ request('search') }}" class="form-control shadow-sm rounded-3 py-2"
+            placeholder="Nama menu ...">
+    </div>
+    <div class="col-md-4">
+        <label for="kategori" class="form-label fw-semibold text-secondary mb-1">Kategori</label>
+        <select name="kategori" id="kategori" class="form-select shadow-sm rounded-3 py-2">
+            <option value="">All</option>
+            @foreach($kategoris as $kategori)
+                <option value="{{ $kategori->nama_kategori }}" {{ request('kategori') == $kategori->nama_kategori ? 'selected' : '' }}>
+                    {{ $kategori->nama_kategori }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+    <div class="col-md-4 d-flex gap-3">
+        <!-- <button type="submit" class="btn btn-primary flex-fill rounded-pill shadow-sm px-4" style="font-weight:600;letter-spacing:.01em;">
+            <i class="bi bi-search"></i> masukan
+        </button> -->
+        <a href="{{ route('orders.index') }}" class="btn btn-light border flex-fill rounded-pill shadow-sm px-4" style="font-weight:600;">
+            <i class="bi bi-x-circle"></i> Reset
+        </a>
+    </div>
+</form>
 
             
             {{-- Grouping menu per kategori di view --}}
@@ -217,13 +222,15 @@
             @endforeach -->
 
             {{-- Kategori lain --}}
-         @foreach ($menusGrouped as $kategori => $menusInGroup)
-    @if(!in_array($kategori, $kategoriOrder))
-        <section class="category-section">
-            <h3>{{ $kategori }}</h3>
-            <div class="d-flex flex-wrap gap-4 justify-content-start">
-                @foreach ($menusInGroup as $menu)
-                    <div class="card-menu">
+    <div id="menu-container">
+    @foreach ($menusGrouped as $kategori => $menusInGroup)
+        @if(!in_array($kategori, $kategoriOrder))
+            <section class="category-section">
+                <h3>{{ $kategori }}</h3>
+                <div class="d-flex flex-wrap gap-4 justify-content-start">
+                    @foreach ($menusInGroup as $menu)
+                        <div class="card-menu">
+
                         @if($menu->gambar)
                             <img src="{{ asset('storage/' . $menu->gambar) }}" alt="{{ $menu->nama_menu }}">
                         @else
@@ -244,11 +251,11 @@
 
                                 @if($menu->stok > 0)
                                    <button 
-    class="btn btn-add-cart add-to-cart-btn" 
-    data-id="{{ $menu->id }}" 
-    data-max="{{ $menu->stok }}">
-    + Keranjang
-</button>
+                                      class="btn btn-add-cart add-to-cart-btn" 
+                                      data-id="{{ $menu->id }}" 
+                                      data-max="{{ $menu->stok }}">
+                                      + Keranjang
+                                  </button>
 
                                 @else
                                     <button class="btn btn-disabled" disabled>Stock Habis</button>
@@ -380,6 +387,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const shownAlerts = new Set();
   const cartState = {};
 
+  const searchInput = document.querySelector('#search');
+  const kategoriSelect = document.querySelector('#kategori');
+
   function updateCartUI(cart) {
     const cartList = document.getElementById('cart-list');
     const cartFooter = document.getElementById('cart-footer');
@@ -394,8 +404,7 @@ document.addEventListener('DOMContentLoaded', () => {
       cartList.innerHTML = `
         <li class="list-group-item text-center text-muted d-flex justify-content-center align-items-center" style="min-height: 200px;">
           Keranjang kosong
-        </li>
-      `;
+        </li>`;
       checkoutButton.classList.remove('btn-primary');
       checkoutButton.classList.add('btn-secondary', 'disabled');
       checkoutButton.setAttribute('href', '#');
@@ -423,8 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <span>${totalHarga}</span>
           </div>
-        </li>
-      `;
+        </li>`;
     }
     cartList.innerHTML = html;
     cartFooter.style.display = 'block';
@@ -434,53 +442,37 @@ document.addEventListener('DOMContentLoaded', () => {
     checkoutButton.setAttribute('href', "{{ route('orders.create') }}");
   }
 
- function updateStockInCard(menuId, newStock) {
-  const card = document.querySelector(`.card-menu button[data-id="${menuId}"]`)?.closest('.card-menu') ||
-               document.querySelector(`.card-menu .btn-disabled[data-id="${menuId}"]`)?.closest('.card-menu');
+  function updateStockInCard(menuId, newStock) {
+    const card = document.querySelector(`.card-menu button[data-id="${menuId}"]`)?.closest('.card-menu') ||
+                 document.querySelector(`.card-menu .btn-disabled[data-id="${menuId}"]`)?.closest('.card-menu');
+    if (!card) return;
 
-  if (!card) return;
+    const stokEl = card.querySelector('.stok-value');
+    const addBtn = card.querySelector(`.add-to-cart-btn[data-id="${menuId}"]`);
+    const disabledBtn = card.querySelector('.btn-disabled');
 
-  const stokEl = card.querySelector('.stok-value');
-  const addBtn = card.querySelector(`.add-to-cart-btn[data-id="${menuId}"]`);
-  const disabledBtn = card.querySelector('.btn-disabled');
+    if (stokEl) stokEl.textContent = `Stok: ${newStock}`;
 
-  // Update teks stok
-  if (stokEl) {
-    stokEl.textContent = `Stok: ${newStock}`;
-  }
-
-  // Ganti tombol sesuai stok
-  if (newStock <= 0) {
-    // Jika stok habis dan belum tombol disabled, ubah tombolnya
-    if (addBtn) {
+    if (newStock <= 0 && addBtn) {
       addBtn.outerHTML = `<button class="btn btn-disabled" data-id="${menuId}" disabled>Stok Habis</button>`;
-    }
-  } else {
-    if (disabledBtn) {
+    } else if (newStock > 0 && disabledBtn) {
       disabledBtn.outerHTML = `
-        <button 
-          class="btn btn-add-cart add-to-cart-btn" 
-          data-id="${menuId}" 
-          data-max="${newStock}">
+        <button class="btn btn-add-cart add-to-cart-btn" data-id="${menuId}" data-max="${newStock}">
           + Keranjang
         </button>`;
     }
   }
-}
-
 
   function optimisticUpdate(menuId, increment) {
     if (!cartState[menuId]) {
       if (increment > 0) {
         cartState[menuId] = { nama_menu: 'Loading...', harga: 0, quantity: 0 };
-      } else {
-        return;
-      }
+      } else return;
     }
+
     cartState[menuId].quantity += increment;
-    if (cartState[menuId].quantity <= 0) {
-      delete cartState[menuId];
-    }
+    if (cartState[menuId].quantity <= 0) delete cartState[menuId];
+
     updateCartUI(cartState);
 
     const card = document.querySelector(`.card-menu button[data-id="${menuId}"]`)?.closest('.card-menu');
@@ -493,7 +485,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // **Implementasi fungsi sendUpdate yang sebelumnya belum ada**
   async function sendUpdate(menuId, route) {
     try {
       const res = await fetch(route, {
@@ -508,7 +499,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (data.status === 'success') {
         updateCartUI(data.cart);
-
         if (typeof data.new_stok !== 'undefined') {
           updateStockInCard(menuId, data.new_stok);
         }
@@ -522,7 +512,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Event tambah/kurangi item di keranjang
+  // Event tombol tambah/kurang di keranjang
   document.getElementById('cart-list').addEventListener('click', e => {
     if (e.target.classList.contains('btn-increase') || e.target.classList.contains('btn-decrease')) {
       const menuId = e.target.getAttribute('data-id');
@@ -558,7 +548,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const card = buttonEl.closest('.card-menu');
             const stokEl = card?.querySelector('.stok-value');
-
             if (stokEl && typeof data.new_stok !== 'undefined') {
               stokEl.textContent = `Stok: ${data.new_stok}`;
               if (data.new_stok <= 0) {
@@ -585,9 +574,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Reset cart saat pindah halaman selain orders
+  // Filter pencarian dan kategori
+  function fetchFilteredMenus() {
+    const search = searchInput?.value || '';
+    const kategori = kategoriSelect?.value || '';
+
+    const params = new URLSearchParams();
+    if (search) params.append('search', search);
+    if (kategori) params.append('kategori', kategori);
+
+    fetch(`{{ route('orders.index') }}?${params.toString()}`, {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+      .then(res => res.text())
+      .then(html => {
+        const parser = new DOMParser();
+        const newDoc = parser.parseFromString(html, 'text/html');
+        const newMenu = newDoc.querySelector('#menu-container');
+        document.querySelector('#menu-container').innerHTML = newMenu.innerHTML;
+      });
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchInput._timeout);
+      searchInput._timeout = setTimeout(fetchFilteredMenus, 350);
+    });
+  }
+
+  if (kategoriSelect) {
+    kategoriSelect.addEventListener('change', fetchFilteredMenus);
+  }
+
+  // Reset cart saat pindah halaman selain /orders
   document.querySelectorAll('a').forEach(link => {
-    link.addEventListener('click', function () {
+    link.addEventListener('click', () => {
       const href = link.getAttribute('href');
       if (!href.includes('/orders')) {
         fetch("{{ route('orders.cart.reset') }}", {
@@ -602,13 +623,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Reset cart saat refresh atau close halaman
+  // Reset saat refresh/close
   window.addEventListener('beforeunload', () => {
     navigator.sendBeacon("{{ route('orders.cart.reset') }}", new Blob([], { type: 'application/json' }));
     shownAlerts.clear();
   });
 });
 </script>
+
 
 
 

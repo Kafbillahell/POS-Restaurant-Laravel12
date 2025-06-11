@@ -15,36 +15,37 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class ReportController extends Controller
 {
-    public function index(Request $request)
-    {
-        $bulanTahun = $request->input('bulan_tahun', Carbon::now()->format('Y-m'));
-        [$tahun, $bulan] = explode('-', $bulanTahun);
+   public function index(Request $request)
+{
+    $bulanTahun = $request->input('bulan_tahun', Carbon::now()->format('Y-m'));
+    [$tahun, $bulan] = explode('-', $bulanTahun);
 
-        $startDate = Carbon::create($tahun, $bulan, 1)->startOfDay();
-        $endDate = Carbon::create($tahun, $bulan, 1)->endOfMonth()->endOfDay();
+    $startDate = Carbon::create($tahun, $bulan, 1)->startOfDay();
+    $endDate = Carbon::create($tahun, $bulan, 1)->endOfMonth()->endOfDay();
 
-        $reports = DB::table('users')
-            ->select(
-                'users.id as kasir_id',
-                'users.name as kasir_name',
-                DB::raw("'$bulanTahun' as bulan_tahun"),
-                DB::raw('COUNT(DISTINCT orders.id) as total_order'),
-                DB::raw('COALESCE(SUM(detail_orders.subtotal), 0) as total_pendapatan'),
-                DB::raw('COALESCE(SUM(detail_orders.subtotal) * 0.2, 0) as total_komisi_kasir'),
-                DB::raw('COALESCE(SUM(detail_orders.subtotal) * 0.8, 0) as total_keuntungan_bersih')
-            )
-            ->leftJoin('orders', function ($join) use ($startDate, $endDate) {
-                $join->on('orders.user_id', '=', 'users.id')
-                    ->whereBetween('orders.created_at', [$startDate, $endDate]);
-            })
-            ->leftJoin('detail_orders', 'detail_orders.order_id', '=', 'orders.id')
-            ->where('users.role', 'kasir')
-            ->groupBy('users.id', 'users.name')
-            ->orderBy('users.name')
-            ->get();
+    $reports = DB::table('users')
+        ->select(
+            'users.id as kasir_id',
+            'users.name as kasir_name',
+            DB::raw("'$bulanTahun' as bulan_tahun"),
+            DB::raw('COUNT(DISTINCT orders.id) as total_order'),
+            DB::raw('COALESCE(SUM(detail_orders.subtotal), 0) as total_pendapatan'),
+            DB::raw('COALESCE(SUM(detail_orders.subtotal) * 0.2, 0) as total_komisi_kasir'),
+            DB::raw('COALESCE(SUM(detail_orders.subtotal) * 0.8, 0) as total_keuntungan_bersih')
+        )
+        ->leftJoin('orders', function ($join) use ($startDate, $endDate) {
+            $join->on('orders.user_id', '=', 'users.id')
+                ->whereBetween('orders.created_at', [$startDate, $endDate]);
+        })
+        ->leftJoin('detail_orders', 'detail_orders.order_id', '=', 'orders.id')
+        ->where('users.role', 'kasir')
+        ->groupBy('users.id', 'users.name')
+        ->orderBy('users.name')
+        ->get();
 
-        return view('reports.index', compact('reports', 'bulanTahun'));
-    }
+    return view('reports.index', compact('reports', 'bulanTahun'));
+}
+
 
     public function show($id, Request $request)
     {

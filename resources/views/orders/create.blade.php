@@ -24,7 +24,7 @@
             </div>
         @endif
 
-        <form action="{{ route('orders.store') }}" method="POST">
+        <form id="checkoutForm" action="{{ route('orders.store') }}" method="POST">
             @csrf
 
             {{-- Nama Kasir --}}
@@ -103,29 +103,26 @@
         {{-- SweetAlert2 --}}
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-        @if(session('success'))
         <script>
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil!',
-                text: "{{ session('success') }}",
-                confirmButtonText: 'OK'
-            });
-        </script>
-        @endif
+            const form = document.getElementById('checkoutForm');
 
-        @if(session('error'))
-        <script>
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: "{{ session('error') }}",
-                confirmButtonText: 'OK'
-            });
-        </script>
-        @endif
+            form.addEventListener('submit', function(e) {
+                e.preventDefault(); // cegah submit langsung
 
-        <script>
+                Swal.fire({
+                    title: 'Konfirmasi Checkout',
+                    text: "Apakah Anda yakin ingin melakukan checkout pesanan ini?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, checkout!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+
             function updateKembalian() {
                 const jumlahBayarInput = document.getElementById('jumlah_bayar');
                 const kembalianDisplay = document.getElementById('kembalian_display');
@@ -149,6 +146,29 @@
             document.getElementById('jumlah_bayar').addEventListener('input', updateKembalian);
             document.addEventListener('DOMContentLoaded', updateKembalian);
         </script>
+
+        @if(session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: "{{ session('success') }}",
+                confirmButtonText: 'OK'
+            });
+        </script>
+        @endif
+
+        @if(session('error'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: "{{ session('error') }}",
+                confirmButtonText: 'OK'
+            });
+        </script>
+        @endif
+
     @endif
 
 @else

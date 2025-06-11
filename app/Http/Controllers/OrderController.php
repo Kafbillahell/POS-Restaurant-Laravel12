@@ -10,6 +10,7 @@ use App\Models\Kategori;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+
 class OrderController extends Controller
 {
     private function checkRole()
@@ -20,7 +21,7 @@ class OrderController extends Controller
         return null;
     }
 
-   public function index(Request $request)
+ public function index(Request $request)
 {
     $query = Menu::query();
 
@@ -36,12 +37,29 @@ class OrderController extends Controller
         });
     }
 
-    $menus = $query->paginate(10); // atau get(), tergantung kebutuhan
-
+    $menus = $query->paginate(10);
     $kategoris = Kategori::all();
 
-    return view('orders.index', compact('menus', 'kategoris'));
+    // Susun ulang menu menjadi grup berdasarkan kategori
+    $menusGrouped = $menus->groupBy(function ($menu) {
+        return optional($menu->kategori)->nama_kategori ?? 'Tanpa Kategori';
+    });
+
+    $kategoriOrder = []; // Tambahkan ini jika diperlukan untuk pengecualian kategori
+
+    // Jika AJAX, kembalikan hanya bagian HTML menu (tanpa layout)
+    if ($request->ajax()) {
+        return response()->view('orders.index', compact(
+            'menus', 'menusGrouped', 'kategoriOrder', 'kategoris'
+        ));
+    }
+
+    // Jika bukan AJAX, render halaman penuh
+    return view('orders.index', compact(
+        'menus', 'menusGrouped', 'kategoriOrder', 'kategoris'
+    ));
 }
+
 
 
 
@@ -253,7 +271,7 @@ public function addToCart(Request $request)
 
     return response()->json([
         'status' => 'success',
-        'message' => 'Menu "' . $menu->nama_menu . '" berhasil ditambahkan ke keranjang!',
+        'message' => 'Menu "' . $menu->nama_menu . '"',
         'cart' => $cart,
         'new_stok' => max(0, $newStok),
     ]);

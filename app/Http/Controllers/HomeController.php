@@ -50,6 +50,7 @@ class HomeController extends Controller
         $orders = Order::paginate(10);
         $detailOrders = DetailOrder::paginate(10);
 
+        // Kirim juga $reports ke view
         return view('dashboard.index', compact(
             'menus', 
             'orders', 
@@ -58,7 +59,8 @@ class HomeController extends Controller
             'totalPendapatan', 
             'totalKomisi', 
             'totalKeuntungan',
-            'lowStockMenus'
+            'lowStockMenus',
+            'reports'  // << ini yang kamu butuhkan
         ));
     }
 }

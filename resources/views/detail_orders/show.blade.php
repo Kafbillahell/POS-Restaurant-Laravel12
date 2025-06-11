@@ -216,7 +216,7 @@
 
     {{-- Barcode (optional) --}}
     <div class="text-center mb-2">
-        <img src="https://barcode.tec-it.com/barcode.ashx?data={{ $order->id }}&code=Code128&dpi=96" alt="Barcode">
+       <img src="{{ url('/barcode/' . $order->id) }}" alt="Barcode">
     </div>
 
     <div class="text-center">
