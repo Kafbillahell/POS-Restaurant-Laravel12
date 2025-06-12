@@ -12,12 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('members', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama');
-            $table->string('email')->unique();
-            $table->string('no_telp');
-            $table->timestamps();
-        });
+    $table->id();
+    $table->string('nama');
+    $table->string('email')->unique();
+    $table->string('no_telp');
+    $table->integer('points')->default(0); // kolom untuk menyimpan poin
+    $table->timestamps();
+});
+
         
     }
 

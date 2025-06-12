@@ -11,37 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('orders', function (Blueprint $table) {
-            $table->id(); // Kolom id
-            
-            // Bisa nullable karena kita akan pakai kolom detail_order untuk banyak menu
-            $table->unsignedBigInteger('menu_id')->nullable(); 
+        Schema::create('detail_orders', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('order_id')->constrained()->onDelete('cascade');
+    $table->foreignId('menu_id')->constrained()->onDelete('cascade');
+    $table->string('nama_menu');    // Backup nama menu
+    $table->integer('harga_menu');  // Backup harga menu
+    $table->integer('jumlah');
+    $table->integer('subtotal');
+    $table->timestamps();
+    $table->softDeletes();
+});
 
-            // Bisa nullable juga, kalau kamu simpan data menu di detail_order JSON
-            $table->string('nama_menu')->nullable();
-            $table->decimal('harga_menu', 10, 2)->nullable();
-            $table->string('gambar_menu')->nullable();
-
-            $table->string('nama_pemesan'); // Nama pemesan
-            $table->string('nama_kasir'); // Nama kasir
-
-            $table->decimal('total_harga', 15, 2)->default(0); // Total harga pesanan
-            $table->decimal('jumlah_bayar', 15, 2)->default(0); // Jumlah bayar
-            $table->decimal('kembalian', 15, 2)->default(0); // Kembalian
-
-            // Kolom JSON untuk menyimpan detail menu dan jumlahnya
-            $table->json('detail_order')->nullable();
-
-            $table->unsignedBigInteger('user_id');
-
-            $table->timestamps();
-
-            // Foreign key untuk user_id
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-
-            // Foreign key untuk menu_id, nullable, jadi tidak wajib
-            $table->foreign('menu_id')->references('id')->on('menus')->onDelete('cascade');
-        });
     }
 
     /**
@@ -49,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('orders');
+        Schema::dropIfExists('detail_orders');
     }
 };

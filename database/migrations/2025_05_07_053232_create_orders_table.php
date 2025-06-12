@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id(); // Kolom id
-            
+
             // Bisa nullable karena kita akan pakai kolom detail_order untuk banyak menu
-            $table->unsignedBigInteger('menu_id')->nullable(); 
+            $table->unsignedBigInteger('menu_id')->nullable();
 
             // Bisa nullable juga, kalau kamu simpan data menu di detail_order JSON
             $table->string('nama_menu')->nullable();
@@ -26,6 +26,9 @@ return new class extends Migration
             $table->string('nama_kasir'); // Nama kasir
 
             $table->decimal('jumlah_bayar', 10, 2)->default(0); // Jumlah bayar
+
+            // Menambahkan kolom kembalian
+           $table->decimal('kembalian', 10, 2)->nullable();
 
             // Kolom JSON untuk menyimpan detail menu dan jumlahnya
             $table->json('detail_order')->nullable();
@@ -50,3 +53,4 @@ return new class extends Migration
         Schema::dropIfExists('orders');
     }
 };
+

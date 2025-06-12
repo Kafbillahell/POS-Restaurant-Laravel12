@@ -302,14 +302,17 @@
                                                 class="btn btn-warning btn-sm rounded-pill px-3 btn-action">
                                                 <i class="bi bi-pencil-square"></i> Edit
                                             </a>
-                                            <form action="{{ route('menus.destroy', $menu->id) }}" method="POST" class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="btn btn-danger btn-sm rounded-pill px-3 btn-action"
-                                                    onclick="return confirm('Hapus menu ini?')">
-                                                    <i class="bi bi-trash"></i> Hapus
-                                                </button>
-                                            </form>
+                          <form action="{{ route('menus.destroy', $menu->id) }}" method="POST" class="delete-form d-inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="button" class="btn btn-danger btn-sm rounded-pill px-3 btn-action delete-button">
+                                <i class="bi bi-trash"></i> Hapus
+                            </button>
+                        </form> 
+
+
+
+
                                         @endif
                                     </td>
                                 </tr>
@@ -353,9 +356,13 @@
 @endsection
 
 @section('scripts')
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Toast muncul dan hilang otomatis
+
+            // ✅ Toast muncul otomatis lalu menghilang
             const toast = document.getElementById('successToast');
             if (toast) {
                 toast.classList.add('show');
@@ -364,7 +371,7 @@
                 }, 3500);
             }
 
-            // Animasi fade-in kartu menu user (delay stagger)
+            // ✅ Animasi fade-in kartu menu (khusus user view)
             const cards = document.querySelectorAll('#menuCards .card');
             cards.forEach((card, i) => {
                 card.style.opacity = 0;
@@ -375,6 +382,45 @@
                     card.style.transform = 'translateY(0)';
                 }, i * 150);
             });
+
+            // ✅ SweetAlert konfirmasi sebelum hapus
+            const deleteButtons = document.querySelectorAll('.delete-button');
+
+            if (deleteButtons.length === 0) {
+                console.warn('Tidak ditemukan tombol dengan class .delete-button');
+            }
+
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    const form = this.closest('form');
+
+                    if (!form) {
+                        console.error('Form tidak ditemukan untuk tombol hapus ini');
+                        return;
+                    }
+
+                    Swal.fire({
+                        title: 'Yakin ingin menghapus menu ini?',
+                        text: 'Data yang dihapus tidak bisa dikembalikan!',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Ya, hapus!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            console.log('Mengirim form...');
+                            form.submit();
+                        } else {
+                            console.log('Penghapusan dibatalkan');
+                        }
+                    });
+                });
+            });
         });
     </script>
 @endsection
+

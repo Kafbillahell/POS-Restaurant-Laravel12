@@ -158,11 +158,12 @@
 </style>
 @endsection
 
+
 @section('content')
 <div class="struk-container">
     <div class="struk-header">
         <img src="{{ asset('assets/images/logo-icon.png') }}" alt="Logo Perusahaan">
-        <div><strong> KAFFE</strong></div>
+        <div><strong>KAFFE</strong></div>
         <div>Jl. Juanda no.17, Cianjur</div>
         <div>Telp: 0895-0768-6298</div>
     </div>
@@ -181,42 +182,30 @@
     <hr>
 
     <ul class="menu-list">
-        @foreach ($order->detailOrders as $detailOrder)
-            <li>
-                {{ $detailOrder->menu->nama_menu ?? '-' }} x {{ $detailOrder->jumlah }}
-                <span>
-                    Rp{{ number_format(($detailOrder->menu->harga ?? 0) * $detailOrder->jumlah, 0, ',', '.') }}
-                </span>
+        @foreach ($order->detailOrders()->withTrashed()->get() as $detailOrder)
+            <li @if($detailOrder->trashed()) style="text-decoration: line-through; color: red;" @endif>
+                {{ $detailOrder->nama_menu ?? '-' }} x {{ $detailOrder->jumlah }}
+                <span>Rp{{ number_format(($detailOrder->harga_menu ?? 0) * $detailOrder->jumlah, 0, ',', '.') }}</span>
             </li>
         @endforeach
     </ul>
 
     <div class="total-line">
         <p><strong>Subtotal:</strong>
-            <span style="float: right;">
-                Rp{{ number_format($order->detailOrders->sum(function($d) {
-                    return ($d->menu->harga ?? 0) * $d->jumlah;
-                }), 0, ',', '.') }}
-            </span>
+            <span>Rp{{ number_format($order->detailOrders->sum(fn($d) => ($d->harga_menu ?? 0) * $d->jumlah), 0, ',', '.') }}</span>
         </p>
         <p><strong>Jumlah Bayar:</strong>
-            <span style="float: right;">
-                Rp{{ number_format($order->jumlah_bayar ?? 0, 0, ',', '.') }}
-            </span>
+            <span>Rp{{ number_format($order->jumlah_bayar ?? 0, 0, ',', '.') }}</span>
         </p>
-       <p><strong>Kembalian:</strong>
-    <span style="float: right;">
-        Rp{{ number_format($order->kembalian, 0, ',', '.') }}
-    </span>
+        <p><strong>Kembalian:</strong>
+            <span>Rp{{ number_format($order->kembalian ?? 0, 0, ',', '.') }}</span>
         </p>
-
     </div>
 
     <hr>
 
-    {{-- Barcode (optional) --}}
     <div class="text-center mb-2">
-       <img src="{{ url('/barcode/' . $order->id) }}" alt="Barcode">
+        <img src="{{ url('/barcode/' . $order->id) }}" alt="Barcode">
     </div>
 
     <div class="text-center">

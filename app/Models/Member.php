@@ -9,13 +9,16 @@ class Member extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nama', 'email', 'no_telp'];
-    public function orders()
-{
-    return $this->hasMany(Order::class);
-}
+    protected $fillable = [
+        'nama',
+        'email',
+        'no_telp',
+        'points',
+    ];
 
-    
-    
-
+    // Contoh relasi jika ingin menghubungkan ke reservasi:
+    public function reservasis()
+    {
+        return $this->hasMany(Reservasi::class);
+    }
 }

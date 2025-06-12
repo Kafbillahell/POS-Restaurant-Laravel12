@@ -9,11 +9,18 @@ class Reservasi extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['member_id', 'tanggal_reservasi', 'jumlah_orang', 'catatan'];
+    protected $fillable = [
+        'member_id',
+        'nama_pemesan',
+        'no_telp',
+        'tanggal_reservasi',
+        'jumlah_orang',
+        'down_payment',
+        'status',
+    ];
 
     public function member()
     {
         return $this->belongsTo(Member::class);
     }
 }
-    

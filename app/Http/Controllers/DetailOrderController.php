@@ -8,21 +8,20 @@ use Illuminate\Http\Request;
 class DetailOrderController extends Controller
 {
     public function index()
-{
-    $user = auth()->user();
+    {
+        $user = auth()->user();
 
-    $detailOrders = DetailOrder::with(['order', 'menu'])
-        ->when($user->role === 'kasir', function ($query) use ($user) {
-            $query->whereHas('order', function ($q) use ($user) {
-                $q->where('user_id', $user->id);
-            });
-        })
-        ->latest()
-        ->get();
+        $detailOrders = DetailOrder::with(['order', 'menu'])
+            ->when($user->role === 'kasir', function ($query) use ($user) {
+                $query->whereHas('order', function ($q) use ($user) {
+                    $q->where('user_id', $user->id);
+                });
+            })
+            ->latest()
+            ->get();
 
-    return view('detail_orders.index', compact('detailOrders'));
-}
-
+        return view('detail_orders.index', compact('detailOrders'));
+    }
 
     public function show($id)
     {
@@ -31,8 +30,7 @@ class DetailOrderController extends Controller
         return view('detail_orders.show', compact('detailOrder'));
     }
 
-    // Menonaktifkan create, store, edit, update, destroy
-
+    // Nonaktifkan metode CRUD yang tidak digunakan
     public function create()
     {
         abort(403, 'Akses tidak diizinkan.');

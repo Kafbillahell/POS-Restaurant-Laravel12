@@ -10,18 +10,18 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {   
+    {
         Schema::create('reservasis', function (Blueprint $table) {
-        $table->id();
-        $table->unsignedBigInteger('member_id');
-        $table->dateTime('tanggal_reservasi');
-        $table->integer('jumlah_orang');
-        $table->text('catatan')->nullable();
-        $table->timestamps();
-    
-        $table->foreign('member_id')->references('id')->on('members')->onDelete('cascade');
-    });
-    
+            $table->id();
+            $table->foreignId('member_id')->nullable()->constrained('members')->nullOnDelete();
+            $table->string('nama_pemesan')->nullable(); // Opsional, isi kalau bukan member
+            $table->string('no_telp');
+            $table->dateTime('tanggal_reservasi');
+            $table->integer('jumlah_orang');
+            $table->decimal('down_payment', 10, 2)->default(0); // uang muka / DP
+            $table->enum('status', ['pending', 'confirmed', 'completed', 'canceled'])->default('pending');
+            $table->timestamps();
+        });
     }
 
     /**

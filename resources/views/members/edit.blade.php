@@ -2,25 +2,28 @@
 
 @section('content')
 <div class="container">
-    <h1 class="mb-4">Edit Member</h1>
+    <h1>Edit Member</h1>
 
-    <form action="{{ route('members.update', $member->id) }}" method="POST">
-        @csrf
-        @method('PUT')
+    <form action="{{ route('members.update', $member) }}" method="POST">
+        @csrf @method('PUT')
+
         <div class="mb-3">
-            <label for="nama">Nama</label>
+            <label>Nama</label>
             <input type="text" name="nama" class="form-control" value="{{ old('nama', $member->nama) }}" required>
         </div>
+
         <div class="mb-3">
-            <label for="email">Email</label>
+            <label>Email</label>
             <input type="email" name="email" class="form-control" value="{{ old('email', $member->email) }}" required>
         </div>
+
         <div class="mb-3">
-            <label for="no_telp">No. Telp</label>
+            <label>No Telepon</label>
             <input type="text" name="no_telp" class="form-control" value="{{ old('no_telp', $member->no_telp) }}" required>
         </div>
-        <button type="submit" class="btn btn-success">Update</button>
-        <a href="{{ route('members.index') }}" class="btn btn-secondary">Batal</a>
+
+        <button type="submit" class="btn btn-primary">Update</button>
+        <a href="{{ route('members.index') }}" class="btn btn-secondary">Kembali</a>
     </form>
 </div>
 @endsection

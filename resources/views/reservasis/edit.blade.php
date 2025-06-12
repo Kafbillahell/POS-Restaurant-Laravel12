@@ -2,17 +2,18 @@
 
 @section('content')
 <div class="container">
-    <h1 class="mb-4">Edit Reservasi</h1>
+    <h1 class="mb-3">Edit Reservasi</h1>
 
-    <form action="{{ route('reservasis.update', $reservasi->id) }}" method="POST">
+    <form action="{{ route('reservasis.update', $reservasi) }}" method="POST">
         @csrf
         @method('PUT')
 
         <div class="mb-3">
-            <label>Member</label>
-            <select name="member_id" class="form-control" required>
-                @foreach($members as $member)
-                    <option value="{{ $member->id }}" {{ $reservasi->member_id == $member->id ? 'selected' : '' }}>
+            <label for="member_id" class="form-label">Member (Opsional)</label>
+            <select name="member_id" id="member_id" class="form-select">
+                <option value="">- Tidak ada -</option>
+                @foreach ($members as $member)
+                    <option value="{{ $member->id }}" {{ old('member_id', $reservasi->member_id) == $member->id ? 'selected' : '' }}>
                         {{ $member->nama }}
                     </option>
                 @endforeach
@@ -20,21 +21,41 @@
         </div>
 
         <div class="mb-3">
-            <label>Tanggal Reservasi</label>
-            <input type="datetime-local" name="tanggal_reservasi" class="form-control" value="{{ \Carbon\Carbon::parse($reservasi->tanggal_reservasi)->format('Y-m-d\TH:i') }}" required>
+            <label for="nama_pemesan" class="form-label">Nama Pemesan</label>
+            <input type="text" name="nama_pemesan" id="nama_pemesan" class="form-control" value="{{ old('nama_pemesan', $reservasi->nama_pemesan) }}">
         </div>
 
         <div class="mb-3">
-            <label>Jumlah Orang</label>
-            <input type="number" name="jumlah_orang" class="form-control" value="{{ $reservasi->jumlah_orang }}" required>
+            <label for="no_telp" class="form-label">Nomor Telepon</label>
+            <input type="text" name="no_telp" id="no_telp" class="form-control" value="{{ old('no_telp', $reservasi->no_telp) }}">
         </div>
 
         <div class="mb-3">
-            <label>Catatan</label>
-            <textarea name="catatan" class="form-control">{{ $reservasi->catatan }}</textarea>
+            <label for="tanggal_reservasi" class="form-label">Tanggal & Waktu Reservasi</label>
+            <input type="datetime-local" name="tanggal_reservasi" id="tanggal_reservasi" class="form-control" value="{{ old('tanggal_reservasi', \Carbon\Carbon::parse($reservasi->tanggal_reservasi)->format('Y-m-d\TH:i')) }}">
         </div>
 
-        <button type="submit" class="btn btn-success">Update</button>
+        <div class="mb-3">
+            <label for="jumlah_orang" class="form-label">Jumlah Orang</label>
+            <input type="number" name="jumlah_orang" id="jumlah_orang" class="form-control" value="{{ old('jumlah_orang', $reservasi->jumlah_orang) }}">
+        </div>
+
+        <div class="mb-3">
+            <label for="down_payment" class="form-label">Down Payment (DP)</label>
+            <input type="number" name="down_payment" id="down_payment" class="form-control" value="{{ old('down_payment', $reservasi->down_payment) }}" step="0.01">
+        </div>
+
+        <div class="mb-3">
+            <label for="status" class="form-label">Status</label>
+            <select name="status" id="status" class="form-select">
+                <option value="pending" {{ old('status', $reservasi->status) == 'pending' ? 'selected' : '' }}>Pending</option>
+                <option value="confirmed" {{ old('status', $reservasi->status) == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
+                <option value="completed" {{ old('status', $reservasi->status) == 'completed' ? 'selected' : '' }}>Completed</option>
+                <option value="canceled" {{ old('status', $reservasi->status) == 'canceled' ? 'selected' : '' }}>Canceled</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update</button>
         <a href="{{ route('reservasis.index') }}" class="btn btn-secondary">Batal</a>
     </form>
 </div>

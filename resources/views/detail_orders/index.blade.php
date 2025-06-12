@@ -252,38 +252,41 @@
 
 @section('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Auto dismiss alert success setelah 3 detik
-        const alertSuccess = document.getElementById('success-alert');
-        if (alertSuccess) {
-            setTimeout(() => {
-                const alert = bootstrap.Alert.getOrCreateInstance(alertSuccess);
-                alert.close();
-            }, 3000);
-        }
+   document.addEventListener('DOMContentLoaded', function() {
+    // Auto dismiss alert success setelah 3 detik
+    const alertSuccess = document.getElementById('success-alert');
+    if (alertSuccess) {
+        setTimeout(() => {
+            const alert = bootstrap.Alert.getOrCreateInstance(alertSuccess);
+            alert.close();
+        }, 3000);
+    }
 
-        // Konfirmasi sebelum membuka halaman detail order, dengan efek animasi klik
-        const detailButtons = document.querySelectorAll('.btn-detail');
-        detailButtons.forEach(button => {
-            button.addEventListener('mousedown', () => {
-                button.style.transform = 'scale(0.96)';
-                button.style.boxShadow = '0 0 0 3px #38b6ff30';
-            });
-            button.addEventListener('mouseup', () => {
-                button.style.transform = '';
-                button.style.boxShadow = '';
-            });
-            button.addEventListener('mouseleave', () => {
-                button.style.transform = '';
-                button.style.boxShadow = '';
-            });
-            button.addEventListener('click', function(event) {
-                const confirmed = confirm('Apakah Anda yakin ingin melihat detail order ini?');
-                if (!confirmed) {
-                    event.preventDefault();
-                }
-            });
+    // Konfirmasi sebelum membuka halaman detail order, dengan efek animasi klik
+    const detailButtons = document.querySelectorAll('.btn-detail');
+    detailButtons.forEach(button => {
+        button.addEventListener('mousedown', () => {
+            button.style.transform = 'scale(0.96)';
+            button.style.boxShadow = '0 0 0 3px #38b6ff30';
+        });
+        button.addEventListener('mouseup', () => {
+            button.style.transform = '';
+            button.style.boxShadow = '';
+        });
+        button.addEventListener('mouseleave', () => {
+            button.style.transform = '';
+            button.style.boxShadow = '';
+        });
+
+        // Menghapus konfirmasi sebelum membuka halaman detail order
+        button.removeEventListener('click', function(event) {
+            const confirmed = confirm('Apakah Anda yakin ingin melihat detail order ini?');
+            if (!confirmed) {
+                event.preventDefault();
+            }
         });
     });
+});
+
 </script>
 @endsection

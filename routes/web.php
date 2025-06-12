@@ -115,6 +115,6 @@ Route::get('/orders/cart/reload', function () {
 Route::get('/orders/{id}/print', [OrderController::class, 'print'])->name('orders.print');
 Route::post('/orders/cart/reset', [OrderController::class, 'resetCart'])->name('orders.cart.reset');
 Route::get('/orders/{order}/struk', [OrderController::class, 'struk'])->name('orders.struk');
-
+Route::get('/check-member', [OrderController::class, 'checkMember'])->name('orders.checkMember');
 
 
