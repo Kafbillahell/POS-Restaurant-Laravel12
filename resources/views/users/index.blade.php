@@ -168,9 +168,10 @@
                         <form action="{{ route('users.destroy', $user) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3 shadow-sm" onclick="return confirm('Yakin ingin menghapus user ini?')">
-                                <i class="bi bi-trash3-fill"></i> Hapus
-                            </button>
+                           <button type="button" class="btn btn-danger btn-sm rounded-pill px-3 shadow-sm btn-delete-user" data-id="{{ $user->id }}" data-name="{{ $user->name }}">
+    <i class="bi bi-trash3-fill"></i> Hapus
+</button>
+
                         </form>
                     </td>
                 </tr>
@@ -192,4 +193,40 @@
 </div>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 @endif
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const deleteButtons = document.querySelectorAll('.btn-delete-user');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const userId = this.getAttribute('data-id');
+                const userName = this.getAttribute('data-name');
+
+                Swal.fire({
+                    title: 'Yakin hapus user?',
+                    html: `User <strong>${userName}</strong> akan dihapus.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Ya, Hapus!',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = `/users/${userId}`;
+                        form.innerHTML = `
+                            @csrf
+                            @method('DELETE')
+                        `;
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+            });
+        });
+    });
+</script>
+
 @endsection
