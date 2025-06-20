@@ -293,14 +293,14 @@
                 Detail Pesanan
             </a>
         </div>
-        <!-- Lihat Menu -->
+        <!-- Lihat Menu
         <div class="action-card action-glass" onclick="cardRipple(this)">
             <div class="action-icon bg3"><i data-feather="book-open"></i></div>
             <h5>Lihat Menu</h5>
             <a href="{{ route('menus.index') }}">
                 Lihat Menu
             </a>
-        </div>
+        </div> -->
         <!-- Cetak Struk -->
         <div class="action-card action-glass" onclick="cardRipple(this)">
             <div class="action-icon bg4"><i data-feather="printer"></i></div>

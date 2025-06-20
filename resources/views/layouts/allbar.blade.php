@@ -91,7 +91,7 @@
     </header>
 
     <!-- Sidebar -->
-    <aside class="left-sidebar" data-sidebarbg="skin6">
+   <aside class="left-sidebar" data-sidebarbg="skin6">
     <div class="scroll-sidebar" data-sidebarbg="skin6">
         <nav class="sidebar-nav">
             <ul id="sidebarnav">
@@ -120,7 +120,6 @@
                             <span class="hide-menu">Report</span>
                         </a>
                     </li>
-                @elseif($role === 'kasir')
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ route('kategoris.index') }}">
                             <i data-feather="layers" class="feather-icon"></i>
@@ -133,6 +132,7 @@
                             <span class="hide-menu">Menus</span>
                         </a>
                     </li>
+                @elseif($role === 'kasir')
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ route('orders.index') }}">
                             <i data-feather="shopping-cart" class="feather-icon"></i>
@@ -150,6 +150,7 @@
         </nav>
     </div>
 </aside>
+
 
 
 </div>
