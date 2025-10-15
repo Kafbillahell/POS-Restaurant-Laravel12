@@ -61,6 +61,56 @@
             @endphp
 
             <style>
+
+              .btn-add-cart-loading {
+    /* ... styling yang sudah ada ... */
+    background-color: #f0f0f0 !important;
+    border-color: #ccc !important;
+    color: transparent !important; /* Sembunyikan teks '+ Keranjang' */
+    cursor: wait !important;
+    /* Tambahkan style untuk menampung spinner */
+    position: relative;
+    overflow: hidden; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ---------------------------------- */
+/* D. Styling Animasi 5 Balok Menyamping */
+/* ---------------------------------- */
+.loader-bars {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2px; /* Jarak antar balok */
+}
+
+.loader-bars div {
+    width: 4px; /* Lebar setiap balok */
+    height: 60%; /* Tinggi balok */
+    background-color: #333; /* Warna balok, sesuai dengan border tombol default */
+    border-radius: 1px;
+    animation: scale-up 1s infinite ease-in-out; /* Nama animasi, durasi, perulangan, kurva */
+}
+
+/* Jeda animasi untuk efek berurutan */
+.loader-bars div:nth-child(2) { animation-delay: -0.8s; }
+.loader-bars div:nth-child(3) { animation-delay: -0.6s; }
+.loader-bars div:nth-child(4) { animation-delay: -0.4s; }
+.loader-bars div:nth-child(5) { animation-delay: -0.2s; }
+
+@keyframes scale-up {
+    0%, 40%, 100% {
+        transform: scaleY(0.4); /* Kecilkan di awal dan akhir */
+    }
+    20% {
+        transform: scaleY(1.0); /* Besarkan di puncak */
+    }
+}
                 /* Section kategori dengan garis bawah tipis dan spacing nyaman */
                 .category-section {
                     border-bottom: 1px solid #ccc;
@@ -186,42 +236,6 @@
                 }
             </style>
 
-            {{-- Loop kategori --}}
-            <!-- @foreach ($kategoriOrder as $kategori)
-                @if(isset($menusGrouped[$kategori]) && $menusGrouped[$kategori]->count() > 0)
-                    <section class="category-section ">
-                        <h3>{{ $kategori }}</h3>
-                        <div class="d-flex flex-wrap gap-4 justify-content-start">
-                            @foreach ($menusGrouped[$kategori] as $menu)
-                                <div class="card-menu">
-                                    @if($menu->gambar)
-                                        <img src="{{ asset('storage/' . $menu->gambar) }}" alt="{{ $menu->nama_menu }}">
-                                    @else
-                                        <div class="no-image-placeholder">No Image</div>
-                                    @endif
-                                    <div class="card-body">
-                                        <div>
-                                            <div class="kategori-label">{{ $menu->kategori->nama_kategori ?? '-' }}</div>
-                                            <h5 class="card-title">{{ $menu->nama_menu }}</h5>
-                                        </div>
-                                        <div>
-                                            <div class="price">Rp {{ number_format($menu->harga, 0, ',', '.') }}</div>
-                                            @if($menu->stok > 0)
-                                                <button class="btn btn-add-cart add-to-cart-btn" data-id="{{ $menu->id }}">+
-                                                    Keranjang</button>
-                                            @else
-                                                <button class="btn btn-disabled" disabled>Stock Habis</button>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </section>
-                @endif
-            @endforeach -->
-
-            {{-- Kategori lain --}}
     <div id="menu-container">
     @foreach ($menusGrouped as $kategori => $menusInGroup)
         @if(!in_array($kategori, $kategoriOrder))
@@ -272,12 +286,6 @@
 @if ($menus->count() === 0)
     <p>Tidak ada menu ditemukan.</p>
 @endif
-
-
-
-
-
-
 
             {{-- Sidebar Keranjang (kanan) --}}
       <style>
@@ -368,8 +376,6 @@
   </div>
 </div>
 
-
-
 @endsection
 
         <style>
@@ -378,10 +384,8 @@
                 display: none !important;
             }
         </style>
-
        @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const shownAlerts = new Set();
@@ -485,94 +489,123 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  async function sendUpdate(menuId, route) {
-    try {
-      const res = await fetch(route, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify({ menu_id: menuId })
-      });
-      const data = await res.json();
-
-      if (data.status === 'success') {
-        updateCartUI(data.cart);
-        if (typeof data.new_stok !== 'undefined') {
-          updateStockInCard(menuId, data.new_stok);
+  function setButtonState(menuId, state) { // state: true (loading), false (done)
+    const button = document.querySelector(`.add-to-cart-btn[data-id="${menuId}"]`);
+    if (button) {
+        button.disabled = state;
+        
+        if (state) {
+            // State: LOADING
+            button.classList.add('btn-add-cart-loading');
+            
+            // Tambahkan elemen HTML untuk animasi 5 Balok
+            button.innerHTML = `
+                <div class="loader-bars">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            `;
+            
+        } else {
+            // State: DONE
+            button.classList.remove('btn-add-cart-loading');
+            button.textContent = '+ Keranjang'; // Kembalikan teks asli
         }
-      } else {
-        Swal.fire({ icon: 'error', title: 'Gagal!', text: data.message });
-        updateCartUI(data.cart || {});
-      }
-    } catch {
-      Swal.fire({ icon: 'error', title: 'Gagal!', text: 'Terjadi kesalahan jaringan.' });
-      updateCartUI(cartState);
     }
-  }
+}
+
+async function sendUpdate(menuId, route, isCardAction = false) {
+    if (isCardAction) {
+        setButtonState(menuId, true); // Nonaktifkan tombol saat memulai proses
+    }
+
+    try {
+        const res = await fetch(route, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ menu_id: menuId })
+        });
+        const data = await res.json();
+
+        if (data.status === 'success') {
+            // Update cart UI dan Stock dengan data dari server (Source of Truth)
+            updateCartUI(data.cart); 
+            if (typeof data.new_stok !== 'undefined') {
+                updateStockInCard(menuId, data.new_stok);
+            }
+        } else {
+            Swal.fire({ icon: 'error', title: 'Gagal!', text: data.message });
+            // Rollback UI (Sinkronisasi ulang)
+            updateCartUI(data.cart || {}); 
+            // Jika gagal, ambil stok terbaru dari server (atau biarkan server mengirim stok terbaru)
+            if (typeof data.new_stok !== 'undefined') {
+                updateStockInCard(menuId, data.new_stok);
+            }
+        }
+    } catch {
+        Swal.fire({ icon: 'error', title: 'Gagal!', text: 'Terjadi kesalahan jaringan.' });
+        // Jika gagal total, paksa sinkronisasi dengan keadaan keranjang terakhir yang diketahui 
+        // atau minta server untuk mengirimkan ulang state cart (jika diperlukan)
+        // Untuk saat ini, kita biarkan cartState tetap.
+        updateCartUI(cartState); 
+    } finally {
+        if (isCardAction) {
+            // Aktifkan kembali tombol setelah proses selesai (sukses/gagal)
+            setButtonState(menuId, false); 
+        }
+    }
+}
 
   // Event tombol tambah/kurang di keranjang
   document.getElementById('cart-list').addEventListener('click', e => {
     if (e.target.classList.contains('btn-increase') || e.target.classList.contains('btn-decrease')) {
-      const menuId = e.target.getAttribute('data-id');
-      const isIncrease = e.target.classList.contains('btn-increase');
-      const route = isIncrease
-        ? "{{ route('orders.cart.add') }}"
-        : "{{ route('orders.cart.remove') }}";
+        const menuId = e.target.getAttribute('data-id');
+        const isIncrease = e.target.classList.contains('btn-increase');
+        const route = isIncrease
+          ? "{{ route('orders.cart.add') }}"
+          : "{{ route('orders.cart.remove') }}";
 
-      optimisticUpdate(menuId, isIncrease ? 1 : -1);
-      sendUpdate(menuId, route);
+        // Tambahkan atribut 'disabled' saat loading di tombol cart (optional)
+        e.target.disabled = true; 
+        
+        // Cukup panggil sendUpdate, biarkan server yang menjadi sumber kebenaran.
+        sendUpdate(menuId, route).finally(() => {
+            e.target.disabled = false;
+        }); 
     }
-  });
+});
 
   // Event tombol tambah ke keranjang dari card menu
   document.body.addEventListener('click', e => {
-    if (e.target.classList.contains('add-to-cart-btn')) {
-      const menuId = e.target.getAttribute('data-id');
-      const buttonEl = e.target;
+    if (e.target.classList.contains('add-to-cart-btn') && !e.target.disabled) { // Cek disabled
+        const menuId = e.target.getAttribute('data-id');
+        const buttonEl = e.target;
 
-      optimisticUpdate(menuId, 1);
-
-      fetch("{{ route('orders.cart.add') }}", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify({ menu_id: menuId })
-      }).then(res => res.json())
-        .then(data => {
-          if (data.status === 'success') {
-            updateCartUI(data.cart);
-
-            const card = buttonEl.closest('.card-menu');
-            const stokEl = card?.querySelector('.stok-value');
-            if (stokEl && typeof data.new_stok !== 'undefined') {
-              stokEl.textContent = `Stok: ${data.new_stok}`;
-              if (data.new_stok <= 0) {
-                buttonEl.outerHTML = `<button class="btn btn-disabled" disabled>Stok Habis</button>`;
-              }
-            }
-
-            if (!shownAlerts.has(menuId)) {
-              shownAlerts.add(menuId);
-              Swal.fire({
-                icon: 'success',
-                title: 'Berhasil!',
-                text: data.message,
-                showConfirmButton: false,
-                timer: 990,
-                timerProgressBar: true
-              });
-            }
-          } else {
-            Swal.fire({ icon: 'error', title: 'Gagal!', text: data.message });
-            updateCartUI(data.cart || {});
-          }
-        });
+        // **Hapus optimisticUpdate(menuId, 1);**
+        
+        sendUpdate(menuId, "{{ route('orders.cart.add') }}", true)
+            .then(data => {
+                // Tampilkan Swal hanya jika sukses dan belum pernah ditampilkan
+                if (data && data.status === 'success' && !shownAlerts.has(menuId)) {
+                    shownAlerts.add(menuId);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: data.message,
+                        showConfirmButton: false,
+                        timer: 990,
+                        timerProgressBar: true
+                    });
+                }
+            });
     }
-  });
+});
 
   // Filter pencarian dan kategori
   function fetchFilteredMenus() {
@@ -630,10 +663,4 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
-
-
-
-
-
-
 @endpush
