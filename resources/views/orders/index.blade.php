@@ -224,8 +224,8 @@
         
         {{-- Tombol Tambah (+) / Awalnya Tombol 'Tambah ke Keranjang' --}}
         <button class="btn btn-dark flex-fill rounded-pill shadow-sm px-4 btn-quantity-card add-to-cart-initial" data-action="increase" data-id="{{ $menu->id }}" style="font-weight:600; width:100%;">
-    <i class="bi bi-cart-plus me-1"></i> + Keranjang
-</button>
+            <i class="bi bi-cart-plus me-1"></i> + Keranjang
+        </button>
 
         {{-- Ini untuk menggantikan tombol besar +Keranjang setelah diklik pertama kali --}}
         <button class="btn btn-sm btn-outline-success px-2 btn-quantity-card" data-action="increase" data-id="{{ $menu->id }}" style="display:none; width:30px; height:30px; border-radius: 50%;">
@@ -319,7 +319,6 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
                                         <strong>{{ $item['nama_menu'] }}</strong>
-                                        {{-- ✅ INI YANG DIUBAH: HANYA MENAMPILKAN KUANTITAS --}}
                                         <span class="mx-2">x{{ $item['quantity'] }}</span> 
                                     </div>
                                     <span>Rp {{ number_format($item['harga'] * $item['quantity'], 0, ',', '.') }}</span>
@@ -482,13 +481,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const totalEl = document.getElementById('cart-subtotal');
             if (totalEl) {
                  totalEl.textContent = subtotal.toLocaleString('id-ID', {
-                    style: 'currency',
-                    currency: 'IDR'
-                });
+                     style: 'currency',
+                     currency: 'IDR'
+                 });
             }
 
             checkoutButton.classList.remove('btn-secondary', 'disabled');
-            checkoutButton.classList.add('btn-primary');
+            checkoutButton.classList.add('btn-success'); 
             checkoutButton.setAttribute('href', "{{ route('orders.create') }}");
         }
         
