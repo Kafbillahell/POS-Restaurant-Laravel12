@@ -711,7 +711,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCartUI(cartState);
     }
 });
-</script>
+</script> 
 
 {{-- Pastikan SweetAlert2 memiliki animasi Animate.css untuk smoothness 60fps --}}
 <link
