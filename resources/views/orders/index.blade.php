@@ -43,10 +43,11 @@
                     </select>
                 </div>
                 <div class="col-md-4 d-flex gap-3">
-                    <a href="{{ route('orders.index') }}" class="btn btn-light border flex-fill rounded-pill shadow-sm px-4" style="font-weight:600;">
-                        <i class="bi bi-x-circle"></i> Reset
-                    </a>
-                </div>
+    {{-- Hapus href dan ubah menjadi tombol biasa --}}
+    <button type="button" class="btn btn-light border flex-fill rounded-pill shadow-sm px-4" style="font-weight:600;" id="reset-button">
+        <i class="bi bi-x-circle"></i> Reset
+    </button>
+</div>  
             </form>
 
             {{-- Grouping menu per kategori di view --}}
@@ -308,28 +309,29 @@
             }
             </style>
 
-            <div id="cart-target">
-                <div class="card">
-                    <div class="card-header fs-5">🛒 Keranjang</div>
+             <div id="cart-target">
+        <div class="card">
+            <div class="card-header fs-5">🛒 Keranjang</div>
 
-                    <ul class="list-group list-group-flush" id="cart-list">
-                        @php $cart = session('cart', []); @endphp
-                        @forelse ($cart as $id => $item)
-                            <li class="list-group-item" data-id="{{ $id }}">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <strong>{{ $item['nama_menu'] }}</strong>
-                                        <span class="mx-2">x{{ $item['quantity'] }}</span> 
-                                    </div>
-                                    <span>Rp {{ number_format($item['harga'] * $item['quantity'], 0, ',', '.') }}</span>
-                                </div>
-                            </li>
-                        @empty
-                            <li class="list-group-item text-center text-muted d-flex justify-content-center align-items-center" style="min-height: 200px;">
-                                Keranjang kosong
-                            </li>
-                        @endforelse
-                    </ul>
+            <ul class="list-group list-group-flush" id="cart-list">
+                {{-- JAMINAN KERANJANG SELALU KOSONG DI SISI PHP/SERVER-SIDE PADA HALAMAN INI --}}
+                @php $cart = []; @endphp 
+                @forelse ($cart as $id => $item) 
+                    <li class="list-group-item" data-id="{{ $id }}">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ $item['nama_menu'] }}</strong>
+                                <span class="mx-2">x{{ $item['quantity'] }}</span> 
+                            </div>
+                            <span>Rp {{ number_format($item['harga'] * $item['quantity'], 0, ',', '.') }}</span>
+                        </div>
+                    </li>
+                @empty
+                    <li class="list-group-item text-center text-muted d-flex justify-content-center align-items-center" style="min-height: 200px;">
+                        Keranjang kosong
+                    </li>
+                @endforelse
+            </ul>
 
                     <div id="cart-footer" class="card-footer p-3 border-0">
     <div class="d-flex justify-content-between align-items-center mb-3 px-1">
@@ -647,6 +649,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+
+    const resetButton = document.querySelector('#reset-button');
+if (resetButton) {
+    resetButton.addEventListener('click', (e) => {
+        // e.preventDefault(); // Tidak diperlukan karena sudah <button type="button">
+        
+        if (searchInput) {
+            searchInput.value = ''; // Kosongkan input pencarian
+        }
+        if (kategoriSelect) {
+            kategoriSelect.value = ''; // Pilih opsi "All"
+        }
+        
+        // Panggil fungsi fetchFilteredMenus untuk memuat ulang daftar menu
+        // sesuai dengan filter yang sudah kosong (tanpa refresh)
+        fetchFilteredMenus();
+    });
+}
     // ... (Fungsi fetchFilteredMenus dan reset logic lainnya tetap sama) ...
     function fetchFilteredMenus() {
         const search = searchInput?.value || '';
@@ -703,15 +723,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // Inisialisasi cartState saat DOMContentLoaded
-    @if(session('cart'))
-        Object.assign(cartState, @json(session('cart')));
-    @endif
+   
     
     if (Object.keys(cartState).length > 0) {
         updateCartUI(cartState);
     }
 });
-</script>
+</script> 
 
 {{-- Pastikan SweetAlert2 memiliki animasi Animate.css untuk smoothness 60fps --}}
 <link
