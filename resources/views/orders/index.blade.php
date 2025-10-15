@@ -43,10 +43,11 @@
                     </select>
                 </div>
                 <div class="col-md-4 d-flex gap-3">
-                    <a href="{{ route('orders.index') }}" class="btn btn-light border flex-fill rounded-pill shadow-sm px-4" style="font-weight:600;">
-                        <i class="bi bi-x-circle"></i> Reset
-                    </a>
-                </div>
+    {{-- Hapus href dan ubah menjadi tombol biasa --}}
+    <button type="button" class="btn btn-light border flex-fill rounded-pill shadow-sm px-4" style="font-weight:600;" id="reset-button">
+        <i class="bi bi-x-circle"></i> Reset
+    </button>
+</div>  
             </form>
 
             {{-- Grouping menu per kategori di view --}}
@@ -647,6 +648,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+
+    const resetButton = document.querySelector('#reset-button');
+if (resetButton) {
+    resetButton.addEventListener('click', (e) => {
+        // e.preventDefault(); // Tidak diperlukan karena sudah <button type="button">
+        
+        if (searchInput) {
+            searchInput.value = ''; // Kosongkan input pencarian
+        }
+        if (kategoriSelect) {
+            kategoriSelect.value = ''; // Pilih opsi "All"
+        }
+        
+        // Panggil fungsi fetchFilteredMenus untuk memuat ulang daftar menu
+        // sesuai dengan filter yang sudah kosong (tanpa refresh)
+        fetchFilteredMenus();
+    });
+}
     // ... (Fungsi fetchFilteredMenus dan reset logic lainnya tetap sama) ...
     function fetchFilteredMenus() {
         const search = searchInput?.value || '';
