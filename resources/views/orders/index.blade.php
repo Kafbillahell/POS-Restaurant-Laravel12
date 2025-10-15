@@ -45,9 +45,9 @@
         <!-- <button type="submit" class="btn btn-primary flex-fill rounded-pill shadow-sm px-4" style="font-weight:600;letter-spacing:.01em;">
             <i class="bi bi-search"></i> masukan
         </button> -->
-        <a href="{{ route('orders.index') }}" class="btn btn-light border flex-fill rounded-pill shadow-sm px-4" style="font-weight:600;">
-            <i class="bi bi-x-circle"></i> Reset
-        </a>
+        <button type="button" id="resetFilterButton" class="btn btn-light border flex-fill rounded-pill shadow-sm px-4" style="font-weight:600;">
+    <i class="bi bi-x-circle"></i> Reset
+</button>
     </div>
 </form>
 
@@ -273,12 +273,6 @@
     <p>Tidak ada menu ditemukan.</p>
 @endif
 
-
-
-
-
-
-
             {{-- Sidebar Keranjang (kanan) --}}
       <style>
   #cart-target {
@@ -389,6 +383,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const searchInput = document.querySelector('#search');
   const kategoriSelect = document.querySelector('#kategori');
+
+  const resetFilterButton = document.querySelector('#resetFilterButton'); 
+
+  // Logika untuk tombol Reset Filter
+  if (resetFilterButton) {
+    resetFilterButton.addEventListener('click', () => {
+      // 1. Reset nilai input pencarian dan dropdown ke nilai default
+      searchInput.value = '';
+      kategoriSelect.value = '';
+
+      // 2. Panggil fungsi AJAX untuk mengambil menu yang tidak terfilter
+      fetchFilteredMenus();
+    });
+  }
 
   function updateCartUI(cart) {
     const cartList = document.getElementById('cart-list');
