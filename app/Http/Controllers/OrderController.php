@@ -32,6 +32,10 @@ class OrderController extends Controller
             $query->where('nama_menu', 'like', '%' . $request->search . '%');
         }
 
+        if (!session()->has('success') && !session()->has('error') && !session()->has('menuBaru')) {
+        session()->forget('cart'); // Menjamin session cart bersih saat memuat halaman
+    }
+
         // Filter kategori jika dipilih
         if ($request->has('kategori') && !empty($request->kategori)) {
             $query->whereHas('kategori', function ($q) use ($request) {

@@ -309,28 +309,29 @@
             }
             </style>
 
-            <div id="cart-target">
-                <div class="card">
-                    <div class="card-header fs-5">🛒 Keranjang</div>
+             <div id="cart-target">
+        <div class="card">
+            <div class="card-header fs-5">🛒 Keranjang</div>
 
-                    <ul class="list-group list-group-flush" id="cart-list">
-                        @php $cart = session('cart', []); @endphp
-                        @forelse ($cart as $id => $item)
-                            <li class="list-group-item" data-id="{{ $id }}">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <strong>{{ $item['nama_menu'] }}</strong>
-                                        <span class="mx-2">x{{ $item['quantity'] }}</span> 
-                                    </div>
-                                    <span>Rp {{ number_format($item['harga'] * $item['quantity'], 0, ',', '.') }}</span>
-                                </div>
-                            </li>
-                        @empty
-                            <li class="list-group-item text-center text-muted d-flex justify-content-center align-items-center" style="min-height: 200px;">
-                                Keranjang kosong
-                            </li>
-                        @endforelse
-                    </ul>
+            <ul class="list-group list-group-flush" id="cart-list">
+                {{-- JAMINAN KERANJANG SELALU KOSONG DI SISI PHP/SERVER-SIDE PADA HALAMAN INI --}}
+                @php $cart = []; @endphp 
+                @forelse ($cart as $id => $item) 
+                    <li class="list-group-item" data-id="{{ $id }}">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ $item['nama_menu'] }}</strong>
+                                <span class="mx-2">x{{ $item['quantity'] }}</span> 
+                            </div>
+                            <span>Rp {{ number_format($item['harga'] * $item['quantity'], 0, ',', '.') }}</span>
+                        </div>
+                    </li>
+                @empty
+                    <li class="list-group-item text-center text-muted d-flex justify-content-center align-items-center" style="min-height: 200px;">
+                        Keranjang kosong
+                    </li>
+                @endforelse
+            </ul>
 
                     <div id="cart-footer" class="card-footer p-3 border-0">
     <div class="d-flex justify-content-between align-items-center mb-3 px-1">
@@ -722,9 +723,7 @@ if (resetButton) {
     });
     
     // Inisialisasi cartState saat DOMContentLoaded
-    @if(session('cart'))
-        Object.assign(cartState, @json(session('cart')));
-    @endif
+   
     
     if (Object.keys(cartState).length > 0) {
         updateCartUI(cartState);
