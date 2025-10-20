@@ -525,20 +525,29 @@
                     <p class="text-muted fst-italic mb-0">Tidak ada pemberitahuan stok menipis.</p>
                 @else
                     @foreach($lowStockMenus as $menu)
-                    <div class="d-flex mb-3 align-items-start admin-activity-row">
-                        <div class="me-3 mt-1">
-                            <i data-feather="alert-triangle" class="text-warning" width="24" height="24"></i>
-                        </div>
-                        <div>
-                            <h6 class="mb-1 fw-semibold text-danger">Stok Hampir Habis!</h6>
-                            <p class="mb-0 text-dark">
-                                Menu <strong>{{ $menu->nama_menu }}</strong> hanya tersisa 
-                                <span class="badge bg-warning text-dark">{{ $menu->stok }} pcs</span>
-                            </p>
-                            <small class="text-muted">Segera lakukan restock</small>
-                        </div>
-                    </div>
-                    @endforeach
+<div class="d-flex mb-3 align-items-start admin-activity-row">
+    <div class="me-3 mt-1">
+        <i data-feather="alert-triangle" 
+           class="{{ $menu->stok == 0 ? 'text-danger' : 'text-warning' }}" 
+           width="24" height="24"></i>
+    </div>
+    <div>
+        <h6 class="mb-1 fw-semibold {{ $menu->stok == 0 ? 'text-danger' : 'text-warning' }}">
+            {{ $menu->stok == 0 ? 'Stok Habis!' : 'Stok Hampir Habis!' }}
+        </h6>
+        <p class="mb-0 text-dark">
+            Menu <strong>{{ $menu->nama_menu }}</strong> hanya tersisa 
+            <span class="badge {{ $menu->stok == 0 ? 'bg-danger' : 'bg-warning text-dark' }}">
+                {{ $menu->stok }} pcs
+            </span>
+        </p>
+        <small class="text-muted">
+            {{ $menu->stok == 0 ? 'Segera lakukan restock sekarang!' : 'Segera lakukan restock' }}
+        </small>
+    </div>
+</div>
+@endforeach
+
                 @endif
             </div>
         </div>
