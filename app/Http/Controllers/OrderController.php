@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Member;
+use App\Models\Promo;
 
 use App\Models\Menu;
 use App\Models\User;
@@ -33,8 +34,8 @@ class OrderController extends Controller
         }
 
         if (!session()->has('success') && !session()->has('error') && !session()->has('menuBaru')) {
-        session()->forget('cart'); // Menjamin session cart bersih saat memuat halaman
-    }
+            session()->forget('cart'); // Menjamin session cart bersih saat memuat halaman
+        }
 
         // Filter kategori jika dipilih
         if ($request->has('kategori') && !empty($request->kategori)) {
@@ -45,6 +46,20 @@ class OrderController extends Controller
 
         $menus = $query->paginate(10);
         $kategoris = Kategori::all();
+
+        $today = now()->toDateString();
+        $promos = Promo::where('mulai', '<=', $today)
+            ->where('selesai', '>=', $today)
+            ->get();
+
+        foreach ($menus as $menu) {
+            $promo = $promos->firstWhere('menu_id', $menu->id);
+            if ($promo) {
+                $menu->harga_asli = $menu->harga;
+                $menu->diskon_persen = $promo->diskon_persen;
+                $menu->harga = $menu->harga - ($menu->harga * $promo->diskon_persen / 100);
+            }
+        }
 
         // Susun ulang menu menjadi grup berdasarkan kategori
         $menusGrouped = $menus->groupBy(function ($menu) {
@@ -70,6 +85,7 @@ class OrderController extends Controller
             'kategoriOrder',
             'kategoris'
         ));
+
     }
 
 
@@ -457,95 +473,95 @@ class OrderController extends Controller
         return redirect()->route('orders.show', $orderId)->with('success', 'Menu berhasil dihapus dari pesanan.');
     }
 
-   public function checkout(Request $request)
-{
-    $cart = session('cart', []);
+    public function checkout(Request $request)
+    {
+        $cart = session('cart', []);
 
-    if (empty($cart)) {
-        return redirect()->back()->with('error', 'Keranjang kosong.');
-    }
-
-    $menuIds = array_keys($cart);
-    $menusCache = Menu::whereIn('id', $menuIds)->get()->keyBy('id');
-
-    $totalHarga = 0;
-    foreach ($cart as $menuId => $item) {
-        $menu = $menusCache->get($menuId);
-        if (!$menu) {
-            return redirect()->back()->with('error', 'Menu tidak ditemukan.');
+        if (empty($cart)) {
+            return redirect()->back()->with('error', 'Keranjang kosong.');
         }
-        $totalHarga += $menu->harga * $item['quantity'];
-    }
 
-    $member = null;
-    if ($request->filled('member_id')) {
-        $member = Member::find($request->member_id);
-    }
+        $menuIds = array_keys($cart);
+        $menusCache = Menu::whereIn('id', $menuIds)->get()->keyBy('id');
 
-    // Potongan dari poin jika pakai poin dan cukup poin
-    $potongan = 0;
-    $pointsUsed = 0;
-    if ($member && $request->use_points && $member->points >= 10) {
-        // Pakai kelipatan 10 poin
-        $pointsUsed = floor($member->points / 10) * 10;
-        $potongan = ($pointsUsed / 10) * 7500;
-    }
-
-    $totalBayar = max($totalHarga - $potongan, 0);
-
-    if ($request->jumlah_bayar < $totalBayar) {
-        return redirect()->back()->with('error', 'Jumlah bayar kurang.');
-    }
-
-    DB::transaction(function () use ($request, $cart, $menusCache, $totalBayar, $totalHarga, $potongan, $member, $pointsUsed) {
-        $user = auth()->user();
-        $namaKasir = $user->role === 'kasir' ? $request->nama_kasir : $user->name;
-
-        $order = Order::create([
-            'nama_pemesan' => $request->nama_pemesan,
-            'jumlah_bayar' => $request->jumlah_bayar,
-            'kembalian' => $request->jumlah_bayar - $totalBayar,
-            'user_id' => $user->id,
-            'nama_kasir' => $namaKasir,
-            'total_harga' => $totalHarga,
-            'potongan' => $potongan,
-            'member_id' => $member?->id,
-        ]);
-
+        $totalHarga = 0;
         foreach ($cart as $menuId => $item) {
             $menu = $menusCache->get($menuId);
-            $qty = $item['quantity'];
+            if (!$menu) {
+                return redirect()->back()->with('error', 'Menu tidak ditemukan.');
+            }
+            $totalHarga += $menu->harga * $item['quantity'];
+        }
 
-            DetailOrder::create([
-                'order_id' => $order->id,
-                'menu_id' => $menu->id,
-                'nama_menu' => $menu->nama_menu,
-                'harga_menu' => $menu->harga,
-                'jumlah' => $qty,
-                'subtotal' => $menu->harga * $qty,
+        $member = null;
+        if ($request->filled('member_id')) {
+            $member = Member::find($request->member_id);
+        }
+
+        // Potongan dari poin jika pakai poin dan cukup poin
+        $potongan = 0;
+        $pointsUsed = 0;
+        if ($member && $request->use_points && $member->points >= 10) {
+            // Pakai kelipatan 10 poin
+            $pointsUsed = floor($member->points / 10) * 10;
+            $potongan = ($pointsUsed / 10) * 7500;
+        }
+
+        $totalBayar = max($totalHarga - $potongan, 0);
+
+        if ($request->jumlah_bayar < $totalBayar) {
+            return redirect()->back()->with('error', 'Jumlah bayar kurang.');
+        }
+
+        DB::transaction(function () use ($request, $cart, $menusCache, $totalBayar, $totalHarga, $potongan, $member, $pointsUsed) {
+            $user = auth()->user();
+            $namaKasir = $user->role === 'kasir' ? $request->nama_kasir : $user->name;
+
+            $order = Order::create([
+                'nama_pemesan' => $request->nama_pemesan,
+                'jumlah_bayar' => $request->jumlah_bayar,
+                'kembalian' => $request->jumlah_bayar - $totalBayar,
+                'user_id' => $user->id,
+                'nama_kasir' => $namaKasir,
+                'total_harga' => $totalHarga,
+                'potongan' => $potongan,
+                'member_id' => $member?->id,
             ]);
 
-            $menu->decrement('stok', $qty);
-        }
+            foreach ($cart as $menuId => $item) {
+                $menu = $menusCache->get($menuId);
+                $qty = $item['quantity'];
 
-        if ($member) {
-            // Kurangi poin yang dipakai
-            if ($pointsUsed > 0) {
-                $member->decrement('points', $pointsUsed);
+                DetailOrder::create([
+                    'order_id' => $order->id,
+                    'menu_id' => $menu->id,
+                    'nama_menu' => $menu->nama_menu,
+                    'harga_menu' => $menu->harga,
+                    'jumlah' => $qty,
+                    'subtotal' => $menu->harga * $qty,
+                ]);
+
+                $menu->decrement('stok', $qty);
             }
 
-            // Tambah poin baru sesuai total harga sebelum potongan
-            $pointsEarned = floor($totalHarga / 3000);
-            // Jika ingin minimal dapat 1 poin setiap order, gunakan:
-            // $pointsEarned = max(1, floor($totalHarga / 3000));
-            $member->increment('points', $pointsEarned);
-        }
-    });
+            if ($member) {
+                // Kurangi poin yang dipakai
+                if ($pointsUsed > 0) {
+                    $member->decrement('points', $pointsUsed);
+                }
 
-    session()->forget('cart');
+                // Tambah poin baru sesuai total harga sebelum potongan
+                $pointsEarned = floor($totalHarga / 3000);
+                // Jika ingin minimal dapat 1 poin setiap order, gunakan:
+                // $pointsEarned = max(1, floor($totalHarga / 3000));
+                $member->increment('points', $pointsEarned);
+            }
+        });
 
-    return redirect()->route('orders.index')->with('success', 'Pesanan berhasil disimpan dan stok diperbarui.');
-}
+        session()->forget('cart');
+
+        return redirect()->route('orders.index')->with('success', 'Pesanan berhasil disimpan dan stok diperbarui.');
+    }
 
 
 

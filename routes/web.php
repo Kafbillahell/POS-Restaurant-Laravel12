@@ -17,6 +17,7 @@ use App\Http\Controllers\DashboardController;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ReportsExport;
 use App\Http\Controllers\BarcodeController;
+use App\Http\Controllers\PromoController;
 
 
 
@@ -55,7 +56,13 @@ Route::middleware('auth')->group(function () {
             }
         })->name('menus.index');
     });
-    
+
+
+    Route::middleware(['auth'])->group(function () {
+    Route::resource('promos', PromoController::class);
+    });
+
+
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
 
     Route::resource('kategoris', KategoriController::class);
@@ -93,17 +100,17 @@ Route::get('/orders/cart/reload', function () {
     }
     $html = '';
     foreach ($cart as $id => $item) {
-        $html .= '<li class="list-group-item" data-id="'. $id .'">
+        $html .= '<li class="list-group-item" data-id="' . $id . '">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <strong>'. e($item['nama_menu']) .'</strong>
+                    <strong>' . e($item['nama_menu']) . '</strong>
                     <div class="mt-1 d-flex align-items-center">
-                        <button class="btn btn-sm btn-outline-success px-2 btn-increase" data-id="'. $id .'">+</button>
-                        <span class="mx-2">x'. $item['quantity'] .'</span>
-                        <button class="btn btn-sm btn-outline-danger px-2 btn-decrease" data-id="'. $id .'">−</button>
+                        <button class="btn btn-sm btn-outline-success px-2 btn-increase" data-id="' . $id . '">+</button>
+                        <span class="mx-2">x' . $item['quantity'] . '</span>
+                        <button class="btn btn-sm btn-outline-danger px-2 btn-decrease" data-id="' . $id . '">−</button>
                     </div>
                 </div>
-                <span>Rp '. number_format($item['harga'] * $item['quantity'], 0, ',', '.') .'</span>
+                <span>Rp ' . number_format($item['harga'] * $item['quantity'], 0, ',', '.') . '</span>
             </div>
         </li>';
     }

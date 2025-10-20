@@ -193,7 +193,18 @@
                                                 <h5 class="card-title">{{ $menu->nama_menu }}</h5>
                                             </div>
                                             <div>
-                                                <div class="price">Rp {{ number_format($menu->harga, 0, ',', '.') }}</div>
+                                                @if(isset($menu->diskon_persen))
+                                                    <div class="price text-danger fw-bold">
+                                                    Rp {{ number_format($menu->harga, 0, ',', '.') }}
+                                                    <small class="text-muted text-decoration-line-through ms-2">
+                                                    Rp {{ number_format($menu->harga_asli, 0, ',', '.') }}
+                                                    </small>
+                                                    <span class="badge bg-success ms-2">-{{ $menu->diskon_persen }}%</span>
+                                                    </div>
+                                                @else
+                                                    <div class="price">Rp {{ number_format($menu->harga, 0, ',', '.') }}</div>
+                                                @endif
+
                                                 <p class="text-muted mb-2 stok-value" style="font-size: 0.9rem;">
                                                     Stok: {{ $menu->stok }}
                                                 </p>

@@ -25,7 +25,8 @@
                         </span>
                         <span class="logo-text" style="display: flex;">
                             <img src="{{ asset('assets/images/logo-text.png') }}" alt="homepage" class="dark-logo" />
-                            <img src="{{ asset('assets/images/logo-light-text.png') }}" alt="homepage" class="light-logo" />
+                            <img src="{{ asset('assets/images/logo-light-text.png') }}" alt="homepage"
+                                class="light-logo" />
                         </span>
                     </a>
                 </div>
@@ -56,7 +57,8 @@
 
                             <span class="ml-2 d-none d-lg-inline-block">
                                 <span>Hello,</span>
-                                <span class="text-dark">{{ Auth::user()->username ?? Auth::user()->name ?? 'User' }}</span>
+                                <span
+                                    class="text-dark">{{ Auth::user()->username ?? Auth::user()->name ?? 'User' }}</span>
                                 <i data-feather="chevron-down" class="svg-icon"></i>
                             </span>
                         </a>
@@ -80,6 +82,11 @@
         </nav>
     </header>
 
+    <!-- Sidebar -->
+    <aside class="left-sidebar" data-sidebarbg="skin6">
+        <div class="scroll-sidebar" data-sidebarbg="skin6">
+            <nav class="sidebar-nav">
+                <ul id="sidebarnav">
     <aside class="left-sidebar" data-sidebarbg="skin6">
     <div class="scroll-sidebar" data-sidebarbg="skin6">
         <nav class="sidebar-nav">
@@ -123,22 +130,66 @@
                     </li>
                 @elseif($role === 'kasir')
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ route('orders.index') }}">
-                            <i data-feather="shopping-cart" class="feather-icon"></i>
-                            <span class="hide-menu">Order</span>
+                        <a class="sidebar-link" href="{{ route('dashboard.index') }}" aria-expanded="false">
+                            <i data-feather="home" class="feather-icon"></i>
+                            <span class="hide-menu">Dashboard</span>
                         </a>
                     </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ route('detail_orders.index') }}">
-                            <i data-feather="file-text" class="feather-icon"></i>
-                            <span class="hide-menu">Detail Order</span>
-                        </a>
-                    </li>
-                @endif
-            </ul>
-        </nav>
-    </div>
-</aside>
+
+                    <li class="list-divider"></li>
+                    <li class="nav-small-cap"><span class="hide-menu">Applications</span></li>
+
+                    @php $role = auth()->user()->role; @endphp
+
+                    @if($role === 'admin')
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="{{ route('users.index') }}">
+                                <i data-feather="users" class="feather-icon"></i>
+                                <span class="hide-menu">User</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="{{ route('reports.index') }}">
+                                <i data-feather="bar-chart-2" class="feather-icon"></i>
+                                <span class="hide-menu">Report</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="{{ route('kategoris.index') }}">
+                                <i data-feather="layers" class="feather-icon"></i>
+                                <span class="hide-menu">Kategori</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="{{ route('menus.index') }}">
+                                <i data-feather="book-open" class="feather-icon"></i>
+                                <span class="hide-menu">Menus</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="{{ route('promos.index') }}">
+                                <i data-feather="percent" class="feather-icon"></i>
+                                <span class="hide-menu">Promo</span>
+                            </a>
+                        </li>
+                    @elseif($role === 'kasir')
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="{{ route('orders.index') }}">
+                                <i data-feather="shopping-cart" class="feather-icon"></i>
+                                <span class="hide-menu">Order</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="{{ route('detail_orders.index') }}">
+                                <i data-feather="file-text" class="feather-icon"></i>
+                                <span class="hide-menu">Detail Order</span>
+                            </a>
+                        </li>
+                    @endif
+                </ul>
+            </nav>
+        </div>
+    </aside>
 
 
 </div>
