@@ -23,4 +23,10 @@ class Menu extends Model
     {
         return $this->hasMany(DetailOrder::class);
     }
+
+    public function promo()
+{
+    return $this->hasOne(Promo::class);
+}
+
 }

@@ -171,16 +171,16 @@
                     {{ $menus->where('stok', '<=', 0)->count() }}
 
                     @if($menus->where('stok', '<=', 0)->count() > 0)
-                                <span style="
-                            position: absolute;
-                            top: -2px;      /* dekat pojok atas */
-                            right: -2px;    /* dekat pojok kanan */
-                            width: 8px;
-                            height: 8px;
-                            background-color: #dc3545; /* merah bootstrap */
-                            border-radius: 50%;
-                            box-shadow: 0 0 5px rgba(220, 53, 69, 0.7);
-                        "></span>
+                        <span style="
+                                    position: absolute;
+                                    top: -2px;      /* dekat pojok atas */
+                                    right: -2px;    /* dekat pojok kanan */
+                                    width: 8px;
+                                    height: 8px;
+                                    background-color: #dc3545; /* merah bootstrap */
+                                    border-radius: 50%;
+                                    box-shadow: 0 0 5px rgba(220, 53, 69, 0.7);
+                                "></span>
                     @endif
                 </button>
 
@@ -189,43 +189,45 @@
         </p>
 
         <!-- Modal -->
-       <div class="modal fade" id="stokKosongModal" tabindex="-1" aria-labelledby="stokKosongLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content shadow rounded-4">
-            <div class="modal-header bg-danger text-white rounded-top-4">
-                <h5 class="modal-title" id="stokKosongLabel"><i class="bi bi-exclamation-circle me-2"></i>Menu Stok Kosong</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                @php
-                    $kosongMenus = $menus->where('stok', '<=', 0);
-                @endphp
+        <div class="modal fade" id="stokKosongModal" tabindex="-1" aria-labelledby="stokKosongLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content shadow rounded-4">
+                    <div class="modal-header bg-danger text-white rounded-top-4">
+                        <h5 class="modal-title" id="stokKosongLabel"><i class="bi bi-exclamation-circle me-2"></i>Menu Stok
+                            Kosong</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        @php
+                            $kosongMenus = $menus->where('stok', '<=', 0);
+                        @endphp
 
-                @if($kosongMenus->isEmpty())
-                    <p class="text-muted text-center">Semua menu tersedia 🎉</p>
-                @else
-           <ul class="list-group list-group-flush">
-    @foreach($kosongMenus as $menu)
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-            {{ $menu->nama_menu }}
+                        @if($kosongMenus->isEmpty())
+                            <p class="text-muted text-center">Semua menu tersedia 🎉</p>
+                        @else
+                            <ul class="list-group list-group-flush">
+                                @foreach($kosongMenus as $menu)
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        {{ $menu->nama_menu }}
 
-            <a href="{{ route('menus.edit', $menu->id) }}" 
-               class="btn btn-outline-danger btn-sm rounded-pill d-flex align-items-center gap-1"
-               title="Tambah Stok">
-                <i class="bi bi-plus-circle"></i>
-                <span class="d-none d-sm-inline">Perlu Ditambah</span>
-            </a>
-        </li>
-    @endforeach
-</ul>
+                                        <a href="{{ route('menus.edit', $menu->id) }}"
+                                            class="btn btn-outline-danger btn-sm rounded-pill d-flex align-items-center gap-1"
+                                            title="Tambah Stok">
+                                            <i class="bi bi-plus-circle"></i>
+                                            <span class="d-none d-sm-inline">Perlu Ditambah</span>
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
 
 
 
-                @endif
+                        @endif
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
 
 
 
@@ -282,7 +284,28 @@
                                     <td>{{ $menu->kategori->nama_kategori ?? '-' }}</td>
                                     <td class="text-start">{{ $menu->nama_menu }}</td>
                                     <td>{{ Str::limit($menu->deskripsi, 40, '...') }}</td>
-                                    <td class="text-end">Rp{{ number_format($menu->harga, 0, ',', '.') }}</td>
+                                    <td class="text-end">
+                                        @php
+                                            $promo = $menu->promo;
+                                        @endphp
+
+                                        @if ($promo && $promo->isActive())
+                                            <div class="text-danger fw-bold">
+                                                Promo {{ $promo->diskon_persen }}% 🔥
+                                            </div>
+                                            <div>
+                                                <span class="text-muted text-decoration-line-through">
+                                                    Rp{{ number_format($menu->harga, 0, ',', '.') }}
+                                                </span><br>
+                                                <span class="text-success fw-bold">
+                                                    Rp{{ number_format($menu->harga * (1 - $promo->diskon_persen / 100), 0, ',', '.') }}
+                                                </span>
+                                            </div>
+                                        @else
+                                            Rp{{ number_format($menu->harga, 0, ',', '.') }}
+                                        @endif
+                                    </td>
+
                                     <td class="text-center">{{ $menu->stok }}</td>
                                     <td class="text-center">
                                         @if ($menu->gambar)
@@ -302,13 +325,15 @@
                                                 class="btn btn-warning btn-sm rounded-pill px-3 btn-action">
                                                 <i class="bi bi-pencil-square"></i> Edit
                                             </a>
-                          <form action="{{ route('menus.destroy', $menu->id) }}" method="POST" class="delete-form d-inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="button" class="btn btn-danger btn-sm rounded-pill px-3 btn-action delete-button">
-                                <i class="bi bi-trash"></i> Hapus
-                            </button>
-                        </form> 
+                                            <form action="{{ route('menus.destroy', $menu->id) }}" method="POST"
+                                                class="delete-form d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button"
+                                                    class="btn btn-danger btn-sm rounded-pill px-3 btn-action delete-button">
+                                                    <i class="bi bi-trash"></i> Hapus
+                                                </button>
+                                            </form>
 
 
 
@@ -423,4 +448,3 @@
         });
     </script>
 @endsection
-

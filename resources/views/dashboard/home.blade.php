@@ -61,13 +61,9 @@
     <!-- ============================================================== -->
     <!-- Main wrapper - style you can find in pages.scss -->
     <!-- ============================================================== -->
-       <!-- ============================================================== -->
-    <!-- Main wrapper - style you can find in pages.scss -->
-    <!-- ============================================================== -->
 
     @include('layouts.allbar')
 
-        
 
     <div class="page-wrapper">
         <div class="content-wrapper" style="margin-left: 250px; padding: 20px; margin-top: 100px; padding-left: 20px; padding-right: 20px; min-height: 100vh;">
@@ -112,6 +108,53 @@
 
 @stack('scripts')
   @yield('scripts') 
+
 </body>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+@if(session('success'))
+<script>
+    Swal.fire({
+        title: 'Berhasil!',
+        text: "{{ session('success') }}",
+        icon: 'success',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+        position: 'center',
+        background: '#fff',
+        color: '#333',
+        customClass: {
+            popup: 'rounded-2xl shadow-xl',
+            title: 'text-lg font-semibold',
+            icon: 'scale-125'
+        },
+    });
+</script>
+@endif
+
+@if(session('error'))
+<script>
+    Swal.fire({
+        title: 'Gagal!',
+        text: "{{ session('error') }}",
+        icon: 'error',
+        showConfirmButton: false,
+        timer: 2500,
+        timerProgressBar: true,
+        position: 'center',
+        background: '#fff',
+        color: '#333',
+        customClass: {
+            popup: 'rounded-2xl shadow-xl',
+            title: 'text-lg font-semibold',
+            icon: 'scale-125'
+        },
+    });
+</script>
+@endif
+
         
 </html>
