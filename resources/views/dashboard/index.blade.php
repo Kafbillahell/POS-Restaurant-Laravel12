@@ -310,22 +310,22 @@
             </a>
         </div>
         <!-- Notifikasi Stok Menipis -->
-        <div class="action-card action-glass" onclick="cardRipple(this)">
+        {{-- <div class="action-card action-glass" onclick="cardRipple(this)">
             <div class="action-icon bg5"><i data-feather="alert-circle"></i></div>
             <h5>Notifikasi Stok</h5>
             <button type="button" class="btn btn-link p-0 action-btn-link" data-bs-toggle="modal" data-bs-target="#stokMenipisModal">
                 Cek Stok Menipis
             </button>
-        </div>
+        </div> --}}
     </div>
 
     <!-- Modal Stok Menipis -->
-    <div class="modal fade" id="stokMenipisModal" tabindex="-1" aria-labelledby="stokMenipisLabel" aria-hidden="true">
+    {{-- <div class="modal fade" id="stokMenipisModal" tabindex="-1" aria-labelledby="stokMenipisLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content shadow rounded-4 glass-modal">
                 <div class="modal-header bg-danger text-white rounded-top-4">
-                    <h5 class="modal-title" id="stokMenipisLabel">
-                        <i class="bi bi-exclamation-circle me-2"></i>Menu Stok Menipis
+                    <h5 class="modal-title" id="stokMenipisLabel"> --}}
+                        {{-- <i class="bi bi-exclamation-circle me-2"></i>Menu Stok Menipis
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                         aria-label="Close"></button>
@@ -344,8 +344,8 @@
                         <ul class="list-group list-group-flush">
                             @foreach($menipisMenus as $menu)
                                 <li class="list-group-item d-flex justify-content-between align-items-center glass-list">
-                                    <div>
-                                        <b>{{ $menu->nama_menu }}</b>
+                                    <div> --}}
+                                        {{-- <b>{{ $menu->nama_menu }}</b>
                                         <span class="badge bg-warning text-dark ms-2">Stok: {{ $menu->stok }}</span>
                                     </div>
                                     <a href="{{ route('menus.edit', $menu->id) }}"
@@ -361,7 +361,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap');
@@ -525,20 +525,29 @@
                     <p class="text-muted fst-italic mb-0">Tidak ada pemberitahuan stok menipis.</p>
                 @else
                     @foreach($lowStockMenus as $menu)
-                    <div class="d-flex mb-3 align-items-start admin-activity-row">
-                        <div class="me-3 mt-1">
-                            <i data-feather="alert-triangle" class="text-warning" width="24" height="24"></i>
-                        </div>
-                        <div>
-                            <h6 class="mb-1 fw-semibold text-danger">Stok Hampir Habis!</h6>
-                            <p class="mb-0 text-dark">
-                                Menu <strong>{{ $menu->nama_menu }}</strong> hanya tersisa 
-                                <span class="badge bg-warning text-dark">{{ $menu->stok }} pcs</span>
-                            </p>
-                            <small class="text-muted">Segera lakukan restock</small>
-                        </div>
-                    </div>
-                    @endforeach
+<div class="d-flex mb-3 align-items-start admin-activity-row">
+    <div class="me-3 mt-1">
+        <i data-feather="alert-triangle" 
+           class="{{ $menu->stok == 0 ? 'text-danger' : 'text-warning' }}" 
+           width="24" height="24"></i>
+    </div>
+    <div>
+        <h6 class="mb-1 fw-semibold {{ $menu->stok == 0 ? 'text-danger' : 'text-warning' }}">
+            {{ $menu->stok == 0 ? 'Stok Habis!' : 'Stok Hampir Habis!' }}
+        </h6>
+        <p class="mb-0 text-dark">
+            Menu <strong>{{ $menu->nama_menu }}</strong> hanya tersisa 
+            <span class="badge {{ $menu->stok == 0 ? 'bg-danger' : 'bg-warning text-dark' }}">
+                {{ $menu->stok }} pcs
+            </span>
+        </p>
+        <small class="text-muted">
+            {{ $menu->stok == 0 ? 'Segera lakukan restock sekarang!' : 'Segera lakukan restock' }}
+        </small>
+    </div>
+</div>
+@endforeach
+
                 @endif
             </div>
         </div>
