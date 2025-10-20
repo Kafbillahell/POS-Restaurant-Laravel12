@@ -11,49 +11,37 @@ class MenuController extends Controller
     public function index()
     {
         $menus = Menu::with('kategori')->get();
-        $userRole = auth()->user()->role;
-
-        if ($userRole === 'user') {
-            return view('menus.user_index', compact('menus'));
-        }
-
-        if (in_array($userRole, ['admin', 'kasir', 'pemilik'])) {
-            return view('menus.index', compact('menus'));
-        }
-
-        abort(403, 'Unauthorized');
+        
+        return view('menus.index', compact('menus'));
     }
 
-    // ✅ Method untuk menampilkan form tambah menu
     public function create()
     {
         $kategoris = Kategori::all();
         return view('menus.create', compact('kategoris'));
     }
 
-   public function store(Request $request)
-{
-    $validated = $request->validate([
-        'kategori_id' => 'required|exists:kategoris,id',
-        'nama_menu' => 'required|string|max:255',
-        'deskripsi' => 'nullable|string',
-        'harga' => 'required|numeric',
-        'stok' => 'required|integer|min:0',
-        'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-    ]);
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'kategori_id' => 'required|exists:kategoris,id',
+            'nama_menu' => 'required|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'harga' => 'required|numeric',
+            'stok' => 'required|integer|min:0',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
 
-    $data = $request->only('kategori_id', 'nama_menu', 'deskripsi', 'harga', 'stok');
+        $data = $request->only('kategori_id', 'nama_menu', 'deskripsi', 'harga', 'stok');
 
-    // Simpan gambar ke storage/app/public/images (agar konsisten dengan edit)
-    if ($request->hasFile('gambar')) {
-        $data['gambar'] = $request->file('gambar')->store('images', 'public');
+        if ($request->hasFile('gambar')) {
+            $data['gambar'] = $request->file('gambar')->store('images', 'public');
+        }
+
+        Menu::create($data);
+
+        return redirect()->route('menus.index')->with('success', 'Menu baru berhasil ditambahkan.');
     }
-
-    Menu::create($data);
-
-    return redirect()->route('menus.index')->with('success', 'Menu baru berhasil ditambahkan.');
-}
-
 
     public function edit(Menu $menu)
     {
@@ -99,9 +87,11 @@ class MenuController extends Controller
 
     public function destroy(Menu $menu)
     {
+        if ($menu->gambar && \Storage::disk('public')->exists($menu->gambar)) {
+            \Storage::disk('public')->delete($menu->gambar);
+        }
+
         $menu->delete();
         return redirect()->route('menus.index')->with('success', 'Menu berhasil dihapus.');
-    }
-
-    
+    }    
 }
