@@ -26,7 +26,7 @@
 
         .table thead th {
             background-color: #f1f5f9;
-            color: #0d6efd;
+            color: #000000ff;
             font-weight: 700;
             border: none;
             border-radius: 12px;
@@ -105,7 +105,7 @@
         }
 
         .card:hover .card-body h5 {
-            color: #0953b3;
+            color: #000000ff;
         }
 
         .card-body p {
@@ -139,17 +139,17 @@
     <div class="container pt-1 pb-4">
 
 
-        <h2 class="fw-semibold text-primary mb-1">📋 Daftar Menu</h2>
+        <h2 class="fw-semibold text-dark mb-1">📋 Daftar Menu</h2>
         <p class="text-muted mb-4 fs-6 d-flex align-items-center gap-4 flex-wrap">
             {{-- Total Menu --}}
             <span>
-                <i class="bi bi-grid-fill text-primary me-1"></i>
-                Total menu:
-                <span
-                    class="badge bg-light text-primary border border-primary fw-semibold px-3 py-1 rounded-pill shadow-sm">
-                    {{ $menus->count() }}
-                </span>
-            </span>
+        <i class="bi bi-grid-fill text-danger me-1"></i>
+        Total menu:
+        <span
+            class="badge bg-warning text-dark border border-warning fw-semibold px-3 py-1 rounded-pill shadow-sm">
+            {{ $menus->count() }}
+        </span>
+    </span>
 
             {{-- Ready Stock --}}
             <span>
@@ -220,21 +220,12 @@
                                     </li>
                                 @endforeach
                             </ul>
-
-
-
                         @endif
                     </div>
                 </div>
             </div>
         </div>
-
-
-
-
-
-
-        {{-- Toast Success --}}
+        
         @if (session('success') && auth()->user()->role != 'user')
             <div id="successToast" class="alert alert-success shadow-sm rounded">
                 <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
@@ -272,7 +263,7 @@
                         @foreach ($groupedMenus as $kategori => $menusByKategori)
                             {{-- Judul kategori --}}
                             <tr>
-                                <td colspan="8" class="fw-semibold text-primary bg-light" style="border-top: 2px solid #0d6efd;">
+                                <td colspan="8" class="fw-semibold text-dark bg-light" style="border-top: 2px solid #000000ff;">
                                     {{ $kategori }}
                                 </td>
                             </tr>
@@ -325,19 +316,14 @@
                                                 class="btn btn-warning btn-sm rounded-pill px-3 btn-action">
                                                 <i class="bi bi-pencil-square"></i> Edit
                                             </a>
-                                            <form action="{{ route('menus.destroy', $menu->id) }}" method="POST"
-                                                class="delete-form d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="button"
-                                                    class="btn btn-danger btn-sm rounded-pill px-3 btn-action delete-button">
-                                                    <i class="bi bi-trash"></i> Hapus
-                                                </button>
-                                            </form>
-
-
-
-
+                                           
+                          <form action="{{ route('menus.destroy', $menu->id) }}" method="POST" class="delete-form d-inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="button" class="btn btn-danger btn-sm rounded-pill px-3 btn-action delete-button">
+                                <i class="bi bi-trash"></i> Hapus
+                            </button>
+                        </form> 
                                         @endif
                                     </td>
                                 </tr>
@@ -349,10 +335,7 @@
                             </tr>
                         @endforeach
                     </tbody>
-
-
             </div>
-
         @else
             {{-- Untuk User --}}
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4" id="menuCards">
@@ -387,7 +370,6 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
 
-            // ✅ Toast muncul otomatis lalu menghilang
             const toast = document.getElementById('successToast');
             if (toast) {
                 toast.classList.add('show');
@@ -396,7 +378,6 @@
                 }, 3500);
             }
 
-            // ✅ Animasi fade-in kartu menu (khusus user view)
             const cards = document.querySelectorAll('#menuCards .card');
             cards.forEach((card, i) => {
                 card.style.opacity = 0;

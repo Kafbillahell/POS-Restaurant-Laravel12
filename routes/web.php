@@ -72,7 +72,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('orders', OrderController::class);
     Route::resource('detail_orders', DetailOrderController::class);
     Route::resource('users', UserController::class);
-    Route::resource('reports', ReportController::class);
+    Route::resource('reports', ReportController::class)->except(['show']);
 });
 
 Route::post('/orders/cart/add', [OrderController::class, 'addToCart'])->name('orders.cart.add');
@@ -83,8 +83,6 @@ Route::get('/detail_orders', [DetailOrderController::class, 'index'])->name('det
 
 Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 
-// routes/web.php
-Route::get('reports/{kasir_id}', [ReportController::class, 'show'])->name('reports.show');
 
 Route::post('/orders/add-to-cart', [OrderController::class, 'addToCart'])->name('orders.addToCart');
 
@@ -123,5 +121,7 @@ Route::get('/orders/{id}/print', [OrderController::class, 'print'])->name('order
 Route::post('/orders/cart/reset', [OrderController::class, 'resetCart'])->name('orders.cart.reset');
 Route::get('/orders/{order}/struk', [OrderController::class, 'struk'])->name('orders.struk');
 Route::get('/check-member', [OrderController::class, 'checkMember'])->name('orders.checkMember');
+
+Route::get('reports/{kasir_id}/{bulan_tahun}', [App\Http\Controllers\ReportController::class, 'show'])->name('reports.show');
 
 
