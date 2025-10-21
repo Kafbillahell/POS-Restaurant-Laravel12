@@ -193,23 +193,24 @@
                                                 <h5 class="card-title">{{ $menu->nama_menu }}</h5>
                                             </div>
                                             <div>
-                                                @if(isset($menu->diskon_persen))
-                                                    <div class="price text-danger fw-bold">
-                                                    Rp {{ number_format($menu->harga, 0, ',', '.') }}
-                                                    <small class="text-muted text-decoration-line-through ms-2">
-                                                    Rp {{ number_format($menu->harga_asli, 0, ',', '.') }}
-                                                    </small>
-                                                    <span class="badge bg-success ms-2">-{{ $menu->diskon_persen }}%</span>
-                                                    </div>
-                                                @else
-                                                    <div class="price">Rp {{ number_format($menu->harga, 0, ',', '.') }}</div>
-                                                @endif
+                                        @if(isset($menu->diskon_persen))
+
+                                        <div class="price text-danger fw-bold">
+                                                Rp {{ number_format($menu->harga, 0, ',', '.') }}
+                                            <small class="text-muted text-decoration-line-through ms-2">
+                                            Rp {{ number_format($menu->harga_asli, 0, ',', '.') }}
+                                            </small>
+                                            <span class="badge bg-success ms-2">-{{ $menu->diskon_persen }}%</span>
+                                            </div>
+                                        @else
+                                            <div class="price">Rp {{ number_format($menu->harga, 0, ',', '.') }}</div>
+                                        @endif
 
                                                 <p class="text-muted mb-2 stok-value" style="font-size: 0.9rem;">
                                                     Stok: {{ $menu->stok }}
                                                 </p>
                                                 <div class="d-flex align-items-center justify-content-between"
-                                                    data-menu-id="{{ $menu->id }}">
+                                                    data-menu-id="{{ $menu->id }}" data-harga="{{ $menu->harga }}">
                                                     @if($menu->stok > 0)
                                                         <button class="btn btn-sm btn-outline-danger px-2 me-2 btn-quantity-card"
                                                             data-action="decrease" data-id="{{ $menu->id }}"
@@ -418,16 +419,16 @@
                     const price = cardMenu.querySelector('.price')?.textContent || '';
 
                     cardBody.innerHTML = `
-                     <div>
-                         <div class="kategori-label">${kategoriLabel}</div>
-                         <h5 class="card-title">${cardTitle}</h5>
-                     </div>
-                     <div>
-                         <div class="price">${price}</div>
-                         ${stokEl.outerHTML}
-                         <button class="btn btn-disabled w-100" disabled>Stock Habis</button>
-                     </div>
-                 `;
+                             <div>
+                                 <div class="kategori-label">${kategoriLabel}</div>
+                                 <h5 class="card-title">${cardTitle}</h5>
+                             </div>
+                             <div>
+                                 <div class="price">${price}</div>
+                                 ${stokEl.outerHTML}
+                                 <button class="btn btn-disabled w-100" disabled>Stock Habis</button>
+                             </div>
+                         `;
                 }
             }
 
@@ -452,22 +453,22 @@
                         currency: 'IDR'
                     });
                     html += `
-                    <li class="list-group-item" data-id="${id}">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <strong>${item.nama_menu}</strong>
-                                <span class="mx-2">x${item.quantity}</span> 
-                            </div>
-                            <span>${totalHarga}</span>
-                        </div>
-                    </li>`;
+                            <li class="list-group-item" data-id="${id}">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>${item.nama_menu}</strong>
+                                        <span class="mx-2">x${item.quantity}</span> 
+                                    </div>
+                                    <span>${totalHarga}</span>
+                                </div>
+                            </li>`;
                 }
 
                 if (Object.keys(cartState).length === 0) {
                     cartList.innerHTML = `
-                    <li class="list-group-item text-center text-muted d-flex justify-content-center align-items-center" style="min-height: 200px;">
-                        Keranjang kosong
-                    </li>`;
+                            <li class="list-group-item text-center text-muted d-flex justify-content-center align-items-center" style="min-height: 200px;">
+                                Keranjang kosong
+                            </li>`;
                     checkoutButton.classList.remove('btn-primary');
                     checkoutButton.classList.add('btn-secondary', 'disabled');
                     checkoutButton.setAttribute('href', '#');
@@ -544,20 +545,35 @@
 
                 if (newQuantity > 0) {
                     if (!cartState[menuId]) {
-                        const cardBody = cardContainer.closest('.card-body');
-                        namaMenu = cardBody.querySelector('.card-title')?.textContent || '';
-                        const hargaText = cardBody.querySelector('.price')?.textContent.replace(/[^\d]/g, '') || '0';
-                        const harga = parseInt(hargaText) || 0;
+                        // Ambil wrapper dengan data-menu-id
+                        const containerWrapper = cardContainer.closest('[data-menu-id]');
 
+                        // Pastikan wrapper ketemu
+                        if (!containerWrapper) {
+                            console.warn('Gagal menemukan data-menu-id untuk menu:', menuId);
+                            return;
+                        }
+
+                        // Ambil harga promo langsung dari attribute data-harga
+                        const hargaAttr = containerWrapper.getAttribute('data-harga');
+                        const harga = hargaAttr ? parseInt(hargaAttr, 10) || 0 : 0;
+
+                        // Ambil nama menu dari elemen terdekat yang punya .card-title
+                        const namaMenuEl = containerWrapper.querySelector('.card-title')
+                            || cardContainer.closest('.card-body')?.querySelector('.card-title');
+                        const namaMenuText = namaMenuEl ? namaMenuEl.textContent.trim() : `Menu #${menuId}`;
+
+                        // Simpan ke state keranjang
                         cartState[menuId] = {
-                            nama_menu: namaMenu.trim(),
+                            nama_menu: namaMenuText,
                             harga: harga,
                             quantity: newQuantity
                         };
                     } else {
+                        // Jika sudah ada, cukup ubah jumlahnya
                         cartState[menuId].quantity = newQuantity;
-                        namaMenu = cartState[menuId].nama_menu;
                     }
+
                 } else {
                     namaMenu = cartState[menuId]?.nama_menu || 'Item';
                     delete cartState[menuId];

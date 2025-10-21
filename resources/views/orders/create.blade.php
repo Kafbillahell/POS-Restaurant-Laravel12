@@ -52,23 +52,39 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($cart as $id => $item)
-                        @php
-                            $subtotal = $item['harga'] * $item['quantity'];
-                            $totalHarga += $subtotal;
-                        @endphp
-                        <tr>
-                            <td>{{ $item['nama_menu'] }}</td>
-                            <td>Rp {{ number_format($item['harga'], 0, ',', '.') }}</td>
-                            <td>
-                                {{ $item['quantity'] }}
-                                <input type="hidden" name="menu_id[]" value="{{ $id }}">
-                                <input type="hidden" name="jumlah[]" value="{{ $item['quantity'] }}">
-                            </td>
-                            <td>Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
+                @foreach ($cart as $id => $item)
+                @php
+            $harga = $item['harga'];
+            $hargaAsli = $item['harga_asli'] ?? $harga;
+            $diskonPersen = $item['diskon_persen'] ?? 0;
+            $subtotal = $harga * $item['quantity'];
+            $totalHarga += $subtotal;
+        @endphp
+        <tr>
+            <td>{{ $item['nama_menu'] }}</td>
+            <td>
+                @if($diskonPersen > 0)
+                    <span class="text-danger fw-bold">
+                        Rp {{ number_format($harga, 0, ',', '.') }}
+                    </span>
+                    <small class="text-muted text-decoration-line-through ms-1">
+                        Rp {{ number_format($hargaAsli, 0, ',', '.') }}
+                    </small>
+                    <span class="badge bg-success ms-1">-{{ $diskonPersen }}%</span>
+                @else
+                    <span>Rp {{ number_format($harga, 0, ',', '.') }}</span>
+                @endif
+            </td>
+            <td>
+                {{ $item['quantity'] }}
+                <input type="hidden" name="menu_id[]" value="{{ $id }}">
+                <input type="hidden" name="jumlah[]" value="{{ $item['quantity'] }}">
+            </td>
+            <td>Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
+        </tr>
+    @endforeach
+</tbody>
+
             </table>
 
             {{-- Total Harga --}}

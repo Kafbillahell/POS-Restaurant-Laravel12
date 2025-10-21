@@ -103,7 +103,6 @@
                             <span class="hide-menu">Dashboard</span>
                         </a>
                     </li>
-
                     <li class="list-divider"></li>
                     <li class="nav-small-cap"><span class="hide-menu">Applications</span></li>
 
