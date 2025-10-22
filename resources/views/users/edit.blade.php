@@ -28,13 +28,25 @@
                     @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
 
+
                 <div class="mb-3">
                     <label for="role" class="form-label fw-semibold">Role</label>
-                    <select name="role" id="role" class="form-select rounded-3 @error('role') is-invalid @enderror" required>
-                        <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Admin</option>
-                        <option value="kasir" {{ old('role', $user->role) == 'kasir' ? 'selected' : '' }}>Kasir</option>
-                    </select>
-                    @error('role') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    
+                    @if ($user->role === 'admin')
+
+                        <p class="form-control-static fw-bold text-danger mb-0">
+                            Admin (Role tidak dapat diubah)
+                        </p>
+
+                        <input type="hidden" name="role" value="admin">
+                    @else
+
+                        <select name="role" id="role" class="form-select rounded-3 @error('role') is-invalid @enderror" required>
+                            <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Admin</option>
+                            <option value="kasir" {{ old('role', $user->role) == 'kasir' ? 'selected' : '' }}>Kasir</option>
+                        </select>
+                        @error('role') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    @endif
                 </div>
 
                 <div class="d-flex justify-content-between">

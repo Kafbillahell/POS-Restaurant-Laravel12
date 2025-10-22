@@ -71,6 +71,20 @@
 
     <div class="page-wrapper">
         <div class="content-wrapper" style="margin-left: 250px; padding: 20px; margin-top: 100px; padding-left: 20px; padding-right: 20px; min-height: 100vh;">
+            
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>Berhasil!</strong> {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            @if (session('warning'))
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>Peringatan!</strong> {{ session('warning') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
             @yield('content')
         </div>
     </div>

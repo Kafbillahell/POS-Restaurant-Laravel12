@@ -15,14 +15,11 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class ReportController extends Controller
 {
-    // DI CONTROLLER ANDA
 public function index(Request $request)
     {
-        // Mengambil tanggal dari request atau menggunakan default bulan ini
         $startDate = Carbon::parse($request->input('start_date', Carbon::now()->startOfMonth()->format('Y-m-d')))->startOfDay();
         $endDate = Carbon::parse($request->input('end_date', Carbon::now()->endOfMonth()->format('Y-m-d')))->endOfDay();
 
-        // 1. Logika untuk Laporan Per Kasir/Bulan
         $reports = DB::table('users')
             ->select(
                 'users.id as kasir_id',
@@ -44,7 +41,6 @@ public function index(Request $request)
             ->orderBy('bulan_tahun')
             ->get();
             
-        // 2. Perhitungan Ringkasan Total Global (LENGKAPI SEMUA VARIABEL SUMMARY)
         $totalSummary = [
             'total_order_all' => $reports->sum('total_order'),
             'total_pendapatan_all' => $reports->sum('total_pendapatan'),
@@ -53,29 +49,20 @@ public function index(Request $request)
         ];
 
 
-        // === PERBAIKAN AJAX: Mengembalikan JSON dengan data summary dan HTML tabel ===
         if ($request->ajax() || $request->has('ajax')) {
-            // Render partial view tabel menjadi string HTML
-            $tableHtml = view('partials.report_table', [ // Ganti nama partial sesuai yang Anda gunakan
+            $tableHtml = view('partials.report_table', [ 
                 'reports' => $reports,
-                // Hilangkan $totalSummary dari sini jika partial hanya butuh $reports
             ])->render(); 
-            
-            // Mengembalikan respons JSON yang berisi data dan HTML
             return response()->json([
                 'summary' => $totalSummary,
                 'table_html' => $tableHtml,
             ]);
         }
-        // =========================================================================
-
-        // Jika bukan AJAX, kembalikan full view seperti biasa
-        // Pastikan variabel 'reports' dan 'totalSummary' dikirim.
         return view('reports.index', [
-            'reports' => $reports, // Digunakan untuk iterasi di tabel DAN menghitung ringkasan awal di blade
+            'reports' => $reports, 
             'startDate' => $startDate->format('Y-m-d'),
             'endDate' => $endDate->format('Y-m-d'),
-            'totalSummary' => $totalSummary, // Sertakan summary untuk pemuatan awal
+            'totalSummary' => $totalSummary, 
         ]);
     }
     public function show($kasir_id, $bulan_tahun)
@@ -96,7 +83,7 @@ public function index(Request $request)
         return view('reports.show', [
             'user' => $user,
             'orders' => $orders,
-            'bulanTahun' => $bulan_tahun, // Gunakan ini di view untuk referensi
+            'bulanTahun' => $bulan_tahun, 
             'tanggal' => $startDate->format('Y-m-d'),
         ]);
     }
