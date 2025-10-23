@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
+    // GANTI dengan Token Bot Telegram Anda yang didapat dari BotFather!
+    const TELEGRAM_BOT_TOKEN = '8415019435:AAHvOH2MKLvye8FJjaWys_G31Dbpe2RLbRo';
     private function checkRole()
     {
         if (auth()->guest() || !in_array(auth()->user()->role, ['kasir', 'user'])) {
@@ -203,35 +205,35 @@ class OrderController extends Controller
 
         session()->forget('cart');
 
-        if ($order) {
-            $kitchenNumber = Setting::where('key', 'wa_kitchen_number')->value('value');
-            
-            if (!empty($kitchenNumber)) {
-                $message = "🔔 *PESANAN BARU DARI KASIR*\n";
-                $message .= "===============================\n";
-                $message .= "No. Order: #{$order->id}\n";
-                $message .= "Nama Pemesan: {$order->nama_pemesan}\n";
-                $message .= "Kasir: {$order->nama_kasir}\n";
-                $message .= "Waktu: " . now()->format('H:i:s, d M Y') . "\n";
-                $message .= "===============================\n";
-                $message .= "*RINCIAN MENU:*\n";
+if ($order) {
+    $telegramChatId = Setting::where('key', 'telegram_kitchen_chat_id')->value('value'); 
+    
+    if (!empty($telegramChatId)) {
+        $message = "🔔 *PESANAN BARU DARI KASIR*\n";
+        $message .= "===============================\n";
+        $message .= "No. Order: #{$order->id}\n";
+        $message .= "Nama Pemesan: {$order->nama_pemesan}\n";
+        $message .= "Kasir: {$order->nama_kasir}\n";
+        $message .= "Waktu: " . now()->format('H:i:s, d M Y') . "\n";
+        $message .= "===============================\n";
+        $message .= "*RINCIAN MENU:*\n";
 
-                if ($order->relationLoaded('detailOrders')) {
-                    foreach ($order->detailOrders as $detail) {
-                        $message .= "➡️ {$detail->jumlah}x " . strtoupper($detail->nama_menu) . "\n";
-                    }
-                } else {
-                    Log::warning("Order {$order->id}: DetailOrders not loaded for WA notification.");
-                }
-                
-                $message .= "===============================\n";
-                $message .= "*SEGERA DIPROSES!*";
-
-                $this->sendWaNotification($kitchenNumber, $message); 
-            } else {
-                Log::warning('WA Kitchen number is not set in settings table.');
+        if ($order->relationLoaded('detailOrders')) {
+            foreach ($order->detailOrders as $detail) {
+                $message .= "➡️ *{$detail->jumlah}x " . strtoupper($detail->nama_menu) . "*\n"; 
             }
+        } else {
+            Log::warning("Order {$order->id}: DetailOrders not loaded for Telegram notification.");
         }
+        
+        $message .= "===============================\n";
+        $message .= "*SEGERA DIPROSES!*";
+
+        $this->sendTelegramNotification($telegramChatId, $message); 
+    } else {
+        Log::warning('Telegram Kitchen Chat ID is not set in settings table.');
+    }
+}
 
         return redirect()->route('orders.index')->with('success', 'Pesanan berhasil disimpan dan stok diperbarui.');
     }
@@ -582,31 +584,31 @@ class OrderController extends Controller
 
     session()->forget('cart');
 
-    if ($order) {
-        $kitchenNumber = \App\Models\Setting::where('key', 'wa_kitchen_number')->value('value');
-        
-        if (!empty($kitchenNumber)) {
-            $message = "🔔 *PESANAN BARU DARI KASIR (CHECKOUT)*\n";
-            $message .= "===============================\n";
-            $message .= "No. Order: #{$order->id}\n";
-            $message .= "Nama Pemesan: {$order->nama_pemesan}\n";
-            $message .= "Kasir: {$order->nama_kasir}\n";
-            $message .= "Waktu: " . now()->format('H:i:s, d M Y') . "\n";
-            $message .= "===============================\n";
-            $message .= "*RINCIAN MENU:*\n";
+if ($order) {
+    $telegramChatId = \App\Models\Setting::where('key', 'telegram_kitchen_chat_id')->value('value');
+    
+    if (!empty($telegramChatId)) {
+        $message = "🔔 *PESANAN BARU DARI KASIR (CHECKOUT)*\n";
+        $message .= "===============================\n";
+        $message .= "No. Order: #{$order->id}\n";
+        $message .= "Nama Pemesan: {$order->nama_pemesan}\n";
+        $message .= "Kasir: {$order->nama_kasir}\n";
+        $message .= "Waktu: " . now()->format('H:i:s, d M Y') . "\n";
+        $message .= "===============================\n";
+        $message .= "*RINCIAN MENU:*\n";
 
-            if ($order->relationLoaded('detailOrders')) {
-                foreach ($order->detailOrders as $detail) {
-                    $message .= "➡️ {$detail->jumlah}x " . strtoupper($detail->nama_menu) . "\n";
-                }
+        if ($order->relationLoaded('detailOrders')) {
+            foreach ($order->detailOrders as $detail) {
+                $message .= "➡️ *{$detail->jumlah}x " . strtoupper($detail->nama_menu) . "*\n";
             }
-            
-            $message .= "===============================\n";
-            $message .= "*SEGERA DIPROSES!*";
-
-            $this->sendWaNotification($kitchenNumber, $message); 
         }
+        
+        $message .= "===============================\n";
+        $message .= "*SEGERA DIPROSES!*";
+
+        $this->sendTelegramNotification($telegramChatId, $message);
     }
+}
 
     return redirect()->route('orders.index')->with('success', 'Pesanan berhasil disimpan dan stok diperbarui.');
 }
@@ -631,47 +633,40 @@ class OrderController extends Controller
         }
     }
 
-private function sendWaNotification(string $number, string $message): bool
-    {
-        $apiKey = "T0xbzseNkWKsmfS8daKAOh8JiKrrj6hB"; 
-        $sender = "6287731288218"; // Nomor Pengirim
 
-        $raw = preg_replace('/\D+/', '', $number);
-        if (str_starts_with($raw, '0')) {
-            $raw = substr($raw, 1);
-        }
-        $e164 = '62' . $raw;
-        
-        if (strlen($e164) < 10) {
-            Log::error('Invalid WA Kitchen number after normalization: ' . $number);
-            return false;
-        }
+private function sendTelegramNotification(string $chatId, string $message): bool
+{
+    // Ganti dengan konstanta BOT_TOKEN
+    $token = self::TELEGRAM_BOT_TOKEN; 
 
-        try {
-            $payload = [
-                "api_key" => $apiKey,
-                "sender"  => $sender,
-                "number"  => $e164,
-                "message" => $message,
-            ];
+    try {
+        $url = "https://api.telegram.org/bot{$token}/sendMessage";
 
-            $res = Http::withHeaders([
-                'Content-Type' => 'application/json',
-                'User-Agent'   => 'order-notification',
-            ])
-            ->timeout(20)
-            ->post('http://premiumwa.sasweblabs.com/send-message', $payload);
+        $payload = [
+            'chat_id' => $chatId,
+            'text' => $message,
+            'parse_mode' => 'Markdown',
+        ];
 
-            Log::info('Order WA Notification', ['status' => $res->status(), 'body' => $res->body(), 'number' => $number]);
-            $json = $res->json();
+        $res = Http::withHeaders([
+            'Content-Type' => 'application/json',
+            'User-Agent' => 'order-notification',
+        ])
+        ->timeout(10)
+        ->post($url, $payload);
 
-            return $res->successful() && (!isset($json['status']) || $json['status'] === true);
-        } catch (\Throwable $e) {
-            Log::error('Order WA Notification exception: ' . $e->getMessage());
-            return false;
-        }
+        Log::info('Order Telegram Notification', [
+            'status' => $res->status(), 
+            'body' => $res->body(), 
+            'chat_id' => $chatId
+        ]);
 
+        return $res->successful();
+    } catch (\Throwable $e) {
+        Log::error('Order Telegram Notification exception: ' . $e->getMessage());
+        return false;
     }
+}
 
     
 }

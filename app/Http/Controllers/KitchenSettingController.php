@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class KitchenSettingController extends Controller
 {
-    const WA_KEY = 'wa_kitchen_number';
+    const TELEGRAM_CHAT_ID = 'telegram_kitchen_chat_id';
 
     private function checkAdminRole()
     {
@@ -26,7 +26,7 @@ class KitchenSettingController extends Controller
         }
 
         $setting = Setting::firstOrCreate(
-            ['key' => self::WA_KEY],
+            ['key' => self::TELEGRAM_CHAT_ID],
             ['value' => '']
         );
 
@@ -41,16 +41,14 @@ class KitchenSettingController extends Controller
         }
 
         $request->validate([
-            'wa_kitchen_number' => 'required|string|min:8|max:20',
+            'telegram_kitchen_chat_id' => 'required|string|min:4|max:50',
         ]);
 
-        $normalizedNumber = preg_replace('/\D+/', '', $request->wa_kitchen_number);
-
         Setting::updateOrCreate(
-            ['key' => self::WA_KEY],
-            ['value' => $normalizedNumber]
+            ['key' => self::TELEGRAM_CHAT_ID],
+            ['value' => $request->telegram_kitchen_chat_id] 
         );
 
-        return redirect()->route('settings.kitchen.index')->with('success', 'Nomor WhatsApp Kitchen berhasil diperbarui.');
+        return redirect()->route('settings.kitchen.index')->with('success', 'Chat ID Telegram Kitchen berhasil diperbarui.');
     }
 }

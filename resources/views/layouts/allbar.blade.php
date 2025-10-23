@@ -128,7 +128,7 @@
                         <li class="sidebar-item">
                             <a class="sidebar-link" href="{{ route('settings.kitchen.index') }}">
                                 <i data-feather="settings" class="feather-icon"></i>
-                                <span class="hide-menu">WA Kitchen Setting</span>
+                                <span class="hide-menu">Kitchen Setting</span>
                             </a>
                         </li>
                     @elseif($role === 'kasir')
