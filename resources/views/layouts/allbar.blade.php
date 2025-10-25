@@ -131,6 +131,12 @@
                                 <span class="hide-menu">Kitchen Setting</span>
                             </a>
                         </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="{{ route('promo.index') }}">
+                                <i data-feather="tag" class="feather-icon"></i>
+                                <span class="hide-menu">Pengaturan Promo</span>
+                            </a>
+                        </li>
                     @elseif($role === 'kasir')
                         <li class="sidebar-item">
                             <a class="sidebar-link" href="{{ route('orders.index') }}">
