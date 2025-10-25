@@ -17,8 +17,8 @@ use App\Http\Controllers\DashboardController;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ReportsExport;
 use App\Http\Controllers\BarcodeController;
+use App\Http\Controllers\KitchenSettingController;
 use App\Http\Controllers\PromoController;
-
 
 
 Route::get('/barcode/{id}', [BarcodeController::class, 'generate']);
@@ -68,6 +68,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('users', UserController::class);
     Route::resource('reports', ReportController::class)->except(['show']);
 });
+
+Route::get('/settings/kitchen', [KitchenSettingController::class, 'index'])->name('settings.kitchen.index');
+Route::post('/settings/kitchen', [KitchenSettingController::class, 'update'])->name('settings.kitchen.update');
 
 Route::post('/orders/cart/add', [OrderController::class, 'addToCart'])->name('orders.cart.add');
 

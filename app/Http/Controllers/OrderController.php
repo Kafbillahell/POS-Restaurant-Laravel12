@@ -4,17 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Member;
-use App\Models\Menu; 
+use App\Models\Menu;
 use App\Models\User;
 use App\Models\DetailOrder;
 use App\Models\Kategori;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 
 class OrderController extends Controller
 {
+    // GANTI dengan Token Bot Telegram Anda yang didapat dari BotFather!
+    const TELEGRAM_BOT_TOKEN = '8415019435:AAHvOH2MKLvye8FJjaWys_G31Dbpe2RLbRo';
     private function checkRole()
     {
         if (auth()->guest() || !in_array(auth()->user()->role, ['kasir', 'user'])) {
@@ -27,7 +32,7 @@ class OrderController extends Controller
     {
         if ($redirect = $this->checkRole())
             return $redirect;
-            
+
         $query = Menu::query();
 
         if ($request->has('search') && !empty($request->search)) {
@@ -35,7 +40,7 @@ class OrderController extends Controller
         }
 
         if (!session()->has('success') && !session()->has('error') && !session()->has('menuBaru')) {
-        session()->forget('cart'); 
+            session()->forget('cart');
         }
 
         if ($request->has('kategori') && !empty($request->kategori)) {
@@ -44,7 +49,7 @@ class OrderController extends Controller
             });
         }
 
-        $menus = $query->get(); 
+        $menus = $query->get();
         $kategoris = Kategori::all();
 
         $cart = session('cart', []);
@@ -54,17 +59,17 @@ class OrderController extends Controller
 
         foreach ($cart as $menuId => $item) {
             $menu = $menusCache->get($menuId);
-            
+
             if ($menu) {
-                $currentPrice = (float) $menu->harga_jual; 
-                $itemPriceInCart = (float) $item['harga']; 
+                $currentPrice = (float) $menu->harga_jual;
+                $itemPriceInCart = (float) $item['harga'];
 
                 if ($itemPriceInCart !== $currentPrice) {
-                    $isPriceUpdated = true; 
+                    $isPriceUpdated = true;
                     $item['harga'] = $currentPrice;
-                    
+
                     $currentNormalPrice = (float) $menu->harga;
-                    
+
                     if ($currentNormalPrice > $currentPrice) {
                         $item['harga_normal'] = $currentNormalPrice;
                     } else {
@@ -74,16 +79,16 @@ class OrderController extends Controller
                     }
                 }
             } else {
-                $isPriceUpdated = true; 
-                continue; 
+                $isPriceUpdated = true;
+                continue;
             }
             $updatedCart[$menuId] = $item;
         }
-        
+
         if ($isPriceUpdated) {
             session(['cart' => $updatedCart]);
         }
-        
+
         $perPage = 10;
         $currentPage = $request->input('page', 1);
         $pagedMenus = new LengthAwarePaginator(
@@ -93,14 +98,14 @@ class OrderController extends Controller
             $currentPage,
             ['path' => $request->url()]
         );
-        $menus = $pagedMenus; 
-        
+        $menus = $pagedMenus;
+
 
         $menusGrouped = $menus->groupBy(function ($menu) {
             return optional($menu->kategori)->nama_kategori ?? 'Tanpa Kategori';
         });
 
-        $kategoriOrder = []; 
+        $kategoriOrder = [];
 
         if ($request->ajax()) {
             return response()->view('orders.index', compact(
@@ -112,7 +117,7 @@ class OrderController extends Controller
         }
 
         if ($isPriceUpdated && !$request->has('reloaded')) {
-              return redirect()->route('orders.index', ['reloaded' => 1]);
+            return redirect()->route('orders.index', ['reloaded' => 1]);
         }
 
 
@@ -139,29 +144,29 @@ class OrderController extends Controller
         $menusCache = Menu::whereIn('id', $menuIds)->get()->keyBy('id');
 
         $updatedCart = [];
-        $totalHargaMenu = 0; 
-        $isPriceUpdated = false; 
+        $totalHargaMenu = 0;
+        $isPriceUpdated = false;
 
         foreach ($cart as $menuId => $item) {
             $menu = $menusCache->get($menuId);
-            
+
             if (!$menu) {
                 unset($cart[$menuId]);
-                $isPriceUpdated = true; 
+                $isPriceUpdated = true;
                 continue;
             }
 
-            $currentPrice = (float) $menu->harga_jual; 
-            $itemPriceInCart = (float) $item['harga']; 
+            $currentPrice = (float) $menu->harga_jual;
+            $itemPriceInCart = (float) $item['harga'];
 
             if ($itemPriceInCart !== $currentPrice) {
-                
-                $isPriceUpdated = true; 
-                
+
+                $isPriceUpdated = true;
+
                 $item['harga'] = $currentPrice;
-                
-                $currentNormalPrice = (float) $menu->harga; 
-                
+
+                $currentNormalPrice = (float) $menu->harga;
+
                 if ($currentNormalPrice > $currentPrice) {
                     $item['harga_normal'] = $currentNormalPrice;
                 } else {
@@ -170,23 +175,23 @@ class OrderController extends Controller
                     }
                 }
             }
-            
+
             $subtotal = $item['harga'] * $item['quantity'];
-            $totalHargaMenu += $subtotal; 
-            
+            $totalHargaMenu += $subtotal;
+
             $updatedCart[$menuId] = $item;
         }
 
         session(['cart' => $updatedCart]);
-        $cart = $updatedCart; 
-        
+        $cart = $updatedCart;
+
         $member = null;
         $potongan = 0;
-        
+
         if ($request->filled('member_id')) {
             $member = Member::find($request->member_id);
         }
-        
+
         $totalBayar = max($totalHargaMenu - $potongan, 0);
 
         if ($isPriceUpdated && !$request->has('refreshed')) {
@@ -232,26 +237,26 @@ class OrderController extends Controller
         $menusCache = Menu::whereIn('id', $menuIds)->get()->keyBy('id');
 
         $updatedCart = [];
-        $totalHarga = 0; 
+        $totalHarga = 0;
         $pointsUsed = 0;
         $potongan = 0;
 
 
         foreach ($cart as $menuId => $item) {
             $menu = $menusCache->get($menuId);
-            
+
             if (!$menu || $menu->stok < $item['quantity']) {
                 return back()->with('error', "Stok tidak cukup atau menu tidak ditemukan untuk ID {$menuId}.");
             }
 
-            $currentPrice = (float) $menu->harga_jual; 
-            $itemPriceInCart = (float) $item['harga']; 
+            $currentPrice = (float) $menu->harga_jual;
+            $itemPriceInCart = (float) $item['harga'];
 
             if ($itemPriceInCart !== $currentPrice) {
                 $item['harga'] = $currentPrice;
-                
-                $currentNormalPrice = (float) $menu->harga; 
-                
+
+                $currentNormalPrice = (float) $menu->harga;
+
                 if ($currentNormalPrice > $currentPrice) {
                     $item['harga_normal'] = $currentNormalPrice;
                 } else {
@@ -260,17 +265,17 @@ class OrderController extends Controller
                     }
                 }
             }
-            
+
             $subtotal = $item['harga'] * $item['quantity'];
-            $totalHarga += $subtotal; 
-            
+            $totalHarga += $subtotal;
+
             $updatedCart[$menuId] = $item;
         }
 
         session(['cart' => $updatedCart]);
-        $cart = $updatedCart; 
-        
-        
+        $cart = $updatedCart;
+
+
         $member = null;
 
         if ($request->member_id) {
@@ -278,11 +283,11 @@ class OrderController extends Controller
 
             if ($request->use_points && $member && $member->points >= 10) {
                 $pointsUsed = floor($member->points / 10) * 10;
-                $potongan = $pointsUsed * 7500 / 10; 
+                $potongan = $pointsUsed * 7500 / 10;
             }
         }
-        
-        
+
+
         $totalHargaFinal = max($totalHarga - $potongan, 0);
 
 
@@ -290,7 +295,7 @@ class OrderController extends Controller
             return back()->with('error', 'Jumlah bayar tidak boleh kurang dari total harga setelah potongan.');
         }
 
-        DB::transaction(function () use ($request, $cart, $menusCache, $totalHarga, $totalHargaFinal, $member, $potongan, $pointsUsed) {
+        DB::transaction(function () use ($request, $cart, $menusCache, $totalHarga, $totalHargaFinal, $member, $potongan, $pointsUsed, &$order) {
             $user = auth()->user();
             $namaKasir = $user->role === 'kasir' ? $request->nama_kasir : $user->name;
 
@@ -300,7 +305,7 @@ class OrderController extends Controller
                 'kembalian' => $request->jumlah_bayar - $totalHargaFinal,
                 'user_id' => $user->id,
                 'nama_kasir' => $namaKasir,
-                'total_harga' => $totalHargaFinal, 
+                'total_harga' => $totalHargaFinal,
                 'potongan' => $potongan,
                 'member_id' => $member?->id,
             ]);
@@ -308,16 +313,16 @@ class OrderController extends Controller
             foreach ($cart as $menuId => $item) {
                 $menu = $menusCache->get($menuId);
                 $qty = $item['quantity'];
-                
-                $hargaFinalItem = $item['harga']; 
+
+                $hargaFinalItem = $item['harga'];
 
                 DetailOrder::create([
                     'order_id' => $order->id,
                     'menu_id' => $menu->id,
                     'nama_menu' => $menu->nama_menu,
-                    'harga_menu' => $hargaFinalItem, 
+                    'harga_menu' => $hargaFinalItem,
                     'jumlah' => $qty,
-                    'subtotal' => $hargaFinalItem * $qty, 
+                    'subtotal' => $hargaFinalItem * $qty,
                 ]);
 
                 $menu->decrement('stok', $qty);
@@ -325,18 +330,51 @@ class OrderController extends Controller
 
             if ($member) {
                 $member->decrement('points', $pointsUsed);
-                
-                $pointsEarned = floor($totalHarga / 3000); 
+
+                $pointsEarned = floor($totalHarga / 3000);
 
                 $member->increment('points', $pointsEarned);
             }
+
+            $order->load('detailOrders');
         });
+
 
         session()->forget('cart');
 
+        if ($order) {
+            $telegramChatId = Setting::where('key', 'telegram_kitchen_chat_id')->value('value');
+
+            if (!empty($telegramChatId)) {
+                $message = "🔔 *PESANAN BARU DARI KASIR*\n";
+                $message .= "===============================\n";
+                $message .= "No. Order: #{$order->id}\n";
+                $message .= "Nama Pemesan: {$order->nama_pemesan}\n";
+                $message .= "Kasir: {$order->nama_kasir}\n";
+                $message .= "Waktu: " . now()->format('H:i:s, d M Y') . "\n";
+                $message .= "===============================\n";
+                $message .= "*RINCIAN MENU:*\n";
+
+                if ($order->relationLoaded('detailOrders')) {
+                    foreach ($order->detailOrders as $detail) {
+                        $message .= "➡️ *{$detail->jumlah}x " . strtoupper($detail->nama_menu) . "*\n";
+                    }
+                } else {
+                    Log::warning("Order {$order->id}: DetailOrders not loaded for Telegram notification.");
+                }
+
+                $message .= "===============================\n";
+                $message .= "*SEGERA DIPROSES!*";
+
+                $this->sendTelegramNotification($telegramChatId, $message);
+            } else {
+                Log::warning('Telegram Kitchen Chat ID is not set in settings table.');
+            }
+        }
+
         return redirect()->route('orders.index')->with('success', 'Pesanan berhasil disimpan dan stok diperbarui.');
     }
-    
+
     public function edit(Order $order)
     {
         if ($redirect = $this->checkRole())
@@ -358,18 +396,18 @@ class OrderController extends Controller
             'menu_id.*' => 'exists:menus,id',
             'jumlah' => 'required|array|min:1',
             'jumlah.*' => 'integer|min:1',
-            
-            'harga_satuan' => 'required|array|min:1', 
-            'harga_satuan.*' => 'numeric|min:0', 
+
+            'harga_satuan' => 'required|array|min:1',
+            'harga_satuan.*' => 'numeric|min:0',
         ]);
 
-        
+
         if (count($request->menu_id) !== count($request->jumlah) || count($request->menu_id) !== count($request->harga_satuan)) {
             return back()->with('error', 'Data menu, jumlah, dan harga tidak sesuai.');
         }
 
         DB::transaction(function () use ($request, $order) {
-            
+
             foreach ($order->detailOrders as $detail) {
                 $menu = Menu::find($detail->menu_id);
                 if ($menu)
@@ -383,26 +421,26 @@ class OrderController extends Controller
             foreach ($request->menu_id as $index => $menuId) {
                 $menu = Menu::findOrFail($menuId);
                 $qty = (int) $request->jumlah[$index];
-                
-                
-                $hargaFinalItem = (float) $request->harga_satuan[$index]; 
+
+
+                $hargaFinalItem = (float) $request->harga_satuan[$index];
 
                 if ($menu->stok < $qty) {
-                    
+
                     throw new \Exception("Stok tidak cukup untuk menu {$menu->nama_menu}.");
                 }
 
                 DetailOrder::create([
                     'order_id' => $order->id,
                     'menu_id' => $menu->id,
-                    'nama_menu' => $menu->nama_menu, 
-                    'harga_menu' => $hargaFinalItem, 
+                    'nama_menu' => $menu->nama_menu,
+                    'harga_menu' => $hargaFinalItem,
                     'jumlah' => $qty,
-                    'subtotal' => $hargaFinalItem * $qty, 
+                    'subtotal' => $hargaFinalItem * $qty,
                 ]);
 
                 $menu->decrement('stok', $qty);
-                $totalHarga += $hargaFinalItem * $qty; 
+                $totalHarga += $hargaFinalItem * $qty;
             }
 
             $order->update(['total_harga' => $totalHarga]);
@@ -430,23 +468,23 @@ class OrderController extends Controller
         return redirect()->route('orders.index')->with('success', 'Order berhasil dihapus');
     }
 
-    
+
     public function addToCart(Request $request)
     {
         $menu = Menu::findOrFail($request->menu_id);
         $cart = session()->get('cart', []);
         $id = $menu->id;
 
-        $hargaNormal = $menu->harga; 
-        $stokTersedia = $menu->stok; 
-        
-        $hargaFinal = $menu->harga_jual; 
+        $hargaNormal = $menu->harga;
+        $stokTersedia = $menu->stok;
+
+        $hargaFinal = $menu->harga_jual;
         $isPromo = $hargaFinal < $hargaNormal;
 
         $currentQuantity = $cart[$id]['quantity'] ?? 0;
         $newQuantity = $currentQuantity + 1;
 
-        $stokUntukPengecekan = $stokTersedia; 
+        $stokUntukPengecekan = $stokTersedia;
 
         if ($newQuantity > $stokUntukPengecekan) {
             return response()->json([
@@ -456,13 +494,13 @@ class OrderController extends Controller
                 'new_stok' => max(0, $stokUntukPengecekan - $currentQuantity),
             ]);
         }
-        
+
         $cart[$id] = [
             'nama_menu' => $menu->nama_menu,
-            'harga' => $hargaFinal, 
+            'harga' => $hargaFinal,
             'harga_normal' => $isPromo ? $hargaNormal : null,
             'gambar' => $menu->gambar,
-            'stok' => $stokTersedia, 
+            'stok' => $stokTersedia,
             'quantity' => $newQuantity,
         ];
 
@@ -504,10 +542,10 @@ class OrderController extends Controller
 
             session()->put('cart', $cart);
 
-            
+
             $jumlahDiKeranjang = $cart[$menuId]['quantity'] ?? 0;
 
-            
+
             $newStok = $menu->stok - $jumlahDiKeranjang;
 
             return response()->json([
@@ -563,27 +601,145 @@ class OrderController extends Controller
         if ($redirect = $this->checkRole())
             return $redirect;
 
-        
+
         $order = Order::find($orderId);
 
         if ($order) {
-            
+
             $detailOrder = $order->detailOrders()->where('menu_id', $menuId)->first();
 
             if ($detailOrder) {
-                
+
                 $menu = Menu::find($menuId);
                 if ($menu) {
                     $menu->increment('stok', $detailOrder->jumlah);
                 }
 
-                
+
                 $detailOrder->delete();
             }
         }
 
-        
+
         return redirect()->route('orders.show', $orderId)->with('success', 'Menu berhasil dihapus dari pesanan.');
+    }
+
+    public function checkout(Request $request)
+    {
+        $cart = session('cart', []);
+
+        if (empty($cart)) {
+            return redirect()->back()->with('error', 'Keranjang kosong.');
+        }
+
+        $menuIds = array_keys($cart);
+        $menusCache = Menu::whereIn('id', $menuIds)->get()->keyBy('id');
+
+        $totalHarga = 0;
+        foreach ($cart as $menuId => $item) {
+            $menu = $menusCache->get($menuId);
+            if (!$menu) {
+                return redirect()->back()->with('error', 'Menu tidak ditemukan.');
+            }
+            $totalHarga += $menu->harga * $item['quantity'];
+        }
+
+        $member = null;
+        if ($request->filled('member_id')) {
+            $member = Member::find($request->member_id);
+        }
+
+        // Potongan dari poin jika pakai poin dan cukup poin
+        $potongan = 0;
+        $pointsUsed = 0;
+        if ($member && $request->use_points && $member->points >= 10) {
+            // Pakai kelipatan 10 poin
+            $pointsUsed = floor($member->points / 10) * 10;
+            $potongan = ($pointsUsed / 10) * 7500;
+        }
+
+        $totalBayar = max($totalHarga - $potongan, 0);
+
+        if ($request->jumlah_bayar < $totalBayar) {
+            return redirect()->back()->with('error', 'Jumlah bayar kurang.');
+        }
+
+        DB::transaction(function () use ($request, $cart, $menusCache, $totalBayar, $totalHarga, $potongan, $member, $pointsUsed, &$order) {
+            $user = auth()->user();
+            $namaKasir = $user->role === 'kasir' ? $request->nama_kasir : $user->name;
+
+            $order = Order::create([
+                'nama_pemesan' => $request->nama_pemesan,
+                'jumlah_bayar' => $request->jumlah_bayar,
+                'kembalian' => $request->jumlah_bayar - $totalBayar,
+                'user_id' => $user->id,
+                'nama_kasir' => $namaKasir,
+                'total_harga' => $totalHarga,
+                'potongan' => $potongan,
+                'member_id' => $member?->id,
+            ]);
+
+            foreach ($cart as $menuId => $item) {
+                $menu = $menusCache->get($menuId);
+                $qty = $item['quantity'];
+
+                DetailOrder::create([
+                    'order_id' => $order->id,
+                    'menu_id' => $menu->id,
+                    'nama_menu' => $menu->nama_menu,
+                    'harga_menu' => $menu->harga,
+                    'jumlah' => $qty,
+                    'subtotal' => $menu->harga * $qty,
+                ]);
+
+                $menu->decrement('stok', $qty);
+            }
+
+            if ($member) {
+                // Kurangi poin yang dipakai
+                if ($pointsUsed > 0) {
+                    $member->decrement('points', $pointsUsed);
+                }
+
+                // Tambah poin baru sesuai total harga sebelum potongan
+                $pointsEarned = floor($totalHarga / 3000);
+                // Jika ingin minimal dapat 1 poin setiap order, gunakan:
+                // $pointsEarned = max(1, floor($totalHarga / 3000));
+                $member->increment('points', $pointsEarned);
+            }
+
+            $order->load('detailOrders');
+        });
+
+        session()->forget('cart');
+
+        if ($order) {
+            $telegramChatId = \App\Models\Setting::where('key', 'telegram_kitchen_chat_id')->value('value');
+
+            if (!empty($telegramChatId)) {
+                $message = "🔔 *PESANAN BARU DARI KASIR (CHECKOUT)*\n";
+                $message .= "===============================\n";
+                $message .= "No. Order: #{$order->id}\n";
+                $message .= "Nama Pemesan: {$order->nama_pemesan}\n";
+                $message .= "Kasir: {$order->nama_kasir}\n";
+                $message .= "Waktu: " . now()->format('H:i:s, d M Y') . "\n";
+                $message .= "===============================\n";
+                $message .= "*RINCIAN MENU:*\n";
+
+                if ($order->relationLoaded('detailOrders')) {
+                    foreach ($order->detailOrders as $detail) {
+                        $message .= "➡️ *{$detail->jumlah}x " . strtoupper($detail->nama_menu) . "*\n";
+                    }
+                }
+
+                $message .= "===============================\n";
+                $message .= "*SEGERA DIPROSES!*";
+
+                $this->sendTelegramNotification($telegramChatId, $message);
+            }
+        }
+
+        return redirect()->route('orders.index')->with('success', 'Pesanan berhasil disimpan dan stok diperbarui.');
     }
 
     public function checkMember(Request $request)
@@ -617,11 +773,11 @@ class OrderController extends Controller
 
         if (isset($cart[$menuId])) {
             if ($cart[$menuId]['harga'] != $newPrice) {
-                $cart[$menuId]['harga'] = $newPrice; 
+                $cart[$menuId]['harga'] = $newPrice;
                 session()->put('cart', $cart);
-                
+
                 return response()->json([
-                    'status' => 'success', 
+                    'status' => 'success',
                     'message' => "Harga menu ID {$menuId} berhasil disinkronkan ke harga normal: {$newPrice}."
                 ]);
             }
@@ -630,4 +786,40 @@ class OrderController extends Controller
 
         return response()->json(['status' => 'success', 'message' => 'Menu tidak ditemukan di keranjang.']);
     }
+
+    private function sendTelegramNotification(string $chatId, string $message): bool
+    {
+        // Ganti dengan konstanta BOT_TOKEN
+        $token = self::TELEGRAM_BOT_TOKEN;
+
+        try {
+            $url = "https://api.telegram.org/bot{$token}/sendMessage";
+
+            $payload = [
+                'chat_id' => $chatId,
+                'text' => $message,
+                'parse_mode' => 'Markdown',
+            ];
+
+            $res = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'User-Agent' => 'order-notification',
+            ])
+                ->timeout(10)
+                ->post($url, $payload);
+
+            Log::info('Order Telegram Notification', [
+                'status' => $res->status(),
+                'body' => $res->body(),
+                'chat_id' => $chatId
+            ]);
+
+            return $res->successful();
+        } catch (\Throwable $e) {
+            Log::error('Order Telegram Notification exception: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+
 }
