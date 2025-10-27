@@ -15,6 +15,13 @@ use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
+    public function print(Order $order)
+    {
+        $order->load('detailOrders.menu');
+        return view('orders.print', compact('order'));
+    }
+
+    
     private function checkRole()
     {
         if (auth()->guest() || !in_array(auth()->user()->role, ['kasir', 'user'])) {
@@ -197,7 +204,20 @@ class OrderController extends Controller
 
         session()->forget('cart');
 
-        return redirect()->route('orders.index')->with('success', 'Pesanan berhasil disimpan dan stok diperbarui.');
+        if ($request->has('cetak_struk')) {
+            return redirect()
+                ->route('orders.index')
+                ->with('success', 'Pesanan berhasil disimpan dan stok diperbarui.')
+                ->with('print', true);
+        }
+
+        return redirect()
+            ->route('orders.index')
+            ->with([
+                'success' => 'Pesanan berhasil disimpan dan stok diperbarui.',
+                'print' => true,
+                'order_id' => $order->id, // simpan ID order untuk cetak
+            ]);
     }
 
 

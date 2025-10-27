@@ -118,3 +118,4 @@ Route::get('/orders/{order}/struk', [OrderController::class, 'struk'])->name('or
 Route::get('/check-member', [OrderController::class, 'checkMember'])->name('orders.checkMember');
 
 
+Route::get('/orders/print/{order}', [OrderController::class, 'print'])->name('orders.print');
