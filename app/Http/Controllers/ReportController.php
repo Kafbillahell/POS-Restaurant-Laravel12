@@ -15,8 +15,8 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class ReportController extends Controller
 {
-    // DI CONTROLLER ANDA
-public function index(Request $request)
+    // Logika Laporan Utama
+    public function index(Request $request)
     {
         // Mengambil tanggal dari request atau menggunakan default bulan ini
         $startDate = Carbon::parse($request->input('start_date', Carbon::now()->startOfMonth()->format('Y-m-d')))->startOfDay();
@@ -44,22 +44,21 @@ public function index(Request $request)
             ->orderBy('bulan_tahun')
             ->get();
             
-        // 2. Perhitungan Ringkasan Total Global (LENGKAPI SEMUA VARIABEL SUMMARY)
+        // 2. Perhitungan Ringkasan Total Global
         $totalSummary = [
             'total_order_all' => $reports->sum('total_order'),
             'total_pendapatan_all' => $reports->sum('total_pendapatan'),
-            'total_komisi_kasir_all' => $reports->sum('total_komisi_kasir'), // Tambahkan ini
-            'total_keuntungan_bersih_all' => $reports->sum('total_keuntungan_bersih'), // Tambahkan ini
+            'total_komisi_kasir_all' => $reports->sum('total_komisi_kasir'),
+            'total_keuntungan_bersih_all' => $reports->sum('total_keuntungan_bersih'),
         ];
 
 
-        // === PERBAIKAN AJAX: Mengembalikan JSON dengan data summary dan HTML tabel ===
+        // === Penanganan AJAX: Mengembalikan JSON dengan data summary dan HTML tabel ===
         if ($request->ajax() || $request->has('ajax')) {
             // Render partial view tabel menjadi string HTML
-            $tableHtml = view('partials.report_table', [ // Ganti nama partial sesuai yang Anda gunakan
+            $tableHtml = view('partials.report_table', [
                 'reports' => $reports,
-                // Hilangkan $totalSummary dari sini jika partial hanya butuh $reports
-            ])->render(); 
+            ])->render();
             
             // Mengembalikan respons JSON yang berisi data dan HTML
             return response()->json([
@@ -67,17 +66,17 @@ public function index(Request $request)
                 'table_html' => $tableHtml,
             ]);
         }
-        // =========================================================================
-
+        
         // Jika bukan AJAX, kembalikan full view seperti biasa
-        // Pastikan variabel 'reports' dan 'totalSummary' dikirim.
         return view('reports.index', [
-            'reports' => $reports, // Digunakan untuk iterasi di tabel DAN menghitung ringkasan awal di blade
+            'reports' => $reports, // Data laporan per kasir/bulan
             'startDate' => $startDate->format('Y-m-d'),
             'endDate' => $endDate->format('Y-m-d'),
             'totalSummary' => $totalSummary, // Sertakan summary untuk pemuatan awal
         ]);
     }
+    
+    // Logika Detail Laporan per Kasir dan Bulan
     public function show($kasir_id, $bulan_tahun)
     {
         [$tahun, $bulan] = explode('-', $bulan_tahun);
@@ -100,6 +99,8 @@ public function index(Request $request)
             'tanggal' => $startDate->format('Y-m-d'),
         ]);
     }
+    
+    // Logika Export ke Excel (XLSX)
     public function exportExcel(Request $request)
     {
         $bulanTahun = $request->input('bulan_tahun', Carbon::now()->format('Y-m'));
@@ -203,6 +204,8 @@ public function index(Request $request)
         $writer->save('php://output');
         exit;
     }
+    
+    // Logika Export ke Word (DOCX)
     public function exportWord(Request $request)
     {
         $bulanTahun = $request->input('bulan_tahun', Carbon::now()->format('Y-m'));
