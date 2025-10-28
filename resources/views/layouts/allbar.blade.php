@@ -1,30 +1,38 @@
-
 <div id="main-wrapper" data-theme="light" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
     data-sidebar-position="fixed" data-header-position="fixed" data-boxed-layout="full">
 
-    <!-- Topbar header -->
+    <style>
+        #sidebarnav a {
+            text-decoration: none !important;
+        }
+
+        #sidebarnav a:hover,
+        #sidebarnav a.active {
+            text-decoration: none !important;
+        }
+    </style>
+
     <header class="topbar" data-navbarbg="skin6">
         <nav class="navbar top-navbar navbar-expand-md">
             <div class="navbar-header" data-logobg="skin6">
-                <!-- Sidebar toggle for mobile -->
                 <a class="nav-toggler waves-effect waves-light d-block d-md-none" href="javascript:void(0)">
                     <i class="ti-menu ti-close"></i>
                 </a>
-                <!-- Logo -->
                 <div class="navbar-brand" style="display: flex; align-items: center; gap: 8px;">
-                    <a href="{{  route('dashboard.index') }}" style="display: flex; align-items: center; text-decoration: none;">
+                    <a href="{{ route('dashboard.index') }}"
+                        style="display: flex; align-items: center; text-decoration: none;">
                         <span class="logo-icon" style="display: flex;">
                             <img src="{{ asset('assets/images/logo-icon.png') }}" alt="homepage" class="dark-logo" />
                             <img src="{{ asset('assets/images/logo-icon.png') }}" alt="homepage" class="light-logo" />
                         </span>
                         <span class="logo-text" style="display: flex;">
                             <img src="{{ asset('assets/images/logo-text.png') }}" alt="homepage" class="dark-logo" />
-                            <img src="{{ asset('assets/images/logo-light-text.png') }}" alt="homepage" class="light-logo" />
+                            <img src="{{ asset('assets/images/logo-light-text.png') }}" alt="homepage"
+                                class="light-logo" />
                         </span>
                     </a>
                 </div>
 
-                <!-- Mobile toggle -->
                 <a class="topbartoggler d-block d-md-none waves-effect waves-light" href="javascript:void(0)"
                     data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
@@ -34,24 +42,9 @@
 
             <div class="navbar-collapse collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav float-left mr-auto ml-3 pl-1">
-                    <!-- Left nav items (optional) -->
                 </ul>
 
                 <ul class="navbar-nav float-right">
-                    <!-- Search -->
-                    <!-- <li class="nav-item d-none d-md-block">
-                        <a class="nav-link" href="javascript:void(0)">
-                            <form>
-                                <div class="customize-input">
-                                    <input class="form-control custom-shadow custom-radius border-0 bg-white"
-                                        type="search" placeholder="Search" aria-label="Search" />
-                                    <i class="form-control-icon" data-feather="search"></i>
-                                </div>
-                            </form>
-                        </a>
-                    </li> -->
-
-                    <!-- User profile dropdown -->
                     <li class="nav-item dropdown position-relative">
                         <a class="nav-link dropdown-toggle" href="javascript:void(0)" data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">
@@ -66,7 +59,8 @@
 
                             <span class="ml-2 d-none d-lg-inline-block">
                                 <span>Hello,</span>
-                                <span class="text-dark">{{ Auth::user()->username ?? Auth::user()->name ?? 'User' }}</span>
+                                <span
+                                    class="text-dark">{{ Auth::user()->username ?? Auth::user()->name ?? 'User' }}</span>
                                 <i data-feather="chevron-down" class="svg-icon"></i>
                             </span>
                         </a>
@@ -90,73 +84,82 @@
         </nav>
     </header>
 
-    <!-- Sidebar -->
-   <aside class="left-sidebar" data-sidebarbg="skin6">
-    <div class="scroll-sidebar" data-sidebarbg="skin6">
-        <nav class="sidebar-nav">
-            <ul id="sidebarnav">
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{ route('dashboard.index') }}" aria-expanded="false">
-                        <i data-feather="home" class="feather-icon"></i>
-                        <span class="hide-menu">Dashboard</span>
-                    </a>
-                </li>
+    <aside class="left-sidebar" data-sidebarbg="skin6">
+        <div class="scroll-sidebar" data-sidebarbg="skin6">
+            <nav class="sidebar-nav">
+                <ul id="sidebarnav">
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ route('dashboard.index') }}" aria-expanded="false">
+                            <i data-feather="home" class="feather-icon"></i>
+                            <span class="hide-menu">Dashboard</span>
+                        </a>
+                    </li>
 
-                <li class="list-divider"></li>
-                <li class="nav-small-cap"><span class="hide-menu">Applications</span></li>
+                    <li class="list-divider"></li>
+                    <li class="nav-small-cap"><span class="hide-menu">Applications</span></li>
 
-                @php $role = auth()->user()->role; @endphp
+                    @php $role = auth()->user()->role; @endphp
 
-                @if($role === 'admin')
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ route('users.index') }}">
-                            <i data-feather="users" class="feather-icon"></i>
-                            <span class="hide-menu">User</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ route('reports.index') }}">
-                            <i data-feather="bar-chart-2" class="feather-icon"></i>
-                            <span class="hide-menu">Report</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ route('kategoris.index') }}">
-                            <i data-feather="layers" class="feather-icon"></i>
-                            <span class="hide-menu">Kategori</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ route('menus.index') }}">
-                            <i data-feather="book-open" class="feather-icon"></i>
-                            <span class="hide-menu">Menus</span>
-                        </a>
-                    </li>
-                @elseif($role === 'kasir')
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ route('orders.index') }}">
-                            <i data-feather="shopping-cart" class="feather-icon"></i>
-                            <span class="hide-menu">Order</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ route('detail_orders.index') }}">
-                            <i data-feather="file-text" class="feather-icon"></i>
-                            <span class="hide-menu">Detail Order</span>
-                        </a>
-                    </li>
-                @endif
-            </ul>
-        </nav>
-    </div>
-</aside>
-
+                    @if($role === 'admin')
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="{{ route('users.index') }}">
+                                <i data-feather="users" class="feather-icon"></i>
+                                <span class="hide-menu">User</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="{{ route('reports.index') }}">
+                                <i data-feather="bar-chart-2" class="feather-icon"></i>
+                                <span class="hide-menu">Report</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="{{ route('kategoris.index') }}">
+                                <i data-feather="layers" class="feather-icon"></i>
+                                <span class="hide-menu">Kategori</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="{{ route('menus.index') }}">
+                                <i data-feather="book-open" class="feather-icon"></i>
+                                <span class="hide-menu">Menus</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="{{ route('settings.kitchen.index') }}">
+                                <i data-feather="settings" class="feather-icon"></i>
+                                <span class="hide-menu">Kitchen Setting</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="{{ route('promo.index') }}">
+                                <i data-feather="tag" class="feather-icon"></i>
+                                <span class="hide-menu">Pengaturan Promo</span>
+                            </a>
+                        </li>
+                    @elseif($role === 'kasir')
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="{{ route('orders.index') }}">
+                                <i data-feather="shopping-cart" class="feather-icon"></i>
+                                <span class="hide-menu">Order</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="{{ route('detail_orders.index') }}">
+                                <i data-feather="file-text" class="feather-icon"></i>
+                                <span class="hide-menu">Detail Order</span>
+                            </a>
+                        </li>
+                    @endif
+                </ul>
+            </nav>
+        </div>
+    </aside>
 
 
 </div>
 
 @push('scripts')
-    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
@@ -185,6 +188,4 @@
             }
         });
     </script>
-
-    
 @endpush

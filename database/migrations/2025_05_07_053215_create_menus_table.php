@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('menus', function (Blueprint $table) {
@@ -17,17 +14,14 @@ return new class extends Migration
             $table->string('nama_menu');
             $table->text('deskripsi')->nullable();
             $table->decimal('harga', 10, 2);
-            $table->string('gambar')->nullable(); // Gambar menu
-            $table->integer('stok')->default(0);  // ✅ Tambahkan baris ini
+            $table->string('gambar')->nullable(); 
+            $table->integer('stok')->default(0); 
             $table->timestamps();
-            $table->softDeletes(); // ✅ Kolom 'deleted_at' untuk SoftDeletes
+            $table->softDeletes(); 
             $table->foreign('kategori_id')->references('id')->on('kategoris')->onDelete('cascade');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('menus');
