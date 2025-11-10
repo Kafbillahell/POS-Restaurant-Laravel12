@@ -4,12 +4,18 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
         Schema::table('menus', function (Blueprint $table) {
-            
+
+            if (!Schema::hasColumn('menus', 'harga_promo')) {
+                $table->unsignedBigInteger('harga_promo')->nullable()->after('harga');
+            }
+            if (!Schema::hasColumn('menus', 'stok_promo')) {
+                $table->integer('stok_promo')->nullable()->after('stok');
+            }
+
             if (!Schema::hasColumn('menus', 'durasi_promo_hari')) {
                 $table->unsignedSmallInteger('durasi_promo_hari')->default(0)->after('stok_promo');
             }
@@ -30,7 +36,7 @@ return new class extends Migration
     {
         Schema::table('menus', function (Blueprint $table) {
             $columnsToDrop = [
-                'harga_promo', 
+                'harga_promo',
                 'stok_promo',
                 'durasi_promo_hari',
                 'durasi_promo_jam',

@@ -54,19 +54,35 @@ class Menu extends Model
     {
         return Attribute::make(
             get: function ($value, $attributes) {
-                $hasDiscount = $attributes['harga_promo'] > 0 && $attributes['harga_promo'] < $attributes['harga'];
-                $hasDuration = (int)$attributes['durasi_promo_hari'] > 0 || (int)$attributes['durasi_promo_jam'] > 0 || (int)$attributes['durasi_promo_menit'] > 0;
                 
-                if (!$hasDiscount || !$hasDuration || is_null($this->promo_start_at)) {
+                // Amankan akses array dengan Null Coalescing Operator (?? 0)
+                $hargaPromo = $attributes['harga_promo'] ?? 0;
+                $hargaNormal = $attributes['harga'] ?? 0;
+                $durasiHari = (int)($attributes['durasi_promo_hari'] ?? 0);
+                $durasiJam = (int)($attributes['durasi_promo_jam'] ?? 0);
+                $durasiMenit = (int)($attributes['durasi_promo_menit'] ?? 0);
+                
+                // Pengecekan 1: Diskon harus valid (promo > 0 DAN promo < harga normal)
+                $hasDiscount = $hargaPromo > 0 && $hargaPromo < $hargaNormal;
+                
+                // Pengecekan 2: Durasi harus valid (salah satu durasi > 0)
+                $hasDuration = $durasiHari > 0 || $durasiJam > 0 || $durasiMenit > 0;
+                
+                // Pengecekan 3: Promo harus diaktifkan/memiliki waktu mulai
+                $hasStartTime = !is_null($this->promo_start_at);
+
+                if (!$hasDiscount || !$hasDuration || !$hasStartTime) {
                     return false; 
                 }
 
+                // Hitung waktu berakhir
                 $endTime = $this->promo_start_at
                     ->copy()
-                    ->addDays((int)$attributes['durasi_promo_hari'])
-                    ->addHours((int)$attributes['durasi_promo_jam'])
-                    ->addMinutes((int)$attributes['durasi_promo_menit']);
+                    ->addDays($durasiHari)
+                    ->addHours($durasiJam)
+                    ->addMinutes($durasiMenit);
 
+                // Pengecekan 4: Waktu sekarang harus kurang dari waktu berakhir
                 return Carbon::now()->lessThan($endTime);
             }
         );
@@ -74,8 +90,9 @@ class Menu extends Model
     
     protected function hargaJual(): Attribute
     {
+        // $this->isPromoActive akan memanggil accessor di atas (aman)
         return Attribute::make(
-            get: fn ($value, $attributes) => $this->isPromoActive ? (int)$attributes['harga_promo'] : (int)$attributes['harga']
+            get: fn ($value, $attributes) => $this->isPromoActive ? (int)($attributes['harga_promo'] ?? 0) : (int)($attributes['harga'] ?? 0)
         );
     }
     
@@ -84,9 +101,10 @@ class Menu extends Model
         return Attribute::make(
             get: function ($value, $attributes) {
                 $parts = [];
-                $d = $attributes['durasi_promo_hari'];
-                $h = $attributes['durasi_promo_jam'];
-                $m = $attributes['durasi_promo_menit'];
+                // Amankan akses array
+                $d = $attributes['durasi_promo_hari'] ?? 0;
+                $h = $attributes['durasi_promo_jam'] ?? 0;
+                $m = $attributes['durasi_promo_menit'] ?? 0;
                 
                 if ($d > 0) $parts[] = $d . ' Hari';
                 if ($h > 0) $parts[] = $h . ' Jam';

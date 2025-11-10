@@ -47,9 +47,16 @@ class PromoController extends Controller
              return response()->json(['error' => 'Data input tidak valid.'], 422);
         }
 
+        $menuIds = $request->input('menu_id', []); // Ambil 'menu_id', jika null berikan array kosong []
+
+        if (!is_array($menuIds)) {
+            // Ini mungkin tidak diperlukan jika menggunakan input() seperti di atas, 
+            // tapi bisa berguna sebagai fall-back jika input() gagal.
+            $menuIds = [];
+        }
 
         $successCount = 0;
-        foreach ($request->menu_id as $menuId) {
+        foreach ($menuIds as $menuId) {
             $menu = Menu::find($menuId);
             if ($menu) {
                 $hargaPromo = (int) ($request->harga_promo[$menuId] ?? 0);
