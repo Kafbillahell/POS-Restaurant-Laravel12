@@ -143,13 +143,12 @@
         <p class="text-muted mb-4 fs-6 d-flex align-items-center gap-4 flex-wrap">
             {{-- Total Menu --}}
             <span>
-        <i class="bi bi-grid-fill text-danger me-1"></i>
-        Total menu:
-        <span
-            class="badge bg-warning text-dark border border-warning fw-semibold px-3 py-1 rounded-pill shadow-sm">
-            {{ $menus->count() }}
-        </span>
-    </span>
+                <i class="bi bi-grid-fill text-danger me-1"></i>
+                Total menu:
+                <span class="badge bg-warning text-dark border border-warning fw-semibold px-3 py-1 rounded-pill shadow-sm">
+                    {{ $menus->count() }}
+                </span>
+            </span>
 
             {{-- Ready Stock --}}
             <span>
@@ -171,16 +170,16 @@
                     {{ $menus->where('stok', '<=', 0)->count() }}
 
                     @if($menus->where('stok', '<=', 0)->count() > 0)
-                                <span style="
-                            position: absolute;
-                            top: -2px;      /* dekat pojok atas */
-                            right: -2px;    /* dekat pojok kanan */
-                            width: 8px;
-                            height: 8px;
-                            background-color: #dc3545; /* merah bootstrap */
-                            border-radius: 50%;
-                            box-shadow: 0 0 5px rgba(220, 53, 69, 0.7);
-                        "></span>
+                        <span style="
+                                    position: absolute;
+                                    top: -2px;      /* dekat pojok atas */
+                                    right: -2px;    /* dekat pojok kanan */
+                                    width: 8px;
+                                    height: 8px;
+                                    background-color: #dc3545; /* merah bootstrap */
+                                    border-radius: 50%;
+                                    box-shadow: 0 0 5px rgba(220, 53, 69, 0.7);
+                                "></span>
                     @endif
                 </button>
 
@@ -189,41 +188,63 @@
         </p>
 
         <!-- Modal -->
-       <div class="modal fade" id="stokKosongModal" tabindex="-1" aria-labelledby="stokKosongLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content shadow rounded-4">
-            <div class="modal-header bg-danger text-white rounded-top-4">
-                <h5 class="modal-title" id="stokKosongLabel"><i class="bi bi-exclamation-circle me-2"></i>Menu Stok Kosong</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                @php
-                    $kosongMenus = $menus->where('stok', '<=', 0);
-                @endphp
+        <div class="modal fade" id="stokKosongModal" tabindex="-1" aria-labelledby="stokKosongLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content shadow rounded-4">
+                    <div class="modal-header bg-danger text-white rounded-top-4">
+                        <h5 class="modal-title" id="stokKosongLabel"><i class="bi bi-exclamation-circle me-2"></i>Menu Stok
+                            Kosong</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        @php
+                            $kosongMenus = $menus->where('stok', '<=', 0);
+                        @endphp
 
-                @if($kosongMenus->isEmpty())
-                    <p class="text-muted text-center">Semua menu tersedia 🎉</p>
-                @else
-           <ul class="list-group list-group-flush">
-    @foreach($kosongMenus as $menu)
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-            {{ $menu->nama_menu }}
+                        @if($kosongMenus->isEmpty())
+                            <p class="text-muted text-center">Semua menu tersedia 🎉</p>
+                        @else
+                            <ul class="list-group list-group-flush">
+                                @foreach($kosongMenus as $menu)
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>
+                                            {{ $menu->nama_menu }}
+                                            <span class="badge bg-danger ms-2">Stok: {{ $menu->stok }}</span>
+                                        </span>
 
-            <a href="{{ route('menus.edit', $menu->id) }}" 
-               class="btn btn-outline-danger btn-sm rounded-pill d-flex align-items-center gap-1"
-               title="Tambah Stok">
-                <i class="bi bi-plus-circle"></i>
-                <span class="d-none d-sm-inline">Perlu Ditambah</span>
-            </a>
-        </li>
-    @endforeach
-</ul>
+                                        {{-- FORM/BUTTON TAMBAH STOK --}}
+                                        <form action="{{ route('menus.update.stok', $menu->id) }}" method="POST"
+                                            class="form-add-stok d-flex align-items-center gap-2">
+                                            @csrf
+                                            @method('PUT')
 
-                @endif
+                                            {{-- Tombol (Awal) / Input (Aktif) --}}
+                                            <button type="button"
+                                                class="btn btn-danger btn-sm rounded-pill btn-action btn-initial-stok"
+                                                data-menu-id="{{ $menu->id }}" title="Klik untuk Tambah Stok">
+                                                <i class="bi bi-box-seam me-1"></i> Tambah Stok
+                                            </button>
+
+                                            {{-- Input Jumlah Stok (Tersembunyi Awalnya) --}}
+                                            <input type="number" name="stok_tambahan" placeholder="Jumlah"
+                                                class="form-control form-control-sm rounded-pill text-center input-stok-tambah d-none"
+                                                style="width: 80px;" min="1">
+
+                                            {{-- Tombol Submit Tambah (Tersembunyi Awalnya) --}}
+                                            <button type="submit" class="btn btn-success btn-sm rounded-pill d-none btn-submit-stok"
+                                                title="Konfirmasi Tambah">
+                                                <i class="bi bi-check2-circle"></i> OK
+                                            </button>
+                                        </form>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @endif
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
         @if (session('success') && auth()->user()->role != 'user')
             <div id="successToast" class="alert alert-success shadow-sm rounded">
                 <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
@@ -231,7 +252,7 @@
         @endif
 
         @if (auth()->user()->role != 'user')
-            {{-- Admin/Kasir/Pemilik --}}
+
             <div class="mb-3 d-flex justify-content-end">
                 <a href="{{ route('menus.create') }}" class="btn btn-success rounded-pill shadow-sm px-4 btn-action">
                     <i class="bi bi-plus-circle"></i> Tambah Menu
@@ -244,7 +265,7 @@
                         <tr>
                             <th>No</th>
                             <th>Kategori</th>
-                            <th class="text-start">Nama Menu</th> <!-- header jadi rata kiri -->
+                            <th class="text-start">Nama Menu</th>
                             <th>Deskripsi</th>
                             <th>Harga</th>
                             <th>Stok</th>
@@ -254,7 +275,7 @@
                     </thead>
                     <tbody>
                         @php
-                            // Group menus per kategori (nama kategori atau 'Tanpa Kategori')
+
                             $groupedMenus = $menus->groupBy(fn($menu) => $menu->kategori->nama_kategori ?? 'Tanpa Kategori');
                         @endphp
 
@@ -293,13 +314,15 @@
                                                 class="btn btn-warning btn-sm rounded-pill px-3 btn-action">
                                                 <i class="bi bi-pencil-square"></i> Edit
                                             </a>
-                          <form action="{{ route('menus.destroy', $menu->id) }}" method="POST" class="delete-form d-inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="button" class="btn btn-danger btn-sm rounded-pill px-3 btn-action delete-button">
-                                <i class="bi bi-trash"></i> Hapus
-                            </button>
-                        </form> 
+                                            <form action="{{ route('menus.destroy', $menu->id) }}" method="POST"
+                                                class="delete-form d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button"
+                                                    class="btn btn-danger btn-sm rounded-pill px-3 btn-action delete-button">
+                                                    <i class="bi bi-trash"></i> Hapus
+                                                </button>
+                                            </form>
                                         @endif
                                     </td>
                                 </tr>
@@ -340,11 +363,111 @@
 @endsection
 
 @section('scripts')
-    <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            const initialStokButtons = document.querySelectorAll('.btn-initial-stok');
+
+            initialStokButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const form = this.closest('.form-add-stok');
+                    const input = form.querySelector('.input-stok-tambah');
+                    const submitBtn = form.querySelector('.btn-submit-stok');
+
+                    this.classList.add('d-none');
+
+                    input.classList.remove('d-none');
+                    submitBtn.classList.remove('d-none');
+                    input.focus();
+                    input.required = true;
+                });
+            });
+
+            const stokForms = document.querySelectorAll('.form-add-stok');
+
+            stokForms.forEach(form => {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+
+                    const formData = new FormData(form);
+                    const url = form.getAttribute('action');
+                    const submitButton = form.querySelector('button[type="submit"]');
+                    const originalButtonHtml = submitButton.innerHTML;
+
+                    const stokInput = form.querySelector('.input-stok-tambah');
+                    if (stokInput.value === '' || parseInt(stokInput.value) <= 0) {
+                        Swal.fire('Perhatian', 'Jumlah stok harus diisi dan lebih dari 0.', 'warning');
+                        return;
+                    }
+
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+
+                    fetch(url, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                if (response.status === 422) {
+                                    return response.json().then(data => { throw new Error(data.message || 'Validasi gagal.'); });
+                                }
+                                throw new Error('Gagal menambah stok. Status: ' + response.status);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Stok Berhasil Ditambah!',
+                                text: data.message || 'Stok menu telah berhasil diperbarui.',
+                                showConfirmButton: false,
+                                timer: 2000
+                            }).then(() => {
+
+                                const modalElement = document.getElementById('stokKosongModal');
+                                const modal = bootstrap.Modal.getInstance(modalElement);
+                                if (modal) {
+                                    modal.hide();
+                                }
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 50);
+                            });
+                        })
+                        .catch(error => {
+
+                            console.error('AJAX Error:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal!',
+                                text: 'Terjadi kesalahan: ' + error.message,
+                            });
+
+                            const initialBtn = form.querySelector('.btn-initial-stok');
+                            const input = form.querySelector('.input-stok-tambah');
+                            const submitBtn = form.querySelector('.btn-submit-stok');
+
+                            initialBtn.classList.remove('d-none');
+                            input.classList.add('d-none');
+                            submitBtn.classList.add('d-none');
+                            input.required = false;
+                            input.value = '';
+
+                        })
+                        .finally(() => {
+
+                            submitButton.disabled = false;
+                            submitButton.innerHTML = originalButtonHtml;
+                        });
+                });
+            });
+
 
             const toast = document.getElementById('successToast');
             if (toast) {
@@ -365,7 +488,6 @@
                 }, i * 150);
             });
 
-            // ✅ SweetAlert konfirmasi sebelum hapus
             const deleteButtons = document.querySelectorAll('.delete-button');
 
             if (deleteButtons.length === 0) {
@@ -405,4 +527,3 @@
         });
     </script>
 @endsection
-

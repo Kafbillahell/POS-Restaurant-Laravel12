@@ -85,6 +85,34 @@ class MenuController extends Controller
         return redirect()->route('menus.index')->with('success', 'Menu berhasil diperbarui.');
     }
 
+    /**
+     * Menambah stok menu (digunakan via AJAX dari modal Stok Kosong).
+     */
+    public function updateStok(Request $request, Menu $menu)
+    {
+        // 1. Validasi input
+        $request->validate([
+            'stok_tambahan' => 'required|integer|min:1',
+        ]);
+
+        $stokTambahan = (int) $request->input('stok_tambahan');
+        
+        // 2. Perbarui stok
+        $menu->stok += $stokTambahan;
+        $menu->save();
+
+        // 3. Respons JSON untuk AJAX request
+        if ($request->ajax()) {
+            return response()->json([
+                'message' => 'Stok ' . $menu->nama_menu . ' berhasil ditambah sebanyak ' . $stokTambahan . '!', 
+                'new_stok' => $menu->stok
+            ], 200);
+        }
+
+        // 4. Fallback jika bukan AJAX request
+        return redirect()->back()->with('success', 'Stok ' . $menu->nama_menu . ' berhasil ditambah.');
+    }
+
     public function destroy(Menu $menu)
     {
         if ($menu->gambar && \Storage::disk('public')->exists($menu->gambar)) {
