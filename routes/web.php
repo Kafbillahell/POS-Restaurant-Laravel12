@@ -127,3 +127,5 @@ Route::middleware(['auth'])->prefix('promo')->name('promo.')->group(function () 
 });
 
 Route::post('/orders/cart/sync-price', [OrderController::class, 'syncPrice'])->name('orders.cart.sync_price');
+
+Route::put('/menus/{menu}/update-stok', [MenuController::class, 'updateStok'])->name('menus.update.stok');
