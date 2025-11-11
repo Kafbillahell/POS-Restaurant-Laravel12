@@ -552,6 +552,7 @@
             </div>
         </div>
     </div>
+    
 
     {{-- Grafik Pendapatan --}}
     <div class="col-md-7">
@@ -567,6 +568,26 @@
         </div>
     </div>
 </div>
+
+ {{-- Menu Best Seller --}}
+   <div class="card mt-4 shadow-sm p-3">
+    <h5 class="fw-bold text-primary mb-3">🌟 Menu Terlaris (Best Seller)</h5>
+    @if(isset($bestSellers) && count($bestSellers) > 0)
+        <ul class="list-group">
+            @foreach ($bestSellers as $item)
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>{{ $item->menu->nama_menu ?? 'Menu tidak ditemukan' }}</span>
+                    <span class="badge bg-success">{{ $item->total_sold }} pcs</span>
+                </li>
+            @endforeach
+        </ul>
+    @else
+        <div class="alert alert-info mb-0">
+            Belum ada data penjualan.
+        </div>
+    @endif
+</div>
+
 
 <style>
 .chart-responsive {
