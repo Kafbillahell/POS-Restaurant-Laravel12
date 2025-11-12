@@ -12,13 +12,11 @@
             font-family: 'Poppins', sans-serif;
         }
 
-        /* --- Common Button Style --- */
         .btn {
             transition: background-color 0.3s ease, color 0.3s ease;
             font-weight: 600;
         }
 
-        /* --- Admin Table --- */
         .table {
             border-collapse: separate;
             border-spacing: 0 10px;
@@ -38,11 +36,19 @@
             box-shadow: 0 3px 8px rgb(0 0 0 / 0.1);
             border-radius: 12px;
             transition: transform 0.2s ease;
-        }
+        }       
 
-        .table tbody tr:hover {
+        .table tbody tr:not(.kategori-row):hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 18px rgb(0 0 0 / 0.15);
+        }
+
+        .table tbody tr.kategori-row {
+            background: none; 
+            box-shadow: none; 
+            border-radius: 0;
+            cursor: default;
+            transform: none;
         }
 
         .table tbody td {
@@ -50,7 +56,6 @@
             padding: 1rem 1.2rem;
         }
 
-        /* Tombol dengan icon */
         .btn-action {
             display: inline-flex;
             align-items: center;
@@ -61,7 +66,6 @@
             font-size: 1.1rem;
         }
 
-        /* Image kecil di tabel */
         td img {
             border-radius: 10px;
             object-fit: cover;
@@ -76,7 +80,6 @@
             box-shadow: 0 6px 14px rgb(0 0 0 / 0.25);
         }
 
-        /* --- User Cards --- */
         .card {
             border: none;
             border-radius: 16px;
@@ -119,7 +122,6 @@
             font-size: 1.1rem;
         }
 
-        /* --- Toast Success --- */
         #successToast {
             position: fixed;
             top: 20px;
@@ -131,6 +133,22 @@
 
         #successToast.show {
             opacity: 1;
+        }
+
+        .stock-indicator {
+            position: relative;
+        }
+
+        .stock-dot {
+            position: absolute;
+            top: -2px;
+            right: -60%;
+            width: 6px;
+            height: 6px;
+            background-color: #dc3545;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(220, 53, 69, 0.7);
+            z-index: 10;
         }
     </style>
 @endsection
@@ -171,19 +189,17 @@
 
                     @if($menus->where('stok', '<=', 0)->count() > 0)
                         <span style="
-                                    position: absolute;
-                                    top: -2px;      /* dekat pojok atas */
-                                    right: -2px;    /* dekat pojok kanan */
-                                    width: 8px;
-                                    height: 8px;
-                                    background-color: #dc3545; /* merah bootstrap */
-                                    border-radius: 50%;
-                                    box-shadow: 0 0 5px rgba(220, 53, 69, 0.7);
-                                "></span>
+                                            position: absolute;
+                                            top: -2px;      /* dekat pojok atas */
+                                            right: -2px;    /* dekat pojok kanan */
+                                            width: 8px;
+                                            height: 8px;
+                                            background-color: #dc3545; /* merah bootstrap */
+                                            border-radius: 50%;
+                                            box-shadow: 0 0 5px rgba(220, 53, 69, 0.7);
+                                        "></span>
                     @endif
                 </button>
-
-
             </span>
         </p>
 
@@ -295,7 +311,16 @@
                                     <td class="text-start">{{ $menu->nama_menu }}</td>
                                     <td>{{ Str::limit($menu->deskripsi, 40, '...') }}</td>
                                     <td class="text-end">Rp{{ number_format($menu->harga, 0, ',', '.') }}</td>
-                                    <td class="text-center">{{ $menu->stok }}</td>
+                                    <td class="text-center fw-bold">
+                                        @if ($menu->stok <= 0)
+                                            <span class="text-danger stock-indicator">
+                                                {{ $menu->stok }}
+                                                <span class="stock-dot"></span>
+                                            </span>
+                                        @else
+                                            {{ $menu->stok }}
+                                        @endif
+                                    </td>
                                     <td class="text-center">
                                         @if ($menu->gambar)
                                             <img src="{{ asset('storage/' . $menu->gambar) }}" alt="Menu Image" />
@@ -305,10 +330,21 @@
                                     </td>
                                     <td class="text-center">
                                         @if ($menu->stok <= 0)
-                                            <a href="{{ route('menus.edit', $menu->id) }}"
-                                                class="btn btn-secondary btn-sm rounded-pill px-3 btn-action">
-                                                <i class="bi bi-box-seam"></i> + Stok
+                                            <div class="d-inline-flex gap-2">
+                                                <a href="{{ route('menus.edit', $menu->id) }}"
+                                                class="btn btn-warning btn-sm rounded-pill px-3 btn-action">
+                                                <i class="bi bi-pencil-square"></i> Edit
                                             </a>
+                                                <form action="{{ route('menus.destroy', $menu->id) }}" method="POST"
+                                                    class="delete-form d-inline m-0">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="button"
+                                                        class="btn btn-danger btn-sm rounded-pill px-3 btn-action delete-button">
+                                                        <i class="bi bi-trash"></i> Hapus
+                                                    </button>
+                                                </form>
+                                            </div>
                                         @else
                                             <a href="{{ route('menus.edit', $menu->id) }}"
                                                 class="btn btn-warning btn-sm rounded-pill px-3 btn-action">
