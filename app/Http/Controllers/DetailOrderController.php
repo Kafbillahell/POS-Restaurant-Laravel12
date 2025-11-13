@@ -9,7 +9,6 @@ class DetailOrderController extends Controller
 {
     public function index()
     {
-        
         $user = auth()->user();
 
         $detailOrders = DetailOrder::with(['order', 'menu'])
@@ -56,5 +55,4 @@ class DetailOrderController extends Controller
     {
         abort(403, 'Akses tidak diizinkan.');
     }
-    
 }
