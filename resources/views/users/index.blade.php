@@ -1,232 +1,371 @@
 @extends('dashboard.home')
 
+@section('styles')
+<style>
+/* ---------------------------------------------------- */
+/* A. TEMA: Minimalist Monochrome SOFT Modern */
+/* ---------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    --black: #171717; /* Sedikit lebih gelap */
+    --gray-dark: #333333;
+    --gray-medium: #6c757d;
+    --gray-light: #f5f5f5; /* Lebih lembut */
+    --bg-soft: #ffffff; /* Putih bersih */
+}
+
+body {
+    background-color: var(--gray-light); /* Background abu muda */
+    font-family: 'Inter', sans-serif;
+    color: var(--black);
+}
+
+.page-title {
+    font-weight: 700; /* Sedikit dilunakkan */
+    font-size: 2.1rem;
+    color: var(--black);
+    letter-spacing: -1px;
+}
+
+/* Modifier baru untuk area Judul agar lebih terstruktur */
+.page-header-container {
+    padding-bottom: 1.5rem; /* Jarak di bawah konten header */
+    margin-bottom: 2rem; /* Margin yang lebih besar untuk memisahkan header dengan konten tabel */
+    border-bottom: 1px solid #e0e0e0; /* Garis pemisah halus */
+}
+
+
+/* Card Modern: Sudut lebih bulat, shadow sangat halus */
+.card-modern {
+    border: 1px solid #e0e0e0;
+    border-radius: 16px; /* Lebih bulat */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04); /* Shadow lebih menyebar */
+    background: var(--bg-soft);
+}
+
+/* Tombol Aksi Utama: Sudut lebih lembut */
+.btn-primary-action {
+    background-color: var(--black);
+    color: #fff;
+    border: 1px solid var(--black);
+    border-radius: 12px; /* Lebih bulat */
+    font-weight: 600;
+    padding: 0.75rem 1.6rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary-action:hover {
+    background-color: var(--gray-dark);
+    color: #fff;
+    border-color: var(--gray-dark);
+    transform: translateY(-1px);
+}
+
+/* Alert/Toast: Sudut lebih lembut */
+.alert-minimal {
+    background: var(--gray-light);
+    border: 1px solid #ddd;
+    color: var(--black);
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    font-weight: 500;
+}
+
+
+/* ---------------------------------------------------- */
+/* B. TABEL MODERN (Soft Edges, Elevated Rows) */
+/* ---------------------------------------------------- */
+.table-minimal-modern {
+    border-collapse: separate;
+    border-spacing: 0 12px; /* Jarak antar baris ditingkatkan */
+}
+
+.table-minimal-modern thead th {
+    background-color: transparent; /* Lebih bersih */
+    color: var(--gray-medium);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-bottom: 2px solid var(--gray-light); /* Garis pemisah halus */
+    padding: 1rem 1rem;
+    font-weight: 600;
+}
+
+.table-minimal-modern tbody tr {
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04); /* Shadow lebih halus */
+    border-radius: 14px; /* Sudut lebih bulat */
+    transition: all 0.2s ease;
+}
+
+.table-minimal-modern tbody tr:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+.table-minimal-modern tbody td {
+    vertical-align: middle;
+    padding: 1.2rem 1rem; /* Padding lebih besar */
+    color: var(--black);
+    border-top: none;
+    border-bottom: none;
+}
+
+/* Memastikan semua sudut baris memiliki radius yang sama */
+.table-minimal-modern tbody tr td:first-child {
+    border-top-left-radius: 14px;
+    border-bottom-left-radius: 14px;
+}
+.table-minimal-modern tbody tr td:last-child {
+    border-top-right-radius: 14px;
+    border-bottom-right-radius: 14px;
+}
+
+/* Avatar Huruf: Sudut bulat total, warna latar belakang lembut */
+.avatar-simple {
+    width: 44px; /* Sedikit lebih besar */
+    height: 44px;
+    background-color: var(--gray-light);
+    color: var(--black);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+    border: 1px solid #e0e0e0;
+}
+
+/* Badge Monokrom Modern (Sudut lebih bulat) */
+.badge-mono {
+    padding: 0.4em 0.8em;
+    font-weight: 600;
+    font-size: 0.7rem;
+    border-radius: 8px; /* Lebih bulat */
+    text-transform: capitalize; 
+    line-height: 1.5;
+}
+
+.badge-solid {
+    background: var(--black);
+    color: #fff;
+}
+.badge-outline {
+    border: 1px solid var(--black);
+    color: var(--black);
+    background: transparent;
+}
+.badge-gray {
+    background: #e9ecef;
+    color: var(--gray-dark);
+}
+
+/* Action Buttons (Ikon & Link) */
+.action-group {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.btn-action-icon {
+    font-size: 1.1rem; /* Ikon sedikit lebih besar */
+    transition: color 0.2s;
+    background: none;
+    border: none;
+    color: var(--gray-medium);
+    padding: 0.3rem;
+}
+
+.btn-action-icon:hover {
+    color: var(--black);
+    transform: scale(1.1);
+}
+
+.btn-action-icon.delete:hover {
+    color: #dc3545; 
+}
+
+/* Perbaikan untuk tampilan tabel saat tidak ada data */
+.table-minimal-modern tbody tr.no-data td {
+    border-radius: 14px;
+    box-shadow: none;
+    background: var(--bg-soft);
+}
+
+</style>
+@endsection
+
+
 @section('content')
 @if (auth()->user()->role !== 'kasir')
-<style>
-    .users-heading {
-        font-size: 2rem;
-        font-weight: 800;
-        color: #284866;
-        letter-spacing: 0.01em;
-        margin-bottom: 2.3rem;
-        display: flex;
-        align-items: center;
-        gap: .7rem;
-    }
-    .user-add-btn {
-        font-weight: 600;
-        font-size: 1.02rem;
-        border-radius: 1.2rem;
-        padding: .55rem 1.3rem;
-        background: #f5f7fa;
-        color: #284866 !important;
-        border: 1px solid #c9d6e3;
-        box-shadow: 0 1.5px 6px #c9d6e320;
-        transition: background .14s, color .14s, box-shadow .13s, border .13s;
-        display: flex;
-        align-items: center;
-        gap: .6rem;
-    }
-    .user-add-btn:hover, .user-add-btn:focus {
-        background: #e8f0fd;
-        color: #16324f !important;
-        border: 1px solid #b5c9de;
-        text-decoration: none;
-        box-shadow: 0 4px 18px #c9d6e340;
-    }
-    .user-table {
-        border-radius: 1.2rem !important;
-        overflow: hidden;
-        box-shadow: 0 6px 24px #c9d6e315, 0 2px 8px #c9d6e30a;
-        margin-bottom: 2rem;
-        background: #f7fafc;
-    }
-    .user-table thead th {
-        background: linear-gradient(90deg, #f7fafc 65%, #e7eef6 100%) !important;
-        color: #284866 !important;
-        font-weight: 800;
-        font-size: 1.05rem;
-        vertical-align: middle;
-        letter-spacing: 0.01em;
-        border-bottom: 2px solid #e3e9f0;
-    }
-    .user-table tbody tr {
-        font-size: 1.01rem;
-        background: #fff;
-        transition: background .12s;
-    }
-    .user-table tbody tr:hover {
-        background: #f0f6fb;
-    }
-    .user-table .badge {
-        font-size: .93rem;
-        font-weight: 600;
-        letter-spacing: 0.04em;
-        border-radius: 1rem;
-        box-shadow: 0 2px 6px #e7eef617;
-        background: #e8f0fd;
-        color: #284866;
-        border: 1px solid #d2dbe7;
-    }
-    .user-table .badge.admin {
-        background: #d9e6f6;
-        color: #205d97;
-        border: 1px solid #c3d2e8;
-    }
-    .user-table .badge.pemilik {
-        background: #ececec;
-        color: #444;
-        border: 1px solid #d6d6d6;
-    }
-    .user-table .badge.kasir {
-        background: #fdf3e9;
-        color: #b86a26;
-        border: 1px solid #f5d8b6;
-    }
-
-    .btn-warning {
-        background: #f8f9fa;
-        color: #c4861c;
-        font-weight: 600;
-        border-radius: 1.2rem;
-        border: 1px solid #eedca9;
-        box-shadow: 0 2px 8px #eedca91a;
-        transition: background .13s, color .13s, border .13s;
-    }
-    .btn-warning:hover, .btn-warning:focus {
-        background: #fffbe9;
-        color: #be951a;
-        border: 1px solid #e3c464;
-    }
-    .btn-danger {
-        background: #faf2f2;
-        color: #c0392b;
-        font-weight: 600;
-        border-radius: 1.2rem;
-        border: 1px solid #eecac9;
-        box-shadow: 0 2px 8px #eecac91a;
-        transition: background .13s, color .13s, border .13s;
-    }
-    .btn-danger:hover, .btn-danger:focus {
-        background: #fff3f2;
-        color: #a93226;
-        border: 1px solid #e3a59e;
-    }
-    .alert-success {
-        font-size: 1.04rem;
-        border-radius: 1rem;
-        font-weight: 600;
-        background: #e7f7ed;
-        color: #2e6051;
-        border: 1px solid #b9dbcc;
-    }
-    @media (max-width: 900px) {
-        .users-heading { font-size: 1.18rem; }
-        .user-table { font-size: .98rem; }
-    }
-</style>
-<div class="container mt-4">
-    <h2 class="users-heading"><i class="bi bi-people-fill"></i> Manajemen Pengguna</h2>
-
-    @if(session('success'))
-        <div class="alert alert-success shadow-sm rounded">{{ session('success') }}</div>
-    @endif
-
-    <div class="d-flex justify-content-end mb-3">
-        <a href="{{ route('users.create') }}" class="user-add-btn shadow-sm">
-            <i class="bi bi-person-plus-fill"></i> Tambah User
+<div class="container-fluid px-4 pt-4 pb-5">
+    
+    {{-- Header & Aksi Utama (Diperbarui untuk membungkus tombol) --}}
+    {{-- Menggunakan align-items-center untuk keselarasan vertikal yang lebih baik --}}
+    <div class="d-flex justify-content-between align-items-center page-header-container">
+        <div>
+            {{-- Menambahkan ikon ke Judul Halaman --}}
+            <h2 class="page-title mb-1 d-flex align-items-center">
+                <i class="bi bi-people-fill me-3 fs-3 text-muted" style="line-height: 1;"></i> 
+                Manajemen Pengguna
+            </h2>
+            <p class="text-muted mb-0 fs-6 ms-5 ps-1">Daftar lengkap akun pengguna yang terdaftar di sistem.</p>
+        </div>
+        <a href="{{ route('users.create') }}" class="btn btn-primary-action shadow-sm">
+            <i class="bi bi-person-plus"></i> Tambah User Baru
         </a>
     </div>
 
-    <div class="table-responsive user-table rounded-4">
-        <table class="table table-hover table-bordered align-middle">
-            <thead class="table-light">
-                <tr class="text-center">
-                    <th>#</th>
-                    <th>Nama</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th style="width: 20%;">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($users as $user)
-                <tr>
-                    <td class="text-center">{{ $loop->iteration }}</td>
-                    <td>{{ $user->name }}</td>
-                    <td>{{ $user->email }}</td>
-                    <td class="text-center">
-                        <span class="badge px-3 py-2 text-uppercase
-                            {{ $user->role === 'admin' ? 'admin' : ($user->role === 'pemilik' ? 'pemilik' : ($user->role === 'kasir' ? 'kasir' : '')) }}">
-                            {{ $user->role }}
-                        </span>
-                    </td>
-                    <td class="text-center">
-                        <a href="{{ route('users.edit', $user) }}" class="btn btn-warning btn-sm rounded-pill px-3 shadow-sm me-2">
-                            <i class="bi bi-pencil-fill"></i> Edit
-                        </a>
-                        <form action="{{ route('users.destroy', $user) }}" method="POST" class="d-inline">
-                            @csrf
-                            @method('DELETE')
-                           <button type="button" class="btn btn-danger btn-sm rounded-pill px-3 shadow-sm btn-delete-user" data-id="{{ $user->id }}" data-name="{{ $user->name }}">
-    <i class="bi bi-trash3-fill"></i> Hapus
-</button>
+    {{-- Alert Minimalis --}}
+    @if(session('success'))
+        <div class="alert alert-minimal alert-dismissible fade show mb-4 d-flex align-items-center" role="alert">
+            <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+            <div>{{ session('success') }}</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
 
-                        </form>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="5" class="text-center text-muted">Belum ada pengguna yang terdaftar.</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
+    {{-- Table Card --}}
+    <div class="card card-modern p-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-minimal-modern w-100 mb-0">
+                    <thead class="text-start">
+                        <tr>
+                            <th class="text-center" width="5%">#</th>
+                            <th width="35%">Nama & Email</th>
+                            <th class="text-center" width="20%">Role</th>
+                            <th class="text-end" width="20%">Bergabung</th>
+                            <th class="text-center" width="20%">Opsi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($users as $user)
+                        <tr>
+                            <td class="text-center text-muted fw-light">{{ $loop->iteration }}</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {{-- Avatar Huruf --}}
+                                    <div class="avatar-simple me-4">
+                                        {{ substr($user->name, 0, 1) }}
+                                    </div>
+                                    <div>
+                                        <span class="fw-semibold d-block">{{ $user->name }}</span>
+                                        <small class="text-muted">{{ $user->email }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                {{-- Logika Badge Monokrom Modern --}}
+                                @if($user->role == 'admin')
+                                    <span class="badge badge-mono badge-solid">Admin</span>
+                                @elseif($user->role == 'pemilik')
+                                    <span class="badge badge-mono badge-outline">Pemilik</span>
+                                @else
+                                    <span class="badge badge-mono badge-gray">Kasir</span>
+                                @endif
+                            </td>
+                            <td class="text-end text-muted small">
+                                {{ $user->created_at ? $user->created_at->format('d M Y') : '-' }}
+                            </td>
+                            <td class="text-center">
+                                <div class="action-group">
+                                    <a href="{{ route('users.edit', $user) }}" class="btn-action-icon" title="Edit Data">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    
+                                    <button type="button" class="btn-action-icon delete btn-delete-user" 
+                                        data-id="{{ $user->id }}" 
+                                        data-name="{{ $user->name }}"
+                                        title="Hapus Pengguna">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr class="no-data">
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="bi bi-person-x-fill fs-4 d-block mb-2"></i>
+                                <em>Belum ada data pengguna yang terdaftar.</em>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+{{-- Hidden Form --}}
+<form id="delete-form" method="POST" style="display: none;">
+    @csrf
+    @method('DELETE')
+</form>
+
 @else
-<div class="container mt-4">
-    <div class="alert alert-info shadow-sm rounded-3">
-        <i class="bi bi-info-circle"></i> Anda tidak memiliki akses untuk melihat data pengguna.
-    </div>
+{{-- Restricted Access Minimalist --}}
+<div class="container mt-5 text-center p-5">
+    <div style="font-size: 4rem; color: var(--gray-medium);"><i class="bi bi-lock-fill"></i></div>
+    <h3 class="fw-bold mt-3" style="letter-spacing: -1px;">AKSES DITOLAK</h3>
+    <p class="text-muted fs-6">Anda tidak memiliki izin (Role Kasir) untuk mengakses halaman Manajemen Pengguna.</p>
+    <a href="{{ url('/dashboard') }}" class="btn btn-primary-action mt-3">
+        <i class="bi bi-arrow-left"></i> Kembali ke Dashboard
+    </a>
 </div>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 @endif
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+@endsection
+
+@section('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const deleteButtons = document.querySelectorAll('.btn-delete-user');
+        const deleteForm = document.getElementById('delete-form');
+
+        // Style SweetAlert agar sejalan dengan tema
+        const swalMono = Swal.mixin({
+            customClass: {
+                popup: 'rounded-3',
+                title: 'fw-bold',
+                confirmButton: 'btn btn-primary-action px-4 py-2 mx-2',
+                cancelButton: 'btn btn-outline-secondary px-4 py-2 mx-2'
+            },
+            buttonsStyling: false,
+            confirmButtonText: 'Ya, Hapus',
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
+            iconColor: '#dc3545', // Warna merah untuk ikon bahaya
+        });
+
         deleteButtons.forEach(button => {
             button.addEventListener('click', function () {
                 const userId = this.getAttribute('data-id');
                 const userName = this.getAttribute('data-name');
 
-                Swal.fire({
-                    title: 'Yakin hapus user?',
-                    html: `User <strong>${userName}</strong> akan dihapus.`,
+                swalMono.fire({
+                    title: 'Hapus Pengguna?',
+                    html: `<p class="text-muted">Anda yakin ingin menghapus data pengguna <strong>${userName}</strong> secara permanen?</p>`,
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Ya, Hapus!',
-                    cancelButtonText: 'Batal',
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        const form = document.createElement('form');
-                        form.method = 'POST';
-                        form.action = `/users/${userId}`;
-                        form.innerHTML = `
-                            @csrf
-                            @method('DELETE')
-                        `;
-                        document.body.appendChild(form);
-                        form.submit();
+                        // Atur action form dan submit
+                        deleteForm.action = `/users/${userId}`;
+                        deleteForm.submit();
                     }
                 });
             });
         });
     });
 </script>
-
 @endsection
