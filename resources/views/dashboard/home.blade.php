@@ -14,7 +14,7 @@
     <link href="{{asset('assets/')}}/extra-libs/jvector/jquery-jvectormap-2.0.2.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
-    <link href="{{asset('dist/')}}/css/style.min.css" rel="stylesheet">
+    <link href="{{asset('dist/')}}/css/style.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
