@@ -94,70 +94,81 @@
         <div class="scroll-sidebar" data-sidebarbg="skin6">
             <nav class="sidebar-nav">
                 <ul id="sidebarnav">
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ route('dashboard.index') }}" aria-expanded="false">
-                            <i data-feather="home" class="feather-icon"></i>
-                            <span class="hide-menu">Dashboard</span>
-                        </a>
-                    </li>
+    <li class="sidebar-item">
+        <a class="sidebar-link" href="{{ route('dashboard.index') }}" aria-expanded="false">
+            <i data-feather="home" class="feather-icon"></i>
+            <span class="hide-menu">Dashboard</span>
+        </a>
+    </li>
 
-                    <li class="list-divider"></li>
-                    <li class="nav-small-cap"><span class="hide-menu">Applications</span></li>
+    <li class="list-divider"></li>
+    <li class="nav-small-cap"><span class="hide-menu">Applications</span></li>
 
-                    @php $role = auth()->user()->role; @endphp
+    @php $role = auth()->user()->role; @endphp
 
-                    @if($role === 'admin')
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="{{ route('users.index') }}">
-                                <i data-feather="users" class="feather-icon"></i>
-                                <span class="hide-menu">User</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="{{ route('reports.index') }}">
-                                <i data-feather="bar-chart-2" class="feather-icon"></i>
-                                <span class="hide-menu">Report</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="{{ route('kategoris.index') }}">
-                                <i data-feather="layers" class="feather-icon"></i>
-                                <span class="hide-menu">Kategori</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="{{ route('menus.index') }}">
-                                <i data-feather="book-open" class="feather-icon"></i>
-                                <span class="hide-menu">Menus</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="{{ route('settings.kitchen.index') }}">
-                                <i data-feather="settings" class="feather-icon"></i>
-                                <span class="hide-menu">Kitchen Setting</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="{{ route('promo.index') }}">
-                                <i data-feather="tag" class="feather-icon"></i>
-                                <span class="hide-menu">Pengaturan Promo</span>
-                            </a>
-                        </li>
-                    @elseif($role === 'kasir')
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="{{ route('orders.index') }}">
-                                <i data-feather="shopping-cart" class="feather-icon"></i>
-                                <span class="hide-menu">Order</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="{{ route('detail_orders.index') }}">
-                                <i data-feather="file-text" class="feather-icon"></i>
-                                <span class="hide-menu">Detail Order</span>
-                            </a>
-                        </li>
-                    @endif
-                </ul>
+    @if($role === 'admin')
+        {{-- MENU BARU: Pengeluaran (Hanya Admin) --}}
+        <li class="sidebar-item">
+            {{-- Tambahkan class 'active' jika rute saat ini adalah pengeluaran.index --}}
+            <a class="sidebar-link {{ request()->routeIs('pengeluaran.index') ? 'active' : '' }}" 
+               href="{{ route('pengeluaran.index') }}" aria-expanded="false">
+                <i data-feather="dollar-sign" class="feather-icon"></i> 
+                <span class="hide-menu">Pengeluaran</span>
+            </a>
+        </li>
+        {{-- MENU LAINNYA UNTUK ADMIN --}}
+        <li class="sidebar-item">
+            <a class="sidebar-link {{ request()->routeIs('users.index') ? 'active' : '' }}" href="{{ route('users.index') }}">
+                <i data-feather="users" class="feather-icon"></i>
+                <span class="hide-menu">User</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
+            <a class="sidebar-link {{ request()->routeIs('reports.index') ? 'active' : '' }}" href="{{ route('reports.index') }}">
+                <i data-feather="bar-chart-2" class="feather-icon"></i>
+                <span class="hide-menu">Report</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
+            <a class="sidebar-link {{ request()->routeIs('kategoris.index') ? 'active' : '' }}" href="{{ route('kategoris.index') }}">
+                <i data-feather="layers" class="feather-icon"></i>
+                <span class="hide-menu">Kategori</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
+            <a class="sidebar-link {{ request()->routeIs('menus.index') ? 'active' : '' }}" href="{{ route('menus.index') }}">
+                <i data-feather="book-open" class="feather-icon"></i>
+                <span class="hide-menu">Menus</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
+            <a class="sidebar-link {{ request()->routeIs('settings.kitchen.index') ? 'active' : '' }}" href="{{ route('settings.kitchen.index') }}">
+                <i data-feather="settings" class="feather-icon"></i>
+                <span class="hide-menu">Kitchen Setting</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
+            <a class="sidebar-link {{ request()->routeIs('promo.index') ? 'active' : '' }}" href="{{ route('promo.index') }}">
+                <i data-feather="tag" class="feather-icon"></i>
+                <span class="hide-menu">Pengaturan Promo</span>
+            </a>
+        </li>
+    @elseif($role === 'kasir')
+        {{-- MENU UNTUK KASIR --}}
+        <li class="sidebar-item">
+            <a class="sidebar-link {{ request()->routeIs('orders.index') ? 'active' : '' }}" href="{{ route('orders.index') }}">
+                <i data-feather="shopping-cart" class="feather-icon"></i>
+                <span class="hide-menu">Order</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
+            <a class="sidebar-link {{ request()->routeIs('detail_orders.index') ? 'active' : '' }}" href="{{ route('detail_orders.index') }}">
+                <i data-feather="file-text" class="feather-icon"></i>
+                <span class="hide-menu">Detail Order</span>
+            </a>
+        </li>
+    @endif
+</ul>
             </nav>
         </div>
     </aside>

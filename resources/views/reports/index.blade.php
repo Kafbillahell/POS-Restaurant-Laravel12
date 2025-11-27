@@ -4,15 +4,17 @@
 
 @section('content')
 
-{{-- STYLE KHUSUS MONOCHROME MODERN (SOFTENED) --}}
 <style>
+    /* Menggunakan variabel CSS untuk konsistensi monochrome */
     :root {
         --black: #1a1a1a;
         --gray-dark: #4a4a4a;
         --gray-medium: #888;
         --gray-light: #e5e5e5;
-        --radius-sm: 0.35rem; /* Sudut membulat halus */
+        --radius-sm: 0.35rem;
         --shadow-subtle: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+        --color-profit: #1e7e34; 
+        --color-loss: #dc3545;
     }
 
     body {
@@ -20,13 +22,12 @@
         font-family: 'Poppins', sans-serif;
     }
 
-    /* --- Page Header & Filter Placement --- */
+    /* Page Header & Filter Placement */
     .page-header-container {
         display: flex;
         justify-content: space-between;
         align-items: flex-end;
         padding-bottom: 1rem;
-        /* Diubah dari 1.5rem kembali ke 2rem atau sedikit lebih besar untuk memberi jarak ke widget */
         margin-bottom: 2rem; 
         border-bottom: 1px solid var(--gray-light);
     }
@@ -37,15 +38,15 @@
         font-size: 2rem;
     }
 
-    /* --- Statistic Boxes (Softened) --- */
+    /* Statistic Boxes */
     .stat-box {
         background: #fff;
         border: 1px solid var(--gray-light);
         padding: 1.5rem;
-        border-radius: var(--radius-sm); /* Sudut membulat */
+        border-radius: var(--radius-sm);
         transition: all 0.2s ease;
         height: 100%;
-        box-shadow: var(--shadow-subtle); /* Shadow halus */
+        box-shadow: var(--shadow-subtle);
     }
     .stat-box:hover {
         border-color: var(--gray-medium);
@@ -68,14 +69,22 @@
         font-weight: 500;
     }
 
-    /* --- Form Filter Styles --- */
+    /* Keuntungan dan Kerugian */
+    .stat-value.profit {
+        color: var(--color-profit);
+    }
+    .stat-value.loss {
+        color: var(--color-loss);
+    }
+
+    /* Form Filter Styles */
     .form-control-mono {
         border: 1px solid var(--gray-light);
         border-radius: var(--radius-sm);
         padding: 0.5rem 1rem;
         color: var(--black);
         transition: border-color 0.2s;
-        box-shadow: none; /* Hilangkan shadow default Bootstrap */
+        box-shadow: none;
     }
     .form-control-mono:focus {
         border-color: var(--gray-medium);
@@ -89,7 +98,7 @@
         margin-bottom: 0.3rem;
     }
 
-    /* --- Buttons --- */
+    /* Buttons */
     .btn-monochrome {
         background-color: var(--black);
         color: #fff;
@@ -111,7 +120,7 @@
     .btn-outline-mono {
         background-color: transparent;
         color: var(--black);
-        border: 1px solid var(--gray-medium); /* Garis outline lebih lembut */
+        border: 1px solid var(--gray-medium);
         border-radius: var(--radius-sm);
         padding: 0.5rem 1.2rem;
         font-weight: 600;
@@ -128,16 +137,25 @@
     }
 </style>
 
-{{-- Perubahan: Mengubah 'pt-3 pb-4' menjadi 'pt-3 pb-5'. Padding atas tetap kecil (pt-3), padding bawah diperbesar untuk memberi jarak dari elemen dashboard di bawah. --}}
 <div class="container pt-3 pb-5">
     
     @php
-        $selectedStartDate = request('start_date') ?? \Carbon\Carbon::now()->startOfMonth()->format('Y-m-d');
-        $selectedEndDate = request('end_date') ?? \Carbon\Carbon::now()->endOfMonth()->format('Y-m-d');
+        use Carbon\Carbon;
+        $selectedStartDate = request('start_date') ?? Carbon::now()->startOfMonth()->format('Y-m-d');
+        $selectedEndDate = request('end_date') ?? Carbon::now()->endOfMonth()->format('Y-m-d');
+
+        // Mengambil data ringkasan dari Controller
+        $totalOrderAll = $totalSummary['total_order_all'] ?? 0;
+        $totalPemasukanAll = $totalSummary['total_pemasukan_all'] ?? 0;
+        $totalPengeluaranAll = $totalSummary['total_pengeluaran_all'] ?? 0;
+        
+        // Perhitungan Keuntungan
+        $totalKeuntunganAll = $totalPemasukanAll - $totalPengeluaranAll;
+        
+        $keuntunganClass = $totalKeuntunganAll >= 0 ? 'profit' : 'loss';
     @endphp
 
     {{-- HEADER WITH INLINE FILTER --}}
-    {{-- Margin bawah page-header-container dikembalikan ke 2rem di CSS untuk memberi jarak normal ke widget --}}
     <div class="page-header-container">
         <h1 class="page-title">
             Laporan Penjualan
@@ -164,45 +182,44 @@
         </form>
     </div>
 
-    {{-- STATISTIK GRID (Softened Stat Boxes) --}}
-    {{-- Margin bawah diubah menjadi mb-5 untuk memberi jarak normal ke Export Buttons di bawahnya --}}
+    {{-- STATISTIK GRID --}}
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-5" id="summaryCardsContainer">
-        {{-- Total Order --}}
+        {{-- 1. Total Transaksi --}}
         <div class="col">
             <div class="stat-box">
                 <div class="stat-label">Total Transaksi</div>
                 <div class="stat-value" id="totalOrderValue">
-                    {{ number_format($totalSummary['total_order_all'], 0, ',', '.') }}
+                    {{ number_format($totalOrderAll, 0, ',', '.') }}
                 </div>
             </div>
         </div>
 
-        {{-- Total Pendapatan --}}
+        {{-- 2. Total Pemasukan --}}
         <div class="col">
             <div class="stat-box">
-                <div class="stat-label">Pendapatan Kotor</div>
-                <div class="stat-value" id="totalPendapatanValue">
-                    Rp {{ number_format($totalSummary['total_pendapatan_all'], 0, ',', '.') }}
+                <div class="stat-label">Total Pemasukan</div>
+                <div class="stat-value" id="totalPemasukanValue">
+                    Rp {{ number_format($totalPemasukanAll, 0, ',', '.') }}
                 </div>
             </div>
         </div>
 
-        {{-- Total Komisi --}}
+        {{-- 3. Total Pengeluaran --}}
         <div class="col">
             <div class="stat-box">
-                <div class="stat-label">Komisi Kasir (20%)</div>
-                <div class="stat-value" id="totalKomisiValue">
-                    Rp {{ number_format($totalSummary['total_komisi_kasir_all'] ?? 0, 0, ',', '.') }}
+                <div class="stat-label">Total Pengeluaran</div>
+                <div class="stat-value loss" id="totalPengeluaranValue">
+                    Rp {{ number_format($totalPengeluaranAll, 0, ',', '.') }}
                 </div>
             </div>
         </div>
 
-        {{-- Keuntungan Bersih --}}
+        {{-- 4. Keuntungan (Pemasukan - Pengeluaran) --}}
         <div class="col">
             <div class="stat-box">
-                <div class="stat-label">Keuntungan Bersih</div>
-                <div class="stat-value" id="totalKeuntunganBersihValue">
-                    Rp {{ number_format($totalSummary['total_keuntungan_bersih_all'] ?? 0, 0, ',', '.') }}
+                <div class="stat-label">Keuntungan</div>
+                <div class="stat-value {{ $keuntunganClass }}" id="totalKeuntunganValue">
+                    Rp {{ number_format($totalKeuntunganAll, 0, ',', '.') }}
                 </div>
             </div>
         </div>
@@ -226,7 +243,7 @@
     </div>
 </div>
 
-{{-- SCRIPT --}}
+{{-- SCRIPT AJAX --}}
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         if (window.feather) feather.replace();
@@ -240,16 +257,14 @@
                 const startDate = document.getElementById('start_date').value;
                 const endDate = document.getElementById('end_date').value;
                 
-                // PENTING: Menggunakan URLSearchParams untuk mendapatkan semua input form,
-                // meskipun kita hanya menggunakan input tanggal di sini.
                 const formData = new URLSearchParams(new FormData(form)).toString() + '&ajax=1';
                 const url = form.getAttribute('action');
 
-                // TAMPILAN LOADING MONOCHROME MODERN
+                // TAMPILAN LOADING
                 document.getElementById('reportTableContainer').innerHTML = `
                     <div class="text-center py-5 bg-white shadow-sm rounded-lg" style="border: 1px solid var(--gray-light);">
                         <div class="spinner-border text-dark" role="status" style="width: 3rem; height: 3rem; border-width: 3px;">
-                            <span class="sr-only"></span>
+                            <span class="sr-only">Loading...</span>
                         </div>
                         <p class="mt-3 text-muted small text-uppercase" style="letter-spacing: 2px;">Memuat Data...</p>
                     </div>
@@ -263,18 +278,29 @@
                     .then(response => {
                         const summary = response.summary;
                         
+                        // Data Pemasukan dan Keuntungan
+                        const totalPemasukan = Number(summary.total_pemasukan_all) || 0;
+                        const totalPengeluaran = Number(summary.total_pengeluaran_all) || 0; 
+                        const totalKeuntungan = totalPemasukan - totalPengeluaran;
+
                         // Fungsi format Rupiah (sederhana)
                         function formatRupiah(number) {
                             number = Number(number) || 0; 
-                            return 'Rp ' + number.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+                            const formatted = Math.abs(number).toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+                            return (number < 0 ? '-Rp ' : 'Rp ') + formatted;
                         }
 
                         // 1. Update Statistik
                         document.getElementById('totalOrderValue').textContent = Number(summary.total_order_all).toLocaleString('id-ID');
-                        document.getElementById('totalPendapatanValue').textContent = formatRupiah(summary.total_pendapatan_all);
-                        document.getElementById('totalKomisiValue').textContent = formatRupiah(summary.total_komisi_kasir_all);
-                        document.getElementById('totalKeuntunganBersihValue').textContent = formatRupiah(summary.total_keuntungan_bersih_all);
+                        document.getElementById('totalPemasukanValue').textContent = formatRupiah(totalPemasukan);
+                        document.getElementById('totalPengeluaranValue').textContent = formatRupiah(totalPengeluaran);
                         
+                        // Update Keuntungan
+                        const keuntunganElement = document.getElementById('totalKeuntunganValue');
+                        keuntunganElement.textContent = formatRupiah(totalKeuntungan);
+                        keuntunganElement.classList.remove('profit', 'loss');
+                        keuntunganElement.classList.add(totalKeuntungan >= 0 ? 'profit' : 'loss');
+
                         // 2. Update Tabel
                         document.getElementById('reportTableContainer').innerHTML = response.table_html;
 
@@ -290,7 +316,7 @@
                         console.error("Fetch Gagal:", error);
                         document.getElementById('reportTableContainer').innerHTML = `
                             <div class="alert border-danger rounded-0 text-center text-danger p-4" style="border: 1px solid var(--gray-medium);">
-                                <h5 class="fw-bold">🚨 Gagal Memuat Data</h5>
+                                <h5 class="fw-bold">Gagal Memuat Data</h5>
                                 <p class="mb-0">Terjadi kesalahan saat mengambil data laporan. Pastikan koneksi dan parameter filter benar.</p>
                             </div>`;
                     });
