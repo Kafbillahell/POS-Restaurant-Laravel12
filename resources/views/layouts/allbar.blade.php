@@ -42,7 +42,13 @@
 
             <div class="navbar-collapse collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav float-left mr-auto ml-3 pl-1">
-                </ul>
+    <li class="nav-item d-none d-md-block">
+        <div class="nav-link text-dark" style="display: flex; align-items: center; height: 100%;">
+            <i data-feather="clock" class="svg-icon mr-2"></i>
+            <span id="realtime-clock" style="font-weight: 600; font-size: 14px;">Memuat waktu...</span>
+        </div>
+    </li>
+</ul>
 
                 <ul class="navbar-nav float-right">
                     <li class="nav-item dropdown position-relative">
@@ -163,6 +169,33 @@
     <script src="{{ asset('assets/js/sweetalert2.min.js') }}"></script>
 
     <script>
+        // --- Script Jam Realtime (WIB) ---
+    function updateClock() {
+        const clockElement = document.getElementById('realtime-clock');
+        if (clockElement) {
+            const options = {
+                timeZone: 'Asia/Jakarta', // Memaksa WIB
+                weekday: 'long',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false // Format 24 jam
+            };
+            
+            const formatter = new Intl.DateTimeFormat('id-ID', options);
+            const formattedTime = formatter.format(new Date());
+
+            clockElement.innerText = formattedTime.replace('pukul', '') + ' WIB';
+        }
+    }
+
+    setInterval(updateClock, 1000);
+
+    updateClock();
+
         document.addEventListener('DOMContentLoaded', function () {
             const logoutBtn = document.getElementById('logout-btn');
 
