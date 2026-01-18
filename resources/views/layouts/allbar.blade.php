@@ -43,9 +43,46 @@
             <div class="navbar-collapse collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav float-left mr-auto ml-3 pl-1">
     <li class="nav-item d-none d-md-block">
-        <div class="nav-link text-dark" style="display: flex; align-items: center; height: 100%;">
-            <i data-feather="clock" class="svg-icon mr-2"></i>
-            <span id="realtime-clock" style="font-weight: 600; font-size: 14px;">Memuat waktu...</span>
+        <div class="nav-link" style="display: flex; align-items: center; height: 100%;">
+            <div class="clock-wrapper" style="
+                background: linear-gradient(135deg, #f6f7ff 0%, #ffffff 100%);
+                border: 1px solid #e8eaff;
+                padding: 6px 16px;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            ">
+                <div style="
+                    background: #795548;
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: white;
+                ">
+                    <i data-feather="clock" style="width: 16px; height: 16px;"></i>
+                </div>
+                <div style="display: flex; flex-direction: column; justify-content: center; line-height: 1.2;">
+                    <span id="clock-time" style="
+                        font-weight: 700;
+                        font-size: 15px;
+                        color: #2c3e50;
+                        font-family: 'Courier New', monospace;
+                        letter-spacing: 0.5px;
+                    ">--:--:--</span>
+                    <span id="clock-date" style="
+                        font-size: 11px;
+                        color: #7c8798;
+                        font-weight: 500;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                    ">---, -- --- ----</span>
+                </div>
+            </div>
         </div>
     </li>
 </ul>
@@ -182,29 +219,37 @@
     <script>
         // --- Script Jam Realtime (WIB) ---
     function updateClock() {
-        const clockElement = document.getElementById('realtime-clock');
-        if (clockElement) {
-            const options = {
-                timeZone: 'Asia/Jakarta', // Memaksa WIB
-                weekday: 'long',
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
+        const timeElement = document.getElementById('clock-time');
+        const dateElement = document.getElementById('clock-date');
+        
+        if (timeElement && dateElement) {
+            const now = new Date();
+            
+            // Format Time
+            const timeOptions = {
+                timeZone: 'Asia/Jakarta',
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit',
-                hour12: false // Format 24 jam
+                hour12: false
             };
-            
-            const formatter = new Intl.DateTimeFormat('id-ID', options);
-            const formattedTime = formatter.format(new Date());
+            const timeFormatter = new Intl.DateTimeFormat('id-ID', timeOptions);
+            timeElement.innerText = timeFormatter.format(now).replace(/\./g, ':') + ' WIB';
 
-            clockElement.innerText = formattedTime.replace('pukul', '') + ' WIB';
+            // Format Date
+            const dateOptions = {
+                timeZone: 'Asia/Jakarta',
+                weekday: 'long',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            };
+            const dateFormatter = new Intl.DateTimeFormat('id-ID', dateOptions);
+            dateElement.innerText = dateFormatter.format(now);
         }
     }
 
     setInterval(updateClock, 1000);
-
     updateClock();
 
         document.addEventListener('DOMContentLoaded', function () {
