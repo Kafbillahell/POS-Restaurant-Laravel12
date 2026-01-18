@@ -89,16 +89,16 @@ class OrderController extends Controller
             session(['cart' => $updatedCart]);
         }
 
-        $perPage = 10;
-        $currentPage = $request->input('page', 1);
-        $pagedMenus = new LengthAwarePaginator(
-            $menus->forPage($currentPage, $perPage),
-            $menus->count(),
-            $perPage,
-            $currentPage,
-            ['path' => $request->url()]
-        );
-        $menus = $pagedMenus;
+        // Pagination removed for client-side filtering
+        // $perPage = 10;
+        // $currentPage = $request->input('page', 1);
+        // $pagedMenus = new LengthAwarePaginator(...);
+        // $menus = $pagedMenus;
+        
+        // Ensure we have a collection
+        if (!($menus instanceof \Illuminate\Database\Eloquent\Collection)) {
+             $menus = $menus->get();
+        }
 
 
         $menusGrouped = $menus->groupBy(function ($menu) {

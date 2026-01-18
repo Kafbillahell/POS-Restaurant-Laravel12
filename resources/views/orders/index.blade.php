@@ -14,7 +14,7 @@
 
         body {
             background-color: var(--bg-beige);
-            font-family: 'Outfit', 'Segoe UI', sans-serif; /* Assuming Outfit or similar is available, fallback to Segoe */
+            font-family: 'Outfit', 'Segoe UI', sans-serif;
         }
 
         /* --- Header & Search --- */
@@ -27,26 +27,6 @@
             font-weight: 700;
             color: var(--dark-brown);
             font-size: 2rem;
-        }
-
-        .search-bar-container {
-            background: white;
-            padding: 1rem;
-            border-radius: 16px;
-            box-shadow: var(--card-shadow);
-            border: 1px solid rgba(121, 85, 72, 0.1);
-        }
-
-        .form-control, .form-select {
-            border-radius: 12px;
-            border: 1px solid #e0e0e0;
-            padding: 0.75rem 1rem;
-            font-size: 0.95rem;
-        }
-
-        .form-control:focus, .form-select:focus {
-            border-color: var(--primary-brown);
-            box-shadow: 0 0 0 4px rgba(121, 85, 72, 0.1);
         }
 
         .btn-reset {
@@ -63,13 +43,53 @@
             color: #333;
         }
 
+        /* --- Category Sidebar --- */
+        .category-sidebar {
+            position: sticky;
+            top: 100px;
+        }
+
+        .category-item {
+            display: block;
+            padding: 12px 20px;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            color: #6d4c41;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            background: transparent;
+            border: 1px solid transparent;
+            cursor: pointer;
+            text-align: left;
+            width: 100%;
+        }
+
+        .category-item:hover {
+            background-color: rgba(121, 85, 72, 0.05);
+            color: var(--primary-brown);
+            transform: translateX(5px);
+        }
+
+        .category-item.active {
+            background: linear-gradient(135deg, var(--primary-brown), var(--dark-brown));
+            color: white;
+            box-shadow: 0 4px 15px rgba(121, 85, 72, 0.3);
+        }
+
+        .category-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
         /* --- Menu Grid --- */
         .category-title {
             font-family: 'Playfair Display', serif;
             font-size: 1.5rem;
             color: var(--dark-brown);
             margin-bottom: 1.5rem;
-            margin-top: 2rem;
+            margin-top: 1rem;
             border-bottom: 2px solid var(--light-brown);
             display: inline-block;
             padding-bottom: 0.5rem;
@@ -94,7 +114,7 @@
         }
 
         .card-img-top {
-            height: 180px;
+            height: 160px;
             object-fit: cover;
             width: 100%;
         }
@@ -198,10 +218,10 @@
         /* --- Cart Panel --- */
         #cart-target {
             position: fixed;
-            top: 100px; /* Adjusted for header */
+            top: 100px;
             right: 30px;
             z-index: 100;
-            width: 380px;
+            width: 350px;
             height: calc(100vh - 130px);
         }
 
@@ -352,38 +372,44 @@
         @endif
 
         <div class="row">
-            <!-- Left Column: Menu Grid -->
-            <div class="col-lg-8 col-md-7 pb-5">
+            <!-- Column 1: Categories (Sidebar) -->
+            <div class="col-lg-2 col-md-3 d-none d-md-block">
+                <div class="category-sidebar">
+                    <h5 class="mb-3 fw-bold" style="color: var(--dark-brown); padding-left: 10px;">Categories</h5>
+                    
+                    <button class="category-item active" onclick="filterCategory('')">
+                        <i class="bi bi-grid-fill"></i> All Menu
+                    </button>
+                    
+                    @foreach($kategoris as $kategori)
+                        <button class="category-item" onclick="filterCategory('{{ $kategori->nama_kategori }}')">
+                            <i class="bi bi-tag-fill"></i> {{ $kategori->nama_kategori }}
+                        </button>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- Column 2: Menu Grid (Center) -->
+            <div class="col-lg-7 col-md-9 pb-5">
                 
-                <!-- Search & Filter -->
-                <form action="{{ route('orders.index') }}" method="GET" class="search-bar-container mb-4">
-                    <div class="row g-3 align-items-center">
-                        <div class="col-md-5">
-                            <div class="input-group">
-                                <span class="input-group-text bg-transparent border-end-0 text-muted ps-3">
+                <!-- Search Bar (Simplified) -->
+                <div class="mb-4">
+                    <div class="row g-2 align-items-center">
+                        <div class="col-12 col-md-9">
+                            <div class="input-group shadow-sm" style="border-radius: 12px; overflow: hidden; border: 1px solid #e0e0e0;">
+                                <span class="input-group-text bg-white border-0 text-muted ps-3">
                                     <i class="bi bi-search"></i>
                                 </span>
-                                <input type="text" name="search" id="search" value="{{ request('search') }}"
-                                    class="form-control border-start-0 ps-0" placeholder="Search menu...">
+                                <input type="text" id="search-input" class="form-control border-0 ps-0 py-2" placeholder="Search menu..." autocomplete="off">
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <select name="kategori" id="kategori" class="form-select">
-                                <option value="">All Categories</option>
-                                @foreach($kategoris as $kategori)
-                                    <option value="{{ $kategori->nama_kategori }}" {{ request('kategori') == $kategori->nama_kategori ? 'selected' : '' }}>
-                                        {{ $kategori->nama_kategori }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <button type="button" class="btn btn-reset w-100 py-2" id="reset-button">
+                        <div class="col-12 col-md-3">
+                            <button type="button" class="btn btn-reset w-100 py-2 shadow-sm" id="reset-button">
                                 <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
                             </button>
                         </div>
                     </div>
-                </form>
+                </div>
 
                 <!-- Menu Container -->
                 @php
@@ -520,8 +546,8 @@
                 </div>
             </div>
 
-            <!-- Right Column: Fixed Cart -->
-            <div class="col-lg-4 col-md-5 d-none d-md-block">
+            <!-- Column 3: Fixed Cart (Right) -->
+            <div class="col-lg-3 col-md-12 d-none d-lg-block">
                 <div id="cart-target">
                     <div class="cart-card">
                         <div class="cart-header">
@@ -564,8 +590,106 @@
         document.addEventListener('DOMContentLoaded', () => {
 
             const cartState = {};
-            const searchInput = document.querySelector('#search');
-            const kategoriSelect = document.querySelector('#kategori');
+            const searchInput = document.querySelector('#search-input');
+            
+            // Client-side filtering logic
+            let activeCategory = "";
+            let searchTerm = "";
+
+            function filterMenus() {
+                const term = searchTerm.toLowerCase();
+                const category = activeCategory;
+
+                const sections = document.querySelectorAll('.category-section');
+                let hasVisibleItems = false;
+
+                sections.forEach(section => {
+                    const sectionTitle = section.querySelector('.category-title').textContent.trim();
+                    const items = section.querySelectorAll('.col'); // The grid columns containing cards
+                    let sectionHasVisible = false;
+                    
+                    const sectionMatchesCategory = category === '' || sectionTitle === category;
+
+                    if (!sectionMatchesCategory) {
+                        section.style.display = 'none';
+                        return;
+                    }
+
+                    items.forEach(item => {
+                        const card = item.querySelector('.card-menu');
+                        const title = card.querySelector('.menu-title').textContent.toLowerCase();
+                        const matchesSearch = title.includes(term);
+
+                        if (matchesSearch) {
+                            item.style.display = 'block';
+                            sectionHasVisible = true;
+                            hasVisibleItems = true;
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+
+                    if (sectionHasVisible) {
+                        section.style.display = 'block';
+                    } else {
+                        section.style.display = 'none';
+                    }
+                });
+                
+                // Show/Hide "No Data" message
+                let noDataMsg = document.getElementById('no-data-message');
+                if (!hasVisibleItems) {
+                    if (!noDataMsg) {
+                        const container = document.getElementById('menu-container');
+                        noDataMsg = document.createElement('div');
+                        noDataMsg.id = 'no-data-message';
+                        noDataMsg.className = 'text-center py-5';
+                        noDataMsg.innerHTML = `
+                            <img src="https://cdn-icons-png.flaticon.com/512/13637/13637462.png" alt="No Data" style="width: 100px; opacity: 0.5;">
+                            <p class="text-muted mt-3">No menu items found.</p>
+                        `;
+                        container.appendChild(noDataMsg);
+                    }
+                    noDataMsg.style.display = 'block';
+                } else {
+                    if (noDataMsg) noDataMsg.style.display = 'none';
+                }
+            }
+
+            // Expose filter function globally
+            window.filterCategory = function(categoryName) {
+                activeCategory = categoryName;
+                
+                // Update active state visually
+                document.querySelectorAll('.category-item').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                const activeBtn = Array.from(document.querySelectorAll('.category-item')).find(btn => {
+                    return btn.textContent.trim().includes(categoryName) && categoryName !== '' || 
+                           (categoryName === '' && btn.textContent.trim().includes('All Menu'));
+                });
+                
+                if (activeBtn) activeBtn.classList.add('active');
+
+                filterMenus();
+            };
+
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    searchTerm = e.target.value;
+                    filterMenus();
+                });
+            }
+
+            const resetButton = document.querySelector('#reset-button');
+            if (resetButton) {
+                resetButton.addEventListener('click', () => {
+                    if (searchInput) searchInput.value = '';
+                    searchTerm = '';
+                    window.filterCategory('');
+                });
+            }
 
             function startPromoTimers() {
                 document.querySelectorAll('.card-menu').forEach(card => {
@@ -597,7 +721,6 @@
                             promoTimerElement.classList.remove('text-danger', 'text-warning', 'fw-bold');
                             promoTimerElement.classList.add('text-muted');
                             
-                            // Revert price display logic if needed, simplified here
                             priceElement.innerHTML = `<span class="menu-price">${originalPriceText}</span>`;
                             priceElement.classList.remove('text-danger');
                             
@@ -648,7 +771,6 @@
                     if (qtyControl) qtyControl.style.display = 'none';
                 }
                 
-                // Disable plus button if max stock reached
                 const plusBtn = container.querySelector('.btn-qty.plus');
                 if (plusBtn) {
                     if (quantity >= maxStock) {
@@ -666,7 +788,6 @@
                 const cartFooter = document.getElementById('cart-footer');
                 const checkoutButton = document.getElementById('checkout-button');
 
-                // Sync local state
                 Object.keys(cartState).forEach(id => {
                     if (!cart[id]) delete cartState[id];
                 });
@@ -722,7 +843,6 @@
                     }
                 }
 
-                // Update all cards on page
                 document.querySelectorAll('.card-menu').forEach(card => {
                     const menuId = card.querySelector('div[data-menu-id]')?.getAttribute('data-menu-id');
                     if (menuId) {
@@ -819,12 +939,10 @@
                     const data = await res.json();
 
                     if (data.status !== 'success') {
-                        // Revert on failure
                         updateCartUI(previousCartState);
                     }
 
                 } catch (error) {
-                    // Revert on network error
                     updateCartUI(previousCartState);
                 }
             }
@@ -840,49 +958,6 @@
                     }
                 }
             });
-
-            const resetButton = document.querySelector('#reset-button');
-            if (resetButton) {
-                resetButton.addEventListener('click', (e) => {
-                    if (searchInput) searchInput.value = '';
-                    if (kategoriSelect) kategoriSelect.value = '';
-                    fetchFilteredMenus();
-                });
-            }
-
-            function fetchFilteredMenus() {
-                const search = searchInput?.value || '';
-                const kategori = kategoriSelect?.value || '';
-
-                const params = new URLSearchParams();
-                if (search) params.append('search', search);
-                if (kategori) params.append('kategori', kategori);
-
-                fetch(`{{ route('orders.index') }}?${params.toString()}`, {
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                })
-                    .then(res => res.text())
-                    .then(html => {
-                        const parser = new DOMParser();
-                        const newDoc = parser.parseFromString(html, 'text/html');
-                        const newMenu = newDoc.querySelector('#menu-container');
-                        document.querySelector('#menu-container').innerHTML = newMenu.innerHTML;
-
-                        updateCartUI(cartState);
-                        startPromoTimers(); 
-                    });
-            }
-
-            if (searchInput) {
-                searchInput.addEventListener('input', () => {
-                    clearTimeout(searchInput._timeout);
-                    searchInput._timeout = setTimeout(fetchFilteredMenus, 300);
-                });
-            }
-
-            if (kategoriSelect) {
-                kategoriSelect.addEventListener('change', fetchFilteredMenus);
-            }
             
             // Initial Load
             updateCartUI(@json(session('cart', [])));
