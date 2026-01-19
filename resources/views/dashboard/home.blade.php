@@ -23,7 +23,7 @@
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
@@ -49,8 +49,6 @@ body {
 </style>
 
 <body>
-
-<body>
     <div class="preloader">
         <div class="lds-ripple">
             <div class="lds-pos"></div>
@@ -69,8 +67,6 @@ body {
 
 
     <script src="{{asset('assets/')}}/libs/jquery/dist/jquery.min.js"></script>
-    <script src="{{asset('assets/')}}/libs/popper.js/dist/umd/popper.min.js"></script>
-    <script src="{{asset('assets/')}}/libs/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="{{asset('dist/')}}/js/app-style-switcher.js"></script>
     <script src="{{asset('dist/')}}/js/feather.min.js"></script>
     <script src="{{asset('assets/')}}/libs/perfect-scrollbar/dist/perfect-scrollbar.jquery.min.js"></script>
@@ -83,13 +79,12 @@ body {
     <script src="{{asset('assets/')}}/extra-libs/jvector/jquery-jvectormap-2.0.2.min.js"></script>
     <script src="{{asset('assets/')}}/extra-libs/jvector/jquery-jvectormap-world-mill-en.js"></script>
     <script src="{{asset('dist/')}}/js/pages/dashboards/dashboard1.min.js"></script>
+    <!-- Use one authoritative Bootstrap 5 bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://unpkg.com/feather-icons"></script>
-<script>feather.replace()</script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script>feather.replace()</script>
 
-
-@stack('scripts')
-  @yield('scripts') 
+    @stack('scripts')
+    @yield('scripts') 
 </body>
-        
 </html>
