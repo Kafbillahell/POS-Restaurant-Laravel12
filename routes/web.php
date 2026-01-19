@@ -19,6 +19,7 @@ use App\Exports\ReportsExport;
 use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\KitchenSettingController;
 use App\Http\Controllers\PromoController;
+use App\Http\Controllers\PengeluaranController;
 
 
 Route::get('/barcode/{id}', [BarcodeController::class, 'generate']);
@@ -129,3 +130,5 @@ Route::middleware(['auth'])->prefix('promo')->name('promo.')->group(function () 
 Route::post('/orders/cart/sync-price', [OrderController::class, 'syncPrice'])->name('orders.cart.sync_price');
 
 Route::put('/menus/{menu}/update-stok', [MenuController::class, 'updateStok'])->name('menus.update.stok');
+
+Route::resource('pengeluaran', PengeluaranController::class);

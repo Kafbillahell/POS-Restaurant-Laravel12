@@ -2,8 +2,10 @@
 
 @section('styles')
 <style>
-/* Mempertahankan semua style awal */
-@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+/* ---------------------------------------------------- */
+/* A. GLOBAL BASE STYLE (Mempertahankan dan Menyempurnakan) */
+/* ---------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 body,
 .table,
@@ -13,46 +15,69 @@ h2,
     font-family: 'Poppins', sans-serif;
 }
 
-.btn {
-    transition: background-color 0.3s ease, color 0.3s ease;
-    font-weight: 600;
+/* Tombol Aksi Utama */
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
 }
 
+/* Tabel Styling */
 .table {
     border-collapse: separate;
     border-spacing: 0 10px;
 }
 
 .table thead th {
-    background-color: #f1f5f9;
-    color: #000000ff;
-    font-weight: 700;
+    background-color: #e9ecef; /* Abu-abu lebih terang */
+    color: #343a40; /* Hitam gelap */
+    font-weight: 600;
     border: none;
-    border-radius: 12px;
+    border-radius: 10px; /* Sedikit membulat */
     padding: 1rem 1.2rem;
+    text-transform: uppercase;
+    font-size: 0.85rem;
 }
 
 .table tbody tr {
     background: #fff;
-    box-shadow: 0 3px 8px rgb(0 0 0 / 0.1);
-    border-radius: 12px;
-    transition: transform 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Shadow lebih halus */
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease;
 }
 
 .table tbody tr:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 18px rgb(0 0 0 / 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
 }
 
 .table tbody td {
     vertical-align: middle;
     padding: 1rem 1.2rem;
+    border-top: none;
+    border-bottom: none;
 }
 
-.btn-action {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
+/* Garis kiri untuk Promo Aktif (Glow Modern) */
+.promo-active {
+    border-left: 5px solid #ffc107;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.3), 0 4px 10px rgba(0, 0, 0, 0.08); 
+}
+
+/* Toast Notification */
+#successToast, #errorToast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 2000;
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    transform: translateX(100%);
+}
+
+#successToast.show, #errorToast.show {
+    opacity: 1;
+    transform: translateX(0);
 }
 
 td img {
@@ -64,52 +89,40 @@ td img {
     transition: transform 0.3s ease;
 }
 
-.input-promo {
-    text-align: right;
-    max-width: 120px;
-}
 
-.promo-active {
-    border-left: 5px solid #ffc107;
-}
-
-.stok-error {
-    color: #dc3545;
-    font-size: 0.8rem;
-    margin-top: 5px;
-    font-weight: 500;
-}
-
-.harga-promo-info {
-    font-size: 0.9rem;
-    margin-top: 5px;
-    font-weight: 500;
-    min-height: 40px;
-}
-
-#successToast, #errorToast {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 2000;
-    opacity: 0;
-    transition: opacity 0.4s ease;
-}
-
-#successToast.show, #errorToast.show {
-    opacity: 1;
-}
-
+/* ---------------------------------------------------- */
+/* B. SLIDER PROMO MODERN (Keep) */
+/* ---------------------------------------------------- */
 .diskon-slider-container {
     position: relative;
-    padding-top: 20px;
+    padding-top: 25px; 
     width: 100%;
     max-width: 200px;
     margin: auto;
 }
 
 .diskon-range-input {
-    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    background: #e2e2e2;
+    border-radius: 3px;
+    outline: none;
+    opacity: 0.9;
+    transition: opacity .2s;
+}
+
+/* Slider Thumb (Gesper) */
+.diskon-range-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #007bff;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    transition: background 0.3s;
 }
 
 .slider-value-label {
@@ -119,27 +132,43 @@ td img {
     z-index: 10;
     font-size: 0.9rem;
     font-weight: 600;
-    padding: 2px 6px;
-    background-color: #007bff;
+    padding: 3px 8px;
+    background-color: #343a40; 
     color: white;
     border-radius: 4px;
     min-width: 40px;
     text-align: center;
     pointer-events: none;
-    transition: left 0.05s ease-out, opacity 0.3s;
+    transition: left 0.1s ease-out, opacity 0.3s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .diskon-slider-container[data-value="0"] .slider-value-label {
     opacity: 0;
 }
 
-/* START: New Modern Duration UI Styles */
+.harga-promo-info {
+    font-size: 0.9rem;
+    margin-top: 5px;
+    font-weight: 500;
+    min-height: 40px;
+    text-align: center;
+}
+.harga-promo-info .text-success {
+    font-size: 1.1rem;
+    color: #28a745 !important;
+}
+
+
+/* ---------------------------------------------------- */
+/* C. MODAL DURASI MODERN (Keep) */
+/* ---------------------------------------------------- */
 .btn-duration-config {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.5rem 1rem;
-    border-radius: 10px;
+    padding: 0.6rem 1rem; 
+    border-radius: 8px;
     background-color: #f1f5f9;
     color: #007bff;
     border: 1px solid #e2e8f0;
@@ -147,13 +176,20 @@ td img {
     font-weight: 600;
     transition: all 0.2s ease;
     width: 100%;
-    max-width: 150px;
+    max-width: 170px; 
 }
 
 .btn-duration-config:hover {
     background-color: #e2f0ff;
     border-color: #007bff;
     color: #0056b3;
+}
+
+.btn-duration-config[disabled] {
+    opacity: 0.5 !important;
+    cursor: not-allowed;
+    background-color: #f1f5f9;
+    color: #6c757d;
 }
 
 .active-duration-text {
@@ -165,60 +201,53 @@ td img {
 }
 
 .modal-content {
-    border-radius: 18px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    border-radius: 15px; 
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2); 
     border: none;
-}
-
-.modal-header {
-    border-bottom: none;
-    padding: 1.5rem 2rem 0.5rem;
-}
-
-.modal-body {
-    padding: 1rem 2rem 2rem;
 }
 
 .duration-input-modern {
     display: flex;
     align-items: center;
     margin-bottom: 15px;
-    background-color: #f8f9fa;
-    border-radius: 12px;
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
     padding: 10px 15px;
+    transition: border-color 0.2s;
+}
+.duration-input-modern:focus-within {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
 .duration-input-modern input {
-    font-size: 1.5rem;
+    font-size: 1.6rem; 
     font-weight: 700;
     text-align: right;
     border: none;
     background: transparent;
     padding: 0;
     flex-grow: 1;
-    max-width: 100px;
+    max-width: 120px;
     color: #333;
 }
 
 .duration-input-modern span {
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 500;
     color: #6c757d;
     margin-left: 10px;
     min-width: 60px;
+    text-align: left;
 }
-
-.duration-input-modern input:focus {
-    box-shadow: none;
-}
-/* END: New Modern Duration UI Styles */
 </style>
 @endsection
 
 @section('content')
 <div class="container pt-1 pb-4">
-    <h2 class="fw-semibold text-dark mb-4">Promo</h2>
-    <p class="text-muted mb-4 fs-6"></p>
+    <h2 class="fw-bold text-dark mb-4">Pengaturan Promo Menu 🚀</h2>
+    <p class="text-muted mb-4 fs-6">Atur diskon persentase dan durasi untuk setiap menu. Baris yang aktif memiliki garis kuning.</p>
 
     @if (session('error'))
         <div id="errorToast" class="alert alert-danger shadow-sm rounded">
@@ -235,22 +264,22 @@ td img {
     <form id="promoForm" action="{{ route('promo.update') }}" method="POST">
         @csrf
 
-        <div class="mb-3 d-flex justify-content-end">
-            <button type="submit" class="btn btn-primary rounded-pill shadow-sm px-4 btn-action" id="submitButton">
+        <div class="mb-4 d-flex justify-content-end">
+            <button type="submit" class="btn btn-primary rounded-pill shadow-lg px-4 btn-action" id="submitButton" style="font-size: 1rem; padding: 0.7rem 1.8rem;">
                 <i class="bi bi-floppy"></i> Simpan Semua Pengaturan Promo
             </button>
         </div>
 
-        <div class="table-responsive shadow-sm rounded">
+        <div class="table-responsive shadow-sm rounded-xl">
             <table class="table table-hover align-middle">
-                <thead class="table-light text-center">
+                <thead class="text-center">
                     <tr>
                         <th style="width: 5%;">No</th>
                         <th style="width: 10%;">Gambar</th>
                         <th class="text-start" style="width: 20%;">Nama Menu</th>
                         <th style="width: 15%;">Harga Normal</th>
                         <th style="width: 25%;">Diskon (%) & Harga Jual</th>
-                        <th style="width: 20%;">Durasi Promo</th> {{-- Kolom ini diubah namanya --}}
+                        <th style="width: 25%;">Durasi Promo & Status</th> 
                     </tr>
                 </thead>
                 <tbody>
@@ -258,20 +287,20 @@ td img {
                         $menus = $menus ?? collect();
                         $groupedMenus = $menus->groupBy(fn($menu) => $menu->kategori->nama_kategori ?? 'Tanpa Kategori');
                         $counter = 0;
-
-                        // Mock data untuk Durasi
                         
-
                         function getDurationText($durasiTersimpan) {
                             $parts = [];
                             if ($durasiTersimpan['days'] > 0) $parts[] = $durasiTersimpan['days'] . ' Hari';
                             if ($durasiTersimpan['hours'] > 0) $parts[] = $durasiTersimpan['hours'] . ' Jam';
                             if ($durasiTersimpan['minutes'] > 0) $parts[] = $durasiTersimpan['minutes'] . ' Menit';
-                            return implode(', ', $parts);
+                            
+                            $text = implode(', ', $parts);
+                            return $text ? $text : 'Tidak disetel';
                         }
                     @endphp
 
                     @foreach ($groupedMenus as $kategori => $menusByKategori)
+                        {{-- STRUKTUR KATEGORI LAMA DIPULIHKAN --}}
                         <tr>
                             <td colspan="6" class="fw-semibold text-dark bg-light" style="border-top: 2px solid #000000ff;">
                                 {{ $kategori }}
@@ -279,113 +308,102 @@ td img {
                         </tr>
 
                         @foreach ($menusByKategori as $menu)
-                           @php
-    $counter++;
-    $hargaNormal = $menu->harga;
-    
-    // 🔥 PENTING: Gunakan ACCESSOR isPromoActive dari Model
-    // Accessor ini sudah menangani logika kedaluwarsa waktu.
-    $isPromoActive = $menu->isPromoActive; 
-    
-    // Ambil nilai promo yang akan ditampilkan jika aktif
-    $hargaPromoTersimpan = $menu->harga_promo ?? 0;
-    $diskonTersimpan = 0;
-    if ($isPromoActive && $hargaPromoTersimpan > 0 && $hargaPromoTersimpan < $hargaNormal) {
-        $diskonTersimpan = round((($hargaNormal - $hargaPromoTersimpan) / $hargaNormal) * 100);
-    }
-    
-    // 🔥 Durasi yang TERSIMPAN (untuk diisi kembali ke Modal/Form)
-    $durasiTersimpan = [
-        'days' => old('durasi_hari.' . $menu->id, $menu->durasi_promo_hari ?? 0),
-        'hours' => old('durasi_jam.' . $menu->id, $menu->durasi_promo_jam ?? 0),
-        'minutes' => old('durasi_menit.' . $menu->id, $menu->durasi_promo_menit ?? 0),
-    ];
-    
-    // Ambil teks durasi
-    $durasiText = getDurationText($durasiTersimpan); // Fungsi PHP Anda
+                            @php
+                                $counter++;
+                                $hargaNormal = $menu->harga;
+                                $isPromoActive = $menu->isPromoActive; 
+                                
+                                $hargaPromoTersimpan = $menu->harga_promo ?? 0;
+                                $diskonTersimpan = 0;
+                                if ($isPromoActive && $hargaPromoTersimpan > 0 && $hargaPromoTersimpan < $hargaNormal) {
+                                    $diskonTersimpan = round((($hargaNormal - $hargaPromoTersimpan) / $hargaNormal) * 100);
+                                }
+                                
+                                $durasiTersimpan = [
+                                    'days' => old('durasi_hari.' . $menu->id, $menu->durasi_promo_hari ?? 0),
+                                    'hours' => old('durasi_jam.' . $menu->id, $menu->durasi_promo_jam ?? 0),
+                                    'minutes' => old('durasi_menit.' . $menu->id, $menu->durasi_promo_menit ?? 0),
+                                ];
+                                
+                                $durasiText = getDurationText($durasiTersimpan); 
 
-    // 🔥 Tentukan waktu berakhir (untuk ditampilkan)
-    $promoEndAt = null;
-    if ($isPromoActive && $menu->promo_start_at) {
-        $promoEndAt = (clone $menu->promo_start_at)
-            ->addDays($menu->durasi_promo_hari)
-            ->addHours($menu->durasi_promo_jam)
-            ->addMinutes($menu->durasi_promo_menit);
-    }
-@endphp
+                                $promoEndAt = null;
+                                if ($isPromoActive && $menu->promo_start_at) {
+                                    $promoEndAt = (clone $menu->promo_start_at)
+                                        ->addDays($menu->durasi_promo_hari)
+                                        ->addHours($menu->durasi_promo_jam)
+                                        ->addMinutes($menu->durasi_promo_menit);
+                                }
+                            @endphp
 
-{{-- Baris HTML <tr> akan tetap menggunakan $isPromoActive: --}}
-<tr class="{{ $isPromoActive ? 'promo-active' : '' }}" data-menu-id="{{ $menu->id }}">
+                            <tr class="{{ $isPromoActive ? 'promo-active' : '' }}" data-menu-id="{{ $menu->id }}">
                                 <td class="text-center">{{ $counter }}</td>
                                 <td class="text-center">
                                     @if ($menu->gambar)
                                         <img src="{{ asset('storage/' . $menu->gambar) }}" alt="Menu Image" />
                                     @else
-                                        -
+                                        <i class="bi bi-image-fill text-muted" style="font-size: 2rem;"></i>
                                     @endif
                                 </td>
-                                <td class="text-start">
+                                <td class="text-start fw-semibold">
                                     {{ $menu->nama_menu }}
                                     <input type="hidden" name="menu_id[]" value="{{ $menu->id }}">
                                 </td>
                                 <td class="text-end" data-harga-normal="{{ $hargaNormal }}">
                                     Rp{{ number_format($hargaNormal, 0, ',', '.') }}
-                                    <small class="text-muted d-block">Stok Normal: <span id="stokNormal-{{ $menu->id }}">{{ $menu->stok }}</span></small>
+                                    <small class="text-muted d-block mt-1">Stok: <span id="stokNormal-{{ $menu->id }}">{{ $menu->stok }}</span></small>
                                 </td>
                                 <td>
                                     <div class="diskon-slider-container" data-value="{{ $diskonTersimpan }}">
+                                        {{-- Label Persentase --}}
                                         <div class="slider-value-label" id="sliderLabel-{{ $menu->id }}">{{ $diskonTersimpan > 0 ? $diskonTersimpan : 0 }}%</div>
 
+                                        {{-- Input Range --}}
                                         <input type="range" name="diskon_range[{{ $menu->id }}]" 
-                                                class="form-range diskon-range-input"
-                                                min="0" max="99" step="1" 
-                                                value="{{ old('diskon_range.' . $menu->id, $diskonTersimpan) }}"
-                                                title="Geser untuk menentukan persentase diskon."
-                                                data-menu-id="{{ $menu->id }}"
-                                                id="diskonRange-{{ $menu->id }}">
+                                            class="form-range diskon-range-input"
+                                            min="0" max="99" step="1" 
+                                            value="{{ old('diskon_range.' . $menu->id, $diskonTersimpan) }}"
+                                            data-menu-id="{{ $menu->id }}"
+                                            id="diskonRange-{{ $menu->id }}">
 
                                         <input type="hidden" name="harga_promo[{{ $menu->id }}]" id="hargaPromoHidden-{{ $menu->id }}" value="{{ old('harga_promo.' . $menu->id, $menu->harga_promo ?? '0') }}">
                                     </div>
 
-                                    <div id="hargaPromoInfo-{{ $menu->id }}" class="harga-promo-info mt-2">
+                                    <div id="hargaPromoInfo-{{ $menu->id }}" class="harga-promo-info">
                                         @if ($isPromoActive)
                                             <span class="d-block text-success fw-bold">Jual: Rp{{ number_format($hargaPromoTersimpan, 0, ',', '.') }}</span>
                                             <small class="text-info d-block">Hemat: Rp{{ number_format($hargaNormal - $hargaPromoTersimpan, 0, ',', '.') }}</small>
                                         @endif
                                     </div>
                                 </td>
-                                {{-- KOLOM BARU UNTUK DURASI PROMO (Modern UI) --}}
                                 <td class="text-center">
-    <button type="button" 
-            class="btn-duration-config"
-            data-bs-toggle="modal" 
-            data-bs-target="#durationModal"
-            data-menu-id="{{ $menu->id }}"
-            data-menu-name="{{ $menu->nama_menu }}"
-            data-durasi-hari="{{ $durasiTersimpan['days'] }}"
-            data-durasi-jam="{{ $durasiTersimpan['hours'] }}"
-            data-durasi-menit="{{ $durasiTersimpan['minutes'] }}">
-        <i class="bi bi-clock-history me-2"></i> Atur Waktu
-    </button>
-    
-    <div class="duration-display" id="durationDisplay-{{ $menu->id }}">
-        @if ($isPromoActive)
-            {{-- Tampilkan durasi dan waktu berakhir --}}
-            <span class="active-duration-text">{{ $durasiText }}</span>
-            <small class="text-danger d-block mt-1">Berakhir: {{ $promoEndAt->format('H:i:s, d M') }}</small>
-        @else
-            <small class="text-muted d-block mt-1">Nonaktif</small>
-        @endif
-    </div>
+                                    <button type="button" 
+                                            class="btn-duration-config"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#durationModal"
+                                            data-menu-id="{{ $menu->id }}"
+                                            data-menu-name="{{ $menu->nama_menu }}"
+                                            data-durasi-hari="{{ $durasiTersimpan['days'] }}"
+                                            data-durasi-jam="{{ $durasiTersimpan['hours'] }}"
+                                            data-durasi-menit="{{ $durasiTersimpan['minutes'] }}">
+                                        <i class="bi bi-clock-history me-2"></i> Atur Waktu
+                                    </button>
+                                    
+                                    <div class="duration-display" id="durationDisplay-{{ $menu->id }}">
+                                        @if ($isPromoActive)
+                                            <span class="active-duration-text">{{ $durasiText }}</span>
+                                            <small class="text-danger d-block mt-1 fw-bold">Berakhir: {{ $promoEndAt->format('H:i, d M Y') }}</small>
+                                        @else
+                                            <small class="text-muted d-block mt-1">Nonaktif</small>
+                                        @endif
+                                    </div>
 
-    {{-- Input tersembunyi untuk Durasi, akan diisi oleh Modal --}}
-    <input type="hidden" name="durasi_hari[{{ $menu->id }}]" id="durasiHariHidden-{{ $menu->id }}" value="{{ $durasiTersimpan['days'] }}">
-    <input type="hidden" name="durasi_jam[{{ $menu->id }}]" id="durasiJamHidden-{{ $menu->id }}" value="{{ $durasiTersimpan['hours'] }}">
-    <input type="hidden" name="durasi_menit[{{ $menu->id }}]" id="durasiMenitHidden-{{ $menu->id }}" value="{{ $durasiTersimpan['minutes'] }}">
-</td>
-                                {{-- END KOLOM BARU --}}
+                                    <input type="hidden" name="durasi_hari[{{ $menu->id }}]" id="durasiHariHidden-{{ $menu->id }}" value="{{ $durasiTersimpan['days'] }}">
+                                    <input type="hidden" name="durasi_jam[{{ $menu->id }}]" id="durasiJamHidden-{{ $menu->id }}" value="{{ $durasiTersimpan['hours'] }}">
+                                    <input type="hidden" name="durasi_menit[{{ $menu->id }}]" id="durasiMenitHidden-{{ $menu->id }}" value="{{ $durasiTersimpan['minutes'] }}">
+                                </td>
                             </tr>
-
+                            {{-- SPACER ROW LAMA DIPULIHKAN --}}
                             <tr>
                                 <td colspan="6" style="padding-top: 1rem;"></td>
                             </tr>
@@ -397,17 +415,18 @@ td img {
     </form>
 </div>
 
+{{-- MODAL DURASI (Keep) --}}
 <div class="modal fade" id="durationModal" tabindex="-1" aria-labelledby="durationModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title fw-bold" id="durationModalLabel">Atur Durasi Promo: <span id="modalMenuName" class="text-primary"></span></h5>
+                <h5 class="modal-title fw-bold" id="durationModalLabel">⏱️ Atur Durasi Promo: <span id="modalMenuName" class="text-primary"></span></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="modalMenuId">
 
-                <p class="text-muted text-center mb-4">Atur waktu promo (0 untuk menonaktifkan)</p>
+                <p class="text-muted text-center mb-4">Waktu akan dihitung sejak tombol "Simpan Semua Pengaturan Promo" ditekan.</p>
 
                 <div class="duration-input-modern">
                     <input type="number" id="modalDurasiHari" class="form-control" min="0" max="365" placeholder="0">
@@ -427,7 +446,7 @@ td img {
             </div>
             <div class="modal-footer" style="border-top: none; padding: 0 2rem 2rem;">
                 <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-primary rounded-pill" id="saveDurationButton">
+                <button type="button" class="btn btn-primary rounded-pill btn-action" id="saveDurationButton">
                     <i class="bi bi-save me-1"></i> Simpan Durasi
                 </button>
             </div>
@@ -445,6 +464,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return new Intl.NumberFormat('id-ID').format(Math.round(angka));
     }
     
+    // Fungsi formatDurationText DIBIARKAN SAMA (sesuai kebutuhan JS)
     function formatDurationText(d, h, m) {
         d = parseInt(d) || 0;
         h = parseInt(h) || 0;
@@ -461,6 +481,9 @@ document.addEventListener("DOMContentLoaded", function () {
         return '<span class="active-duration-text">' + parts.join(', ') + '</span>';
     }
 
+    // ----------------------------------------------------
+    // START: TOAST & SLIDER LOGIC (Keep)
+    // ----------------------------------------------------
     const successToast = document.getElementById('successToast');
     if (successToast) {
         successToast.classList.add('show');
@@ -490,25 +513,26 @@ document.addEventListener("DOMContentLoaded", function () {
         
         const durationButton = tr.querySelector('.btn-duration-config');
 
+        // Logic untuk menonaktifkan tombol durasi jika diskon 0%
         if (diskonPersen === 0) {
-            durationButton.style.opacity = 0.4;
-            durationButton.style.pointerEvents = 'auto';
-            durationButton.setAttribute('disabled', true); 
-
+            durationButton.setAttribute('disabled', 'true'); 
+            
+            // Atur durasi tersembunyi menjadi 0
             document.getElementById(`durasiHariHidden-${menuId}`).value = 0;
             document.getElementById(`durasiJamHidden-${menuId}`).value = 0;
             document.getElementById(`durasiMenitHidden-${menuId}`).value = 0;
             
+            // Update display durasi menjadi Nonaktif
             const durationDisplay = document.getElementById(`durationDisplay-${menuId}`);
             durationDisplay.innerHTML = formatDurationText(0, 0, 0);
 
         } else {
-            durationButton.style.opacity = 1;
-            durationButton.style.pointerEvents = 'auto';
             durationButton.removeAttribute('disabled');
         }
 
+        // Logic untuk menandai baris 'promo-active'
         if (tr) {
+             // Promo aktif jika ada diskon (>0) DAN ada durasi yang disetel (>0)
              if (diskonPersen > 0 && (durasiHari > 0 || durasiJam > 0 || durasiMenit > 0)) {
                  tr.classList.add('promo-active');
              } else {
@@ -544,26 +568,25 @@ document.addEventListener("DOMContentLoaded", function () {
                 <small class="text-info d-block">Hemat: Rp${formatRupiah(hemat)}</small>
             `;
             
-            checkPromoActiveStatus(menuId); 
         } else {
             hargaPromoHidden.value = '0'; 
             hargaPromoInfo.innerHTML = '';
-            
-            const durationDisplay = document.getElementById(`durationDisplay-${menuId}`);
-            durationDisplay.innerHTML = formatDurationText(0, 0, 0);
-
-            checkPromoActiveStatus(menuId); 
         }
         
         sliderLabel.textContent = diskonPersen + '%';
         
+        // Menyesuaikan posisi label agar mengikuti thumb slider
         const max = parseInt(input.getAttribute('max'));
         const min = parseInt(input.getAttribute('min'));
         const range = max - min;
         const value = parseInt(input.value);
         
         let position = ((value - min) / range) * 100;
-        sliderLabel.style.left = `calc(${position}% + (${8 - position * 0.15}px))`; 
+        // Penyesuaian offset: membuat label sedikit lebih ke tengah thumb
+        let offset = 8 - position * 0.15; // Logika ini membantu label tetap di tengah
+        sliderLabel.style.left = `calc(${position}% + (${offset}px))`; 
+        
+        checkPromoActiveStatus(menuId); 
     }
 
     diskonRangeInputs.forEach(input => {
@@ -572,21 +595,24 @@ document.addEventListener("DOMContentLoaded", function () {
             calculateAndDisplayPromo(this);
         });
     });
+    
+    // ----------------------------------------------------
+    // END: SLIDER LOGIC
+    // START: DURATION MODAL LOGIC (Keep)
+    // ----------------------------------------------------
 
     const durationModal = document.getElementById('durationModal');
     
     document.querySelectorAll('.btn-duration-config').forEach(button => {
-        button.removeEventListener('click', handleDurationButtonClick);
-        button.addEventListener('click', handleDurationButtonClick);
+        button.addEventListener('click', function(event) {
+            if (this.hasAttribute('disabled')) {
+                event.stopPropagation();
+                event.preventDefault(); 
+                const menuName = this.getAttribute('data-menu-name');
+                alert(`⚠️ Harap atur persentase diskon untuk ${menuName} (minimal 1%) terlebih dahulu sebelum mengatur durasi!`);
+            }
+        });
     });
-    
-    function handleDurationButtonClick(event) {
-        if (this.hasAttribute('disabled')) {
-            event.stopPropagation();
-            event.preventDefault(); 
-            alert('⚠️ Harap atur persentase diskon (slider) terlebih dahulu sebelum mengatur durasi!');
-        }
-    }
 
     durationModal.addEventListener('show.bs.modal', function (event) {
         const button = event.relatedTarget; 
@@ -610,14 +636,6 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('modalDurasiMenit').value = parseInt(m_input.value) || 0;
     });
 
-    durationModal.addEventListener('hidden.bs.modal', function () {
-        document.body.classList.remove('modal-open');
-        document.body.style.overflow = '';
-        
-        const backdrops = document.querySelectorAll('.modal-backdrop');
-        backdrops.forEach(backdrop => backdrop.remove());
-    });
-    
     document.getElementById('saveDurationButton').addEventListener('click', function() {
         const modal = bootstrap.Modal.getInstance(durationModal);
         
@@ -625,14 +643,23 @@ document.addEventListener("DOMContentLoaded", function () {
         const hari = parseInt(document.getElementById('modalDurasiHari').value, 10) || 0;
         const jam = parseInt(document.getElementById('modalDurasiJam').value, 10) || 0;
         const menit = parseInt(document.getElementById('modalDurasiMenit').value, 10) || 0;
+        
+        // Validasi
+        if (hari < 0 || jam < 0 || menit < 0 || jam > 23 || menit > 59) {
+            alert('Input durasi tidak valid!');
+            return;
+        }
 
+        // Update hidden fields
         document.getElementById(`durasiHariHidden-${menuId}`).value = hari;
         document.getElementById(`durasiJamHidden-${menuId}`).value = jam;
         document.getElementById(`durasiMenitHidden-${menuId}`).value = menit;
         
+        // Update tampilan di tabel
         const durationDisplay = document.getElementById(`durationDisplay-${menuId}`);
         durationDisplay.innerHTML = formatDurationText(hari, jam, menit);
         
+        // Check Status Promo Active
         checkPromoActiveStatus(menuId);
 
         modal.hide();

@@ -1,186 +1,146 @@
 @extends('dashboard.home')
 
-@section('styles')
+@section('content')
+
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-
-    body, .table, .btn, h2, .card {
-        font-family: 'Poppins', sans-serif;
+    /* KONSEP: Minimalist Monochrome (Konsisten dengan halaman User) */
+    :root {
+        --black: #1a1a1a;
+        --gray-dark: #4a4a4a;
+        --gray-light: #e5e5e5;
     }
 
-    .kategori-heading {
-        font-size: 1.7rem;
+    body {
+        color: var(--black);
+        font-family: sans-serif; /* Menggunakan font default sistem agar lebih cepat/bersih */
+    }
+
+    .page-title {
         font-weight: 700;
-        color: #2a3950;
-        letter-spacing: 0.01em;
+        color: var(--black);
+        letter-spacing: -0.5px;
     }
 
-    /* --- Table Header --- */
-    .table thead th {
-        background: linear-gradient(90deg, #f4f7fb 78%, #e7eefa 100%);
-        color: #284866;
-        font-weight: 600;
-        border: none;
-        padding: 1rem 1.2rem;
-        border-radius: 10px 10px 0 0;
-        font-size: 1rem;
-        letter-spacing: .01em;
-    }
-
-    /* --- Table Body --- */
-    .table tbody tr {
+    /* Kartu Flat */
+    .card-minimal {
+        border: 1px solid var(--gray-light);
+        border-radius: 8px;
+        box-shadow: none;
         background: #fff;
-        box-shadow: 0 2px 6px rgb(42 57 80 / 8%);
-        border-radius: 9px;
-        transition: transform 0.17s, box-shadow 0.17s;
-    }
-    .table tbody tr:hover {
-        transform: translateY(-2px) scale(1.01);
-        box-shadow: 0 6px 18px rgb(42 57 80 / 13%);
-        background: #f5fafd;
-    }
-    .table tbody td {
-        vertical-align: middle;
-        padding: 1rem 1.2rem;
-        font-size: 1.01rem;
-        color: #284866;
     }
 
-    /* --- Button Style --- */
-    .btn {
-        font-weight: 600;
-        border-radius: 1.2rem;
-        transition: background .19s, color .19s, box-shadow .17s, border .13s;
-        font-size: 1rem;
-    }
-    .btn-action {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.3rem;
-    }
-    .btn-action i {
-        font-size: 1.02rem;
-    }
-    .btn-success {
-        background: #eaf8f0;
-        border: 1.5px solid #b6dfcd;
-        color: #218154 !important;
-        box-shadow: 0 2px 10px #c4f1e11a;
-    }
-    .btn-success:hover, .btn-success:focus {
-        background: #d2f4e0;
-        color: #16643e !important;
-        border: 1.5px solid #81c7a3;
-    }
-    .btn-warning {
-        background: #fff8e1;
-        border: 1.5px solid #ffe9b2;
-        color: #c4861c;
-        box-shadow: 0 2px 10px #ffe9b21a;
-    }
-    .btn-warning:hover, .btn-warning:focus {
-        background: #fff3cd;
-        color: #ad7a0a;
-        border: 1.5px solid #ffde8a;
-    }
-    .btn-danger {
-        background: #fff1f0;
-        border: 1.5px solid #f7c2c2;
-        color: #c0392b;
-        box-shadow: 0 2px 10px #f7c2c218;
-    }
-    .btn-danger:hover, .btn-danger:focus {
-        background: #ffe5e3;
-        color: #a93226;
-        border: 1.5px solid #ffb3b3;
-    }
-
-    /* --- Card --- */
-    .card {
-        border: none;
-        border-radius: 18px;
-        background: #f9fbfd;
-        box-shadow: 0 6px 18px #28486613, 0 2px 8px #d7e0ec0a;
-    }
-
-    /* --- Toast Success --- */
-    #successToast {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 2000;
-        opacity: 0;
-        transition: opacity 0.4s ease;
-        font-size: 1.05rem;
-        border-radius: 1rem;
+    /* Tombol Hitam Putih */
+    .btn-monochrome {
+        background-color: var(--black);
+        color: #fff;
+        border: 1px solid var(--black);
+        border-radius: 6px;
         font-weight: 500;
-        background: #e7f7ed;
-        color: #2e6051;
-        border: 1px solid #b9dbcc;
-        box-shadow: 0 2px 10px #b9dbcc55;
+        padding: 0.5rem 1.2rem;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-block;
     }
-    #successToast.show {
-        opacity: 1;
+    .btn-monochrome:hover {
+        background-color: #fff;
+        color: var(--black);
     }
-    @media (max-width: 768px) {
-        .kategori-heading { font-size: 1.13rem; }
-        .btn { font-size: .97rem; }
-        .table th, .table td { padding: .75rem .65rem; }
+
+    /* Tabel Minimalis */
+    .table-minimal thead th {
+        background-color: #fff;
+        color: var(--gray-dark);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        border-bottom: 2px solid var(--black);
+        padding: 1rem 0.75rem;
+    }
+
+    .table-minimal tbody td {
+        vertical-align: middle;
+        padding: 1.2rem 0.75rem;
+        color: var(--black);
+        border-bottom: 1px solid var(--gray-light);
+    }
+    
+    .table-minimal tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* Action Links (Pengganti Tombol Warna-warni) */
+    .action-link {
+        color: var(--gray-dark);
+        text-decoration: none;
+        font-size: 0.9rem;
+        margin: 0 5px;
+        font-weight: 500;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 0;
+    }
+    .action-link:hover {
+        color: var(--black);
+        text-decoration: underline;
     }
 </style>
-@endsection
 
-@section('content')
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-        <h2 class="fw-semibold text-primary kategori-heading mb-0">📂 Daftar Kategori</h2>
-        <a href="{{ route('kategoris.create') }}" class="btn btn-success shadow-sm px-4 btn-action">
-            <i class="bi bi-plus-circle me-1"></i> Tambah Kategori
+<div class="container-fluid px-4 mt-4">
+    
+    {{-- Header Section --}}
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h2 class="page-title mb-1">Daftar Kategori</h2>
+            <div style="width: 40px; height: 3px; background: #000;"></div> {{-- Aksen Garis --}}
+        </div>
+        <a href="{{ route('kategoris.create') }}" class="btn-monochrome">
+            + Tambah Kategori
         </a>
     </div>
 
+    {{-- Alert Minimalis --}}
     @if(session('success'))
-        <div id="successToast" class="alert alert-success shadow-sm rounded">
-            <i class="bi bi-check-circle me-2"></i> {{ session('success') }}
+        <div class="alert bg-white border border-dark rounded-1 mb-4 d-flex align-items-center" role="alert" style="color: #000;">
+            <i class="bi bi-check-circle me-2"></i>
+            <div>{{ session('success') }}</div>
         </div>
     @endif
 
-    <div class="card shadow-sm border-0 rounded">
+    {{-- Table Card --}}
+    <div class="card card-minimal">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-striped table-hover align-middle text-center m-0">
+                <table class="table table-minimal w-100 mb-0">
                     <thead>
                         <tr>
-                            <th style="width: 10%;">ID</th>
+                            <th class="text-center" style="width: 10%;">ID</th>
                             <th class="text-start">Nama Kategori</th>
-                            <th style="width: 20%;">Aksi</th>
+                            <th class="text-end pe-4" style="width: 20%;">Opsi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($kategoris as $kategori)
                             <tr>
-                                <td>{{ $kategori->id }}</td>
-                                <td class="text-start">{{ $kategori->nama_kategori }}</td>
-                                <td>
-                                    <a href="{{ route('kategoris.edit', $kategori->id) }}" class="btn btn-warning btn-sm px-3 btn-action">
-                                        <i class="bi bi-pencil-square"></i> Edit
+                                <td class="text-center text-muted">{{ $kategori->id }}</td>
+                                <td class="text-start fw-bold">{{ $kategori->nama_kategori }}</td>
+                                <td class="text-end pe-4">
+                                    <a href="{{ route('kategoris.edit', $kategori->id) }}" class="action-link">
+                                        Edit
                                     </a>
-                                    <form action="{{ route('kategoris.destroy', $kategori->id) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button 
-                                            type="submit" 
-                                            class="btn btn-danger btn-sm px-3 btn-action" 
-                                            onclick="return confirm('Apakah Anda yakin ingin menghapus kategori ini?')"
-                                        >
-                                            <i class="bi bi-trash"></i> Hapus
-                                        </button>
-                                    </form>
+                                    <span class="text-muted mx-1">|</span>
+                                    <button type="button" class="action-link btn-delete-kategori" 
+                                        data-id="{{ $kategori->id }}"
+                                        data-name="{{ $kategori->nama_kategori }}">
+                                        Hapus
+                                    </button>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="3" class="text-center text-muted">Belum ada kategori.</td>
+                                <td colspan="3" class="text-center py-5 text-muted">
+                                    <em>Belum ada kategori yang ditambahkan.</em>
+                                </td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -189,18 +149,54 @@
         </div>
     </div>
 </div>
-@endsection
 
-@section('scripts')
+{{-- Hidden Form untuk Delete --}}
+<form id="delete-form" method="POST" style="display: none;">
+    @csrf
+    @method('DELETE')
+</form>
+
+{{-- Scripts & Icons --}}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const toast = document.getElementById('successToast');
-        if (toast) {
-            toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3500);
-        }
+    document.addEventListener('DOMContentLoaded', function () {
+        const deleteButtons = document.querySelectorAll('.btn-delete-kategori');
+        const deleteForm = document.getElementById('delete-form');
+
+        // Style SweetAlert Monochrome
+        const swalMono = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-dark px-4 py-2 rounded-1 mx-1',
+                cancelButton: 'btn btn-outline-secondary px-4 py-2 rounded-1 mx-1'
+            },
+            buttonsStyling: false
+        });
+
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const id = this.getAttribute('data-id');
+                const name = this.getAttribute('data-name');
+
+                swalMono.fire({
+                    title: 'Hapus Kategori?',
+                    text: `Kategori "${name}" akan dihapus permanen.`,
+                    icon: 'warning',
+                    iconColor: '#333',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Hapus',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        deleteForm.action = `/kategoris/${id}`; // Pastikan rutenya sesuai
+                        deleteForm.submit();
+                    }
+                });
+            });
+        });
     });
 </script>
+
 @endsection

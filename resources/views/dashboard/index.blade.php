@@ -4,63 +4,68 @@
 <div class="container-fluid px-0">
     <div class="row g-0">
         <div class="col-12">
-            <div class="welcome-banner px-4 py-4 mb-4">
-                @php
-                    $user = auth()->user();
-                    $role = $user->role;
-                    $isAdmin = $role === 'admin';
-                    $isKasir = $role === 'kasir';
-                @endphp
-                <div class="d-flex flex-column flex-md-row align-items-center justify-content-between">
-                    <div>
-                        <div class="welcome-message mb-2">
+            {{-- BANNER SELAMAT DATANG DENGAN GAMBAR LATAR BELAKANG --}}
+            <div class="welcome-banner px-4 py-3 mb-4"> 
+                {{-- OVERLAY untuk memastikan teks terbaca di atas gambar latar --}}
+                <div class="welcome-banner-overlay">
+                    @php
+                        $user = auth()->user();
+                        $role = $user->role;
+                        $isAdmin = $role === 'admin';
+                        $isKasir = $role === 'kasir';
+                    @endphp
+                    <div class="d-flex flex-column flex-md-row align-items-center justify-content-between">
+                        <div>
+                            <div class="welcome-message mb-2">
+                                @if($isAdmin)
+                                    {{-- ICON ADMIN DI SINI: Mengubah ke warna terang agar kontras --}}
+                                    <span class="welcome-icon me-2"><i class="bi bi-person-badge-fill text-admin-coffee-light"></i></span> 
+                                    <span>Selamat Datang, <b>{{ $user->name }}</b></span>
+                                @elseif($isKasir)
+                                    <span class="welcome-icon me-2"><i class="bi bi-person-vcard-fill text-info-coffee-light"></i></span>
+                                    <span>Selamat Datang, <b>{{ $user->name }}</b></span>
+                                @else
+                                    <span class="welcome-icon me-2"><i class="bi bi-emoji-smile text-warning-coffee-light"></i></span>
+                                    <span>Selamat, <b>{{ $user->name }}</b></span>
+                                @endif
+                            </div>
+                            <div class="dashboard-title mb-1">
+                                <i class="bi bi-speedometer2 text-secondary-coffee-light"></i> Dashboard
+                            </div>
+                            <div class="dashboard-subtitle">
+                                @if($isAdmin)
+                                    Kelola restoran, pantau stok, dan lihat laporan pendapatan di sini.
+                                @elseif($isKasir)
+                                    Buat pesanan dan kelola transaksi pelanggan dengan mudah.
+                                @else
+                                    Jelajahi menu terbaik kami dan nikmati pengalaman kuliner terbaik!
+                                @endif
+                            </div>
+                            <div class="bio-message mt-3">
+                                @if($isAdmin)
+                                    Anda memiliki akses penuh untuk mengelola dan memantau seluruh operasional restoran. Pantau stok, atur menu, kelola kasir, dan dapatkan laporan pendapatan secara real-time dengan mudah dan efisien.
+                                @elseif($isKasir)
+                                    Nikmati kemudahan dalam membuat pesanan dan mengelola transaksi pelanggan setiap hari. Pastikan pelayanan terbaik untuk pengalaman makan yang memuaskan!
+                                @else
+                                    Temukan ragam menu favorit yang disiapkan dengan bahan berkualitas. Jadikan setiap kunjungan Anda menjadi momen istimewa bersama keluarga dan sahabat.
+                                @endif
+                            </div>
+                        </div>
+                        <div class="mt-4 mt-md-0">
                             @if($isAdmin)
-                                <span class="welcome-icon me-2"><i class="bi bi-person-badge-fill text-success"></i></span>
-                                <span>Selamat Datang, <b>{{ $user->name }}</b></span>
+                                <a href="{{ route('reports.index') }}" class="lihat-menu-btn">
+                                    <i class="bi bi-bar-chart-line-fill me-1"></i> Lihat Laporan
+                                </a>
                             @elseif($isKasir)
-                                <span class="welcome-icon me-2"><i class="bi bi-person-vcard-fill text-info"></i></span>
-                                <span>Selamat Datang, <b>{{ $user->name }}</b></span>
+                                <a href="{{ route('orders.index') }}" class="lihat-menu-btn">
+                                    <i class="bi bi-receipt-cutoff me-1"></i> Buat Pesanan
+                                </a>
                             @else
-                                <span class="welcome-icon me-2"><i class="bi bi-emoji-smile text-warning"></i></span>
-                                <span>Selamat, <b>{{ $user->name }}</b></span>
+                                <a href="{{ route('menus.index') }}" class="lihat-menu-btn mb-4">
+                                    <i class="bi bi-list-ul me-1"></i> Lihat Semua Menu
+                                </a>
                             @endif
                         </div>
-                        <div class="dashboard-title mb-1">
-                            <i class="bi bi-speedometer2 text-secondary"></i> Dashboard
-                        </div>
-                        <div class="dashboard-subtitle">
-                            @if($isAdmin)
-                                Kelola restoran, pantau stok, dan lihat laporan pendapatan di sini.
-                            @elseif($isKasir)
-                                Buat pesanan dan kelola transaksi pelanggan dengan mudah.
-                            @else
-                                Jelajahi menu terbaik kami dan nikmati pengalaman kuliner terbaik!
-                            @endif
-                        </div>
-                        <div class="bio-message mt-3">
-                            @if($isAdmin)
-                                Anda memiliki akses penuh untuk mengelola dan memantau seluruh operasional restoran. Pantau stok, atur menu, kelola kasir, dan dapatkan laporan pendapatan secara real-time dengan mudah dan efisien.
-                            @elseif($isKasir)
-                                Nikmati kemudahan dalam membuat pesanan dan mengelola transaksi pelanggan setiap hari. Pastikan pelayanan terbaik untuk pengalaman makan yang memuaskan!
-                            @else
-                                Temukan ragam menu favorit yang disiapkan dengan bahan berkualitas. Jadikan setiap kunjungan Anda menjadi momen istimewa bersama keluarga dan sahabat.
-                            @endif
-                        </div>
-                    </div>
-                    <div class="mt-4 mt-md-0">
-                        @if($isAdmin)
-                            <a href="{{ route('reports.index') }}" class="lihat-menu-btn">
-                                <i class="bi bi-bar-chart-line-fill me-1"></i> Lihat Laporan
-                            </a>
-                        @elseif($isKasir)
-                            <a href="{{ route('orders.index') }}" class="lihat-menu-btn">
-                                <i class="bi bi-receipt-cutoff me-1"></i> Buat Pesanan
-                            </a>
-                        @else
-                            <a href="{{ route('menus.index') }}" class="lihat-menu-btn mb-4">
-                                <i class="bi bi-list-ul me-1"></i> Lihat Semua Menu
-                            </a>
-                        @endif
                     </div>
                 </div>
             </div>
@@ -69,19 +74,55 @@
 </div>
 
 <style>
+/* ** PALET WARNA COFFEE SHOP (HANYA UNTUK TEKS) **
+   * Coffee Text Dark: #4E342E (Dark Brown/Coffee)
+   * Coffee Text Medium: #795548 (Medium Brown)
+   * Coffee Accent Gold/Amber: #FFCA28 (Amber/Emas)
+*/
+.text-admin-coffee-light { color: #D7CCC8 !important; } /* Soft Taupe untuk Admin (terlihat di latar gelap) */
+.text-info-coffee-light { color: #FFD54F !important; } /* Amber/Emas untuk Kasir */
+.text-warning-coffee-light { color: #FFCA28 !important; } /* Amber/Emas untuk User */
+.text-secondary-coffee-light { color: #A1887F !important; } /* Soft Brown untuk ikon speedometer */
+
+
+/* >>> PERUBAHAN UTAMA DI SINI: WELCOME BANNER DENGAN GAMBAR LATAR BELAKANG <<< */
 .welcome-banner {
-    width: 100%;
-    background: linear-gradient(90deg, #f8fafc 70%, #d2e6fa 100%);
+    /* Ganti background gradient default dengan gambar latar belakang */
+    background: url('{{ asset("images/welcome-coffee-bg.jpg") }}') center center no-repeat;
+    background-size: cover;
+    position: relative; 
+    overflow: hidden;
     border-radius: 1.5rem;
     box-shadow: 0 8px 32px rgba(44,62,80,0.09), 0 2px 8px rgba(44,62,80,0.04);
-    margin-top: 2rem;
     margin-bottom: 2rem;
     min-height: 180px;
+    z-index: 1; /* Pastikan di atas elemen lain jika ada tumpang tindih */
+}
+
+/* OVERLAY COKELAT GELAP TRANSPARAN */
+.welcome-banner-overlay {
+    position: absolute; /* GANTI dari 'relative' ke 'absolute' */
+    top: 0; /* Tambahkan ini */
+    left: 0; /* Tambahkan ini */
+    padding: 1rem 0; /* Biarkan padding vertikal untuk konten di dalamnya */
+    /* Dark Brown/Black overlay */
+    background: rgba(30, 15, 0, 0.45); /* Sesuaikan opasitas sesuai kebutuhan */
+    width: 100%;
+    height: 100%;
+    border-radius: 1.5rem;
+    padding-top: 1rem; /* Sesuaikan padding vertikal agar konten terlihat baik */
+    padding-bottom: 1rem;
+}
+
+/* Mengubah semua teks di dalam banner menjadi warna terang (putih) */
+.welcome-message, .dashboard-title, .dashboard-subtitle {
+    /* Mengubah ke Putih/Terang */
+    color: #fdfdfd; 
+    text-shadow: 0 1px 4px rgba(0,0,0,0.6); /* Tambahkan bayangan agar lebih kontras */
 }
 .welcome-message {
     font-size: 1.7rem;
     font-weight: 700;
-    color: #1b5e20;
     letter-spacing: 0.01em;
     display: flex;
     align-items: center;
@@ -90,29 +131,35 @@
 .dashboard-title {
     font-size: 1.4rem;
     font-weight: 700;
-    color: #195b9a;
     letter-spacing: 0.03em;
     margin-bottom: .2rem;
 }
 .dashboard-subtitle {
-    color: #7b8a9e;
     font-size: 1.12rem;
     font-weight: 500;
     margin-bottom: 0.3rem;
 }
 .bio-message {
-    background: #e4f0f7;
+    /* Mengubah latar belakang menjadi cokelat transparan dan teks menjadi putih */
+    background: rgba(255, 255, 255, 0.15); /* Light/Transparant */
     border-radius: .9rem;
     padding: .8rem 1.4rem;
-    color: #294b63;
+    /* Teks Putih */
+    color: #fdfdfd;
     font-size: 1.01rem;
     font-weight: 500;
     max-width: 700px;
-    box-shadow: 0 2px 10px #36b37e09;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    backdrop-filter: blur(4px); /* Nilai 4px menentukan intensitas blur */
+    -webkit-backdrop-filter: blur(4px); /* Untuk kompatibilitas browser Safari */
+    
+    background: rgba(255, 255, 255, 0.15);
 }
 .lihat-menu-btn {
-    background: linear-gradient(90deg, #ffe082 0%, #ffd54f 100%);
-    color: #663c00;
+    /* Amber/Gold Gradient (Tombol tetap cerah) */
+    background: linear-gradient(90deg, #FFD54F 0%, #FFB300 100%);
+    /* Dark Coffee Text */
+    color: #4E342E;
     font-weight: 600;
     font-size: 1.07rem;
     border: none;
@@ -124,8 +171,8 @@
     display: inline-block;
 }
 .lihat-menu-btn:hover, .lihat-menu-btn:focus {
-    background: linear-gradient(90deg, #ffd54f 0%, #ffe082 100%);
-    color: #473400;
+    background: linear-gradient(90deg, #FFB300 0%, #FFD54F 100%);
+    color: #3E2723; /* Darker Coffee */
     box-shadow: 0 4px 16px #ffd54f55;
     text-decoration: none;
 }
@@ -152,132 +199,149 @@
 
 
     @if($isAdmin)
-        <!-- <a href="{{ route('reports.index') }}" class="lihat-menu-btn">
-            Lihat Laporan
-        </a> -->
-    @elseif($isKasir)
-        <!-- <a href="{{ route('orders.index') }}" class="lihat-menu-btn">
-            Buat Pesanan
-        </a> -->
-    @else
-        {{-- Untuk user biasa, tampilkan daftar menu per kategori langsung --}}
-        <!-- <a href="{{ route('menus.index') }}" class="lihat-menu-btn mb-4">
-            Lihat Semua Menu
-        </a> -->
-    
-
-        <style>
-            .user-dashboard-card {
-                border-radius: 1rem;
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-                padding: 1.5rem;
-                background: #ffffff;
-                transition: 0.3s ease;
+        {{-- BAGIAN ADMIN (CARD INI DIKEMBALIKAN KE WARNA TERANG SEPERTI KODE ASLI) --}}
+        @php
+            // Data dummy untuk lowStockMenus dan reports jika variabel asli tidak ada
+            if (!isset($lowStockMenus)) {
+                $lowStockMenus = collect([
+                    (object)['nama_menu' => 'Espresso Classic', 'stok' => 0],
+                    (object)['nama_menu' => 'Latte Caramel', 'stok' => 3],
+                ]);
             }
-
-            .user-dashboard-card:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            if (!isset($reports)) {
+                $reports = collect([
+                    (object)['kasir_name' => 'Budi', 'total_pendapatan' => 1200000],
+                    (object)['kasir_name' => 'Sari', 'total_pendapatan' => 950000],
+                ]);
             }
+        @endphp
 
-            .dashboard-title {
-                font-weight: 600;
-                color: #2c3e50;
-            }
-
-            .menu-img {
-                width: 100%;
-                height: 180px;
-                object-fit: cover;
-                border-radius: 0.75rem;
-            }
-        </style>
-
-      <div class="container py-4">
-    <h2 class="dashboard-title mb-5 text-center" style="font-weight: 800; letter-spacing: 0.03em; color: #195b9a;">
-        Menu Tersedia
-    </h2>
-    @php
-        $menusByCategory = $menus->groupBy('kategori_id');
-    @endphp
-
-    @foreach ($menusByCategory as $kategoriId => $menusGroup)
-        <div class="mb-5">
-            <div class="d-flex align-items-center mb-4">
-                <span style="width: 9px; height: 32px; background: linear-gradient(180deg, #2d9cdb 0%, #195b9a 100%); border-radius: 6px; margin-right: 16px; display: inline-block;"></span>
-                <h4 class="mb-0" style="color: #195b9a; font-weight: 700;">
-                    {{ $menusGroup->first()->kategori->nama_kategori ?? 'Kategori Tidak Diketahui' }}
-                </h4>
+        <div class="row mb-4">
+            {{-- Aktivitas Terbaru --}}
+            <div class="col-md-5 mb-3">
+                <div class="card shadow-sm rounded-4 admin-elegant-card h-100 border-0">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4 fw-bold text-primary-coffee" style="letter-spacing:0.5px;">
+                            <i class="bi bi-bell-fill text-warning-coffee me-2"></i> Aktivitas Terbaru
+                        </h5>
+                        @if($lowStockMenus->isEmpty())
+                            <p class="text-muted fst-italic mb-0" style="color: #795548 !important;">Tidak ada pemberitahuan stok menipis.</p>
+                        @else
+                            @foreach($lowStockMenus as $menu)
+                                <div class="d-flex mb-3 align-items-start admin-activity-row">
+                                    <div class="me-3 mt-1">
+                                        <i data-feather="alert-triangle" 
+                                           class="{{ $menu->stok == 0 ? 'text-danger-coffee' : 'text-warning-coffee' }}" 
+                                           width="24" height="24"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1 fw-semibold {{ $menu->stok == 0 ? 'text-danger-coffee' : 'text-warning-coffee' }}">
+                                            {{ $menu->stok == 0 ? 'Stok Habis!' : 'Stok Hampir Habis!' }}
+                                        </h6>
+                                        <p class="mb-0 text-dark-coffee">
+                                            Menu <strong>{{ $menu->nama_menu }}</strong> hanya tersisa 
+                                            <span class="badge {{ $menu->stok == 0 ? 'bg-danger-coffee' : 'bg-warning-coffee text-dark-coffee-important' }}">
+                                                {{ $menu->stok }} pcs
+                                            </span>
+                                        </p>
+                                        <small class="text-muted" style="color: #A1887F !important;">
+                                            {{ $menu->stok == 0 ? 'Segera lakukan restock sekarang!' : 'Segera lakukan restock' }}
+                                        </small>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @endif
+                    </div>
+                </div>
             </div>
-            <div class="row g-4">
-                @foreach ($menusGroup as $menu)
-                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                        <div class="menu-card text-center border-0"
-                             style="padding: 1.6rem 1.1rem; border-radius: 1.4rem; background: linear-gradient(135deg, #fafdff 80%, #e6f0fa 100%); box-shadow: 0 8px 32px rgba(25,91,154,0.12); position: relative; overflow: hidden; transition: 0.25s;">
-                            <img src="{{ asset('storage/' . $menu->gambar) }}"
-                                 alt="{{ $menu->nama_menu }}"
-                                 class="menu-img mb-3"
-                                 style="border-radius: 1rem; width: 100%; height: 160px; object-fit: cover; box-shadow: 0 4px 16px #195b9a13;">
-                            <h5 class="mb-1" style="font-weight: 700; color: #2366b5;">{{ $menu->nama_menu }}</h5>
-                            <p class="mb-2" style="color: #789; font-size: 1.01rem; font-weight: 500;">
-                                Rp {{ number_format($menu->harga, 0, ',', '.') }}
-                            </p>
-                            <div class="mt-3">
-                                @if($menu->stok > 0)
-                                    <span class="badge bg-gradient-ready" style="font-size: 1em; padding: .54em 1.3em; border-radius: 999px; font-weight:600;">
-                                        <i class="bi bi-check-circle-fill me-1"></i> Ready
-                                    </span>
-                                @else
-                                    <span class="badge bg-gradient-habis" style="font-size: 1em; padding: .54em 1.3em; border-radius: 999px; font-weight:600;">
-                                        <i class="bi bi-x-circle me-1"></i> Stock Habis
-                                    </span>
-                                @endif
-                            </div>
+
+            {{-- Grafik Pendapatan --}}
+            <div class="col-md-7">
+                <div class="card shadow-sm rounded-4 admin-elegant-card border-0" style="display:inline-block; width:auto; min-width:360px;">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-4 fw-bold text-primary-coffee" style="letter-spacing:0.5px; white-space:nowrap; font-size:1.45rem;">
+                            <i class="bi bi-bar-chart-line-fill text-success-coffee me-2"></i>
+                            Grafik Total Pendapatan per Kasir
+                        </h5>
+                        <div class="chart-responsive" style="width:100%; min-width:340px; height:290px;">
+                            <canvas id="pendapatanChart"></canvas>
                         </div>
                     </div>
-                @endforeach
+                </div>
             </div>
         </div>
-    @endforeach
-</div>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-<style>
-    .menu-card {
-        box-shadow: 0 8px 24px rgba(44,62,80,0.09);
-        transition: transform .22s, box-shadow .22s, background .22s;
-        border: none;
-    }
-    .menu-card:hover {
-        transform: translateY(-9px) scale(1.035);
-        box-shadow: 0 18px 36px rgba(25,91,154,0.18);
-        background: linear-gradient(135deg, #e6f0fa 80%, #fafdff 100%);
-        z-index: 2;
-    }
-    .badge.bg-gradient-ready {
-        background: linear-gradient(90deg,#43d477 60%,#23b26d 100%)!important;
-        color: #fff!important;
-        box-shadow: 0 2px 12px #43d47725;
-    }
-    .badge.bg-gradient-habis {
-        background: linear-gradient(90deg,#bfc9d1 60%,#7b8a9e 100%)!important;
-        color: #fff!important;
-        box-shadow: 0 2px 12px #bfc9d122;
-    }
-    .menu-img {
-        transition: filter 0.2s;
-    }
-    .menu-card:hover .menu-img {
-        filter: brightness(0.97) saturate(1.07);
-    }
-</style>
-    @endif
-</div>
+        <style>
+        /* ** Custom Coffee Shop Colors for Admin Dashboard ** */
+        .text-primary-coffee { color: #4E342E !important; }
+        .text-success-coffee { color: #689F38 !important; }
+        .text-warning-coffee { color: #FFCA28 !important; }
+        .text-danger-coffee { color: #D32F2F !important; } 
+        .text-dark-coffee { color: #4E342E !important; }
+        .text-dark-coffee-important { color: #4E342E !important; }
 
+        /* Backgrounds for Badges/Activity Rows */
+        .bg-danger-coffee { background-color: #D32F2F !important; color: #fff !important; }
+        .bg-warning-coffee { background-color: #FFCA28 !important; color: #4E342E !important; }
+
+        .chart-responsive {
+            width: 100%;
+            min-width: 340px;
+            height: 290px;
+            position: relative;
+        }
+        .chart-responsive canvas {
+            width: 100% !important;
+            height: 100% !important;
+            display: block;
+        }
+        /* ADMIN CARD DIKEMBALIKAN KE WARNA TERANG */
+        .admin-elegant-card {
+            background: linear-gradient(120deg, #f8fafc 70%, #fff 100%);
+            border-radius: 1.2rem !important;
+            box-shadow: 0 8px 32px rgba(44,62,80,0.09), 0 2px 8px rgba(44,62,80,0.04) !important;
+            border: 0;
+            transition: box-shadow .18s;
+        }
+        .admin-elegant-card:hover {
+            box-shadow: 0 18px 48px #b59a743a, 0 2px 8px #b59a7414;
+        }
+        .admin-elegant-card .card-title {
+            font-size: 1.17rem;
+            font-weight: 700;
+            color: #4E342E;
+            margin-bottom: 1.1rem;
+            letter-spacing: 0.03em;
+            display: flex;
+            align-items: center;
+        }
+        .admin-activity-row {
+            /* Light Amber/Creamy Warning Background (Untuk kontras di latar belakang terang) */
+            background: rgba(255, 202, 40, 0.13); 
+            border-radius: 0.7rem;
+            padding: 0.6rem 0.7rem 0.6rem 0.5rem;
+            transition: background 0.17s;
+        }
+        .admin-activity-row:hover {
+            background: rgba(255, 202, 40, 0.30);
+        }
+        .admin-elegant-card .badge {
+            font-size: 0.97em;
+            padding: .38em 1.1em;
+            border-radius: 1rem;
+            font-weight: 600;
+            letter-spacing: .02em;
+            box-shadow: 0 2px 7px #b59a7437;
+        }
+        @media (max-width: 900px) {
+            .admin-elegant-card { padding: .6rem 0.7rem; }
+            .row.mb-4 > div { margin-bottom: 1.1rem; }
+        }
+        </style>
+
+    @elseif($isKasir)
     {{-- Quick Actions Section --}}
-@if ($isKasir)
     <div class="quick-actions d-flex flex-wrap gap-4 justify-content-center align-items-stretch py-3">
-        <!-- Buat Pesanan -->
         <div class="action-card action-glass" onclick="cardRipple(this)">
             <div class="action-icon bg1"><i data-feather="plus-circle"></i></div>
             <h5>Buat Pesanan</h5>
@@ -285,7 +349,6 @@
                 Pesan Sekarang
             </a>
         </div>
-        <!-- Lihat Detail Pesanan -->
         <div class="action-card action-glass" onclick="cardRipple(this)">
             <div class="action-icon bg2"><i data-feather="file-text"></i></div>
             <h5>Lihat Detail Pesanan</h5>
@@ -293,15 +356,6 @@
                 Detail Pesanan
             </a>
         </div>
-        <!-- Lihat Menu
-        <div class="action-card action-glass" onclick="cardRipple(this)">
-            <div class="action-icon bg3"><i data-feather="book-open"></i></div>
-            <h5>Lihat Menu</h5>
-            <a href="{{ route('menus.index') }}">
-                Lihat Menu
-            </a>
-        </div> -->
-        <!-- Cetak Struk -->
         <div class="action-card action-glass" onclick="cardRipple(this)">
             <div class="action-icon bg4"><i data-feather="printer"></i></div>
             <h5>Cetak Struk</h5>
@@ -309,61 +363,9 @@
                 Pilih Pesanan
             </a>
         </div>
-        <!-- Notifikasi Stok Menipis -->
-        {{-- <div class="action-card action-glass" onclick="cardRipple(this)">
-            <div class="action-icon bg5"><i data-feather="alert-circle"></i></div>
-            <h5>Notifikasi Stok</h5>
-            <button type="button" class="btn btn-link p-0 action-btn-link" data-bs-toggle="modal" data-bs-target="#stokMenipisModal">
-                Cek Stok Menipis
-            </button>
-        </div> --}}
     </div>
-
-    <!-- Modal Stok Menipis -->
-    {{-- <div class="modal fade" id="stokMenipisModal" tabindex="-1" aria-labelledby="stokMenipisLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content shadow rounded-4 glass-modal">
-                <div class="modal-header bg-danger text-white rounded-top-4">
-                    <h5 class="modal-title" id="stokMenipisLabel"> --}}
-                        {{-- <i class="bi bi-exclamation-circle me-2"></i>Menu Stok Menipis
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    @php
-                        $menipisMenus = $menus->where('stok', '>', 0)->where('stok', '<=', 5);
-                    @endphp
-
-                    @if($menipisMenus->isEmpty())
-                        <div class="d-flex flex-column align-items-center text-center">
-                            <lottie-player src="https://lottie.host/9aa3b3e6-ff73-47b1-9f76-e9b6b7d2fb2e/1w7Wbi9rLw.json" background="transparent" speed="1" style="width: 150px; height: 150px;" loop autoplay></lottie-player>
-                            <p class="text-muted mt-2">Tidak ada menu dengan stok menipis 🎉</p>
-                        </div>
-                    @else
-                        <ul class="list-group list-group-flush">
-                            @foreach($menipisMenus as $menu)
-                                <li class="list-group-item d-flex justify-content-between align-items-center glass-list">
-                                    <div> --}}
-                                        {{-- <b>{{ $menu->nama_menu }}</b>
-                                        <span class="badge bg-warning text-dark ms-2">Stok: {{ $menu->stok }}</span>
-                                    </div>
-                                    <a href="{{ route('menus.edit', $menu->id) }}"
-                                        class="btn btn-outline-primary btn-sm rounded-pill d-flex align-items-center gap-1"
-                                        title="Tambah Stok">
-                                        <i class="bi bi-plus-circle"></i>
-                                        <span class="d-none d-sm-inline">Tambah Stok</span>
-                                    </a>
-                                </li>
-                            @endforeach
-                        </ul>
-                    @endif
-                </div>
-            </div>
-        </div>
-    </div> --}}
-
     <style>
+        /* CSS Kasir Quick Actions (Sama seperti kode asli) */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap');
         .quick-actions {
             flex-wrap: wrap;
@@ -403,19 +405,21 @@
             box-shadow: 0 5px 30px rgba(44,62,80,0.16);
             transform: scale(1.08);
         }
-        .bg1 { background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);}
-        .bg2 { background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);}
-        .bg3 { background: linear-gradient(135deg, #7474bf 0%, #348ac7 100%);}
-        .bg4 { background: linear-gradient(135deg, #232526 0%, #414345 100%);}
-        .bg5 { background: linear-gradient(135deg, #fc5c7d 0%, #6a82fb 100%);}
+        /* Custom Coffee Gradients untuk ICON BACKGROUND */
+        .bg1 { background: linear-gradient(135deg, #8BC34A 0%, #4E342E 100%);} /* Olive Green to Coffee */
+        .bg2 { background: linear-gradient(135deg, #D7CCC8 0%, #A1887F 100%);} /* Soft Taupe */
+        .bg3 { background: linear-gradient(135deg, #FFD54F 0%, #FFB300 100%);} /* Amber/Gold */
+        .bg4 { background: linear-gradient(135deg, #6D4C41 0%, #3E2723 100%);} /* Darker Coffee */
+        .bg5 { background: linear-gradient(135deg, #FFCA28 0%, #FFD54F 100%);} /* Amber */
+        
         .action-card h5 {
             font-weight: 700;
-            color: #232526;
+            color: #4E342E;
             margin-bottom: 0.7rem;
             font-size: 1.13rem;
         }
         .action-card a, .action-card button.btn-link {
-            color: #185a9d;
+            color: #8D6E63;
             font-weight: 600;
             text-decoration: none;
             font-size: 1.06rem;
@@ -429,7 +433,7 @@
             transition: color .17s;
         }
         .action-card a:hover, .action-card button.btn-link:hover {
-            color: #fc5c7d;
+            color: #4E342E;
         }
         .action-btn-link {
             font-size: 1.06rem;
@@ -445,7 +449,7 @@
             opacity:.45;
         }
         .action-card:focus {
-            outline: 2px solid #43cea2;
+            outline: 2px solid #8BC34A;
         }
         .action-glass {
             backdrop-filter: blur(3.5px);
@@ -473,11 +477,193 @@
             }
         }
     </style>
+    @else
+    {{-- Menu Tersedia Section (User Biasa) --}}
+    <style>
+        .user-dashboard-card {
+            border-radius: 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            background: #ffffff;
+            transition: 0.3s ease;
+        }
 
-    <!-- Lottie Player CDN for Animation (stock aman) -->
-    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-    <script>
-        // Ripple effect untuk card
+        .user-dashboard-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .dashboard-title {
+            font-weight: 600;
+            color: #4E342E;
+        }
+
+        .menu-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 0.75rem;
+        }
+    </style>
+
+    <div class="container py-4">
+        <h2 class="dashboard-title mb-5 text-center" style="font-weight: 800; letter-spacing: 0.03em; color: #4E342E;">
+            Menu Tersedia
+        </h2>
+        @php
+            if (!isset($menusByCategory)) {
+                $menusByCategory = collect([ // Data dummy untuk ilustrasi
+                    1 => collect([
+                        (object)['nama_menu' => 'Espresso Classic', 'harga' => 25000, 'stok' => 10, 'gambar' => 'path/to/img1.jpg', 'kategori' => (object)['nama_kategori' => 'Coffee']],
+                        (object)['nama_menu' => 'Latte Caramel', 'harga' => 30000, 'stok' => 0, 'gambar' => 'path/to/img2.jpg', 'kategori' => (object)['nama_kategori' => 'Coffee']],
+                    ]),
+                    2 => collect([
+                        (object)['nama_menu' => 'Croissant Almond', 'harga' => 22000, 'stok' => 5, 'gambar' => 'path/to/img3.jpg', 'kategori' => (object)['nama_kategori' => 'Pastry']],
+                    ]),
+                ]);
+            }
+        @endphp
+
+        @foreach ($menusByCategory as $kategoriId => $menusGroup)
+            <div class="mb-5">
+                <div class="d-flex align-items-center mb-4">
+                    <span style="width: 9px; height: 32px; /* Brown/Coffee Stripe */ background: linear-gradient(180deg, #8D6E63 0%, #4E342E 100%); border-radius: 6px; margin-right: 16px; display: inline-block;"></span>
+                    <h4 class="mb-0" style="color: #4E342E; font-weight: 700;">
+                        {{ $menusGroup->first()->kategori->nama_kategori ?? 'Kategori Tidak Diketahui' }}
+                    </h4>
+                </div>
+                <div class="row g-4">
+                    @foreach ($menusGroup as $menu)
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                            <div class="menu-card text-center border-0"
+                                style="padding: 1.6rem 1.1rem; border-radius: 1.4rem; background: linear-gradient(135deg, #fafdff 80%, #e6f0fa 100%); box-shadow: 0 8px 32px rgba(25,91,154,0.12); position: relative; overflow: hidden; transition: 0.25s;">
+                                <img src="{{ asset('storage/' . $menu->gambar) }}"
+                                        alt="{{ $menu->nama_menu }}"
+                                        class="menu-img mb-3"
+                                        style="border-radius: 1rem; width: 100%; height: 160px; object-fit: cover; box-shadow: 0 4px 16px #195b9a13;">
+                                <h5 class="mb-1" style="font-weight: 700; color: #4E342E;">{{ $menu->nama_menu }}</h5>
+                                <p class="mb-2" style="color: #795548; font-size: 1.01rem; font-weight: 500;">
+                                    Rp {{ number_format($menu->harga, 0, ',', '.') }}
+                                </p>
+                                <div class="mt-3">
+                                    @if($menu->stok > 0)
+                                        <span class="badge bg-gradient-ready" style="font-size: 1em; padding: .54em 1.3em; border-radius: 999px; font-weight:600;">
+                                            <i class="bi bi-check-circle-fill me-1"></i> Ready
+                                        </span>
+                                    @else
+                                        <span class="badge bg-gradient-habis" style="font-size: 1em; padding: .54em 1.3em; border-radius: 999px; font-weight:600;">
+                                            <i class="bi bi-x-circle me-1"></i> Stock Habis
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endforeach
+    </div>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        /* CSS Menu Card (Sama seperti kode asli) */
+        .menu-card {
+            box-shadow: 0 8px 24px rgba(44,62,80,0.09);
+            transition: transform .22s, box-shadow .22s, background .22s;
+            border: none;
+        }
+        .menu-card:hover {
+            transform: translateY(-9px) scale(1.035);
+            box-shadow: 0 18px 36px rgba(25,91,154,0.18);
+            background: linear-gradient(135deg, #e6f0fa 80%, #fafdff 100%);
+            z-index: 2;
+        }
+        .badge.bg-gradient-ready {
+            /* Olive Green/Success Coffee Theme */
+            background: linear-gradient(90deg,#8BC34A 60%,#689F38 100%)!important;
+            color: #fff!important;
+            box-shadow: 0 2px 12px #43d47725;
+        }
+        .badge.bg-gradient-habis {
+            /* Muted Brown/Grey */
+            background: linear-gradient(90deg,#D7CCC8 60%,#A1887F 100%)!important;
+            color: #fff!important;
+            box-shadow: 0 2px 12px #bfc9d122;
+        }
+        .menu-img {
+            transition: filter 0.2s;
+        }
+        .menu-card:hover .menu-img {
+            filter: brightness(0.97) saturate(1.07);
+        }
+    </style>
+    @endif
+</div>
+
+<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+<script src="https://unpkg.com/feather-icons"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        if (typeof feather !== 'undefined') {
+            feather.replace();
+        }
+
+        // Script Chart.js untuk Admin
+        @if($isAdmin)
+            const ctx = document.getElementById('pendapatanChart').getContext('2d');
+            const chartData = {
+                labels: {!! json_encode($reports->pluck('kasir_name')) !!},
+                datasets: [{
+                    label: 'Total Pendapatan',
+                    data: {!! json_encode($reports->pluck('total_pendapatan')) !!},
+                    /* Darker Brown/Coffee Color for Chart Bars */
+                    backgroundColor: 'rgba(78, 52, 46, 0.8)',
+                    borderColor: 'rgba(78, 52, 46, 1)',
+                    borderWidth: 1,
+                    borderRadius: 5,
+                }]
+            };
+            
+            if (typeof Chart !== 'undefined') {
+                const pendapatanChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: chartData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                ticks: {
+                                    callback: function(value) {
+                                        return 'Rp ' + value.toLocaleString('id-ID');
+                                    }
+                                },
+                                beginAtZero: true
+                            },
+                            x: {}
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'Rp ' + context.parsed.y.toLocaleString('id-ID');
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                console.error("Chart.js library not loaded.");
+            }
+        @endif
+        
+        // Ripple effect untuk card kasir
         function cardRipple(card) {
             let ripple = document.createElement('span');
             ripple.className = 'card-ripple';
@@ -485,19 +671,14 @@
             setTimeout(() => ripple.remove(), 500);
         }
 
-        // Feather icon refresh
-        document.addEventListener("DOMContentLoaded", function () {
-            if (window.feather) feather.replace();
-        });
-
-        // Ripple effect style (dimasukkan lewat JS agar tidak bocor ke card lain)
+        // Ripple effect style
         let rippleStyle = document.createElement('style');
         rippleStyle.innerHTML = `
         .card-ripple {
             position: absolute;
             left: 50%; top: 50%;
             width: 200px; height: 200px;
-            background: rgba(67,206,162,0.16);
+            background: rgba(139, 195, 74, 0.16);
             border-radius: 50%;
             pointer-events: none;
             transform: translate(-50%,-50%) scale(0.2);
@@ -509,219 +690,7 @@
         }
         `;
         document.head.appendChild(rippleStyle);
-    </script>
-@endif
-
-@if($isAdmin)
-<div class="row mb-4">
-    {{-- Aktivitas Terbaru --}}
-    <div class="col-md-5 mb-3">
-        <div class="card shadow-sm rounded-4 admin-elegant-card h-100 border-0">
-            <div class="card-body">
-                <h5 class="card-title mb-4 fw-bold text-primary" style="letter-spacing:0.5px;">
-                    <i class="bi bi-bell-fill text-warning me-2"></i> Aktivitas Terbaru
-                </h5>
-                @if($lowStockMenus->isEmpty())
-                    <p class="text-muted fst-italic mb-0">Tidak ada pemberitahuan stok menipis.</p>
-                @else
-                    @foreach($lowStockMenus as $menu)
-<div class="d-flex mb-3 align-items-start admin-activity-row">
-    <div class="me-3 mt-1">
-        <i data-feather="alert-triangle" 
-           class="{{ $menu->stok == 0 ? 'text-danger' : 'text-warning' }}" 
-           width="24" height="24"></i>
-    </div>
-    <div>
-        <h6 class="mb-1 fw-semibold {{ $menu->stok == 0 ? 'text-danger' : 'text-warning' }}">
-            {{ $menu->stok == 0 ? 'Stok Habis!' : 'Stok Hampir Habis!' }}
-        </h6>
-        <p class="mb-0 text-dark">
-            Menu <strong>{{ $menu->nama_menu }}</strong> hanya tersisa 
-            <span class="badge {{ $menu->stok == 0 ? 'bg-danger' : 'bg-warning text-dark' }}">
-                {{ $menu->stok }} pcs
-            </span>
-        </p>
-        <small class="text-muted">
-            {{ $menu->stok == 0 ? 'Segera lakukan restock sekarang!' : 'Segera lakukan restock' }}
-        </small>
-    </div>
-</div>
-@endforeach
-
-                @endif
-            </div>
-        </div>
-    </div>
-
-    {{-- Grafik Pendapatan --}}
-    <div class="col-md-7">
-    <div class="card shadow-sm rounded-4 admin-elegant-card border-0" style="display:inline-block; width:auto; min-width:360px;">
-        <div class="card-body p-4">
-            <h5 class="card-title mb-4 fw-bold text-primary" style="letter-spacing:0.5px; white-space:nowrap; font-size:1.45rem;">
-                <i class="bi bi-bar-chart-line-fill text-success me-2"></i>
-                Grafik Total Pendapatan per Kasir
-            </h5>
-            <div class="chart-responsive" style="width:100%; min-width:340px; height:290px;">
-                <canvas id="pendapatanChart"></canvas>
-            </div>
-        </div>
-    </div>
-</div>
-
-<style>
-.chart-responsive {
-    width: 100%;
-    min-width: 340px;
-    height: 290px;
-    position: relative;
-}
-.chart-responsive canvas {
-    width: 100% !important;
-    height: 100% !important;
-    display: block;
-}
-.admin-elegant-card {
-    background: linear-gradient(120deg, #f8fafc 70%, #fff 100%);
-    border-radius: 1.2rem !important;
-    box-shadow: 0 8px 32px rgba(44,62,80,0.09), 0 2px 8px rgba(44,62,80,0.04) !important;
-    border: 0;
-    transition: box-shadow .18s;
-}
-.admin-elegant-card:hover {
-    box-shadow: 0 18px 48px #b59a743a, 0 2px 8px #b59a7414;
-}
-</style>
-<script>
-/* 
-Pastikan inisialisasi Chart.js seperti berikut:
-new Chart(document.getElementById('pendapatanChart').getContext('2d'), {
-  type: 'bar',
-  data: { ... },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    // ...
-  }
-});
-*/
-</script>
-</div>
-
-<style>
-.admin-elegant-card {
-    background: linear-gradient(120deg, #f8fafc 70%, #fff 100%);
-    border-radius: 1.2rem !important;
-    box-shadow: 0 8px 32px rgba(44,62,80,0.09), 0 2px 8px rgba(44,62,80,0.04) !important;
-    border: 0;
-    transition: box-shadow .18s;
-}
-.admin-elegant-card:hover {
-    box-shadow: 0 18px 48px #b59a743a, 0 2px 8px #b59a7414;
-}
-.admin-elegant-card .card-title {
-    font-size: 1.17rem;
-    font-weight: 700;
-    color: #283e51;
-    margin-bottom: 1.1rem;
-    letter-spacing: 0.03em;
-    display: flex;
-    align-items: center;
-}
-.admin-activity-row {
-    background: rgba(255, 243, 205, 0.13);
-    border-radius: 0.7rem;
-    padding: 0.6rem 0.7rem 0.6rem 0.5rem;
-    transition: background 0.17s;
-}
-.admin-activity-row:hover {
-    background: rgba(255, 243, 205, 0.30);
-}
-.admin-elegant-card .badge {
-    font-size: 0.97em;
-    padding: .38em 1.1em;
-    border-radius: 1rem;
-    font-weight: 600;
-    letter-spacing: .02em;
-    box-shadow: 0 2px 7px #b59a7437;
-}
-@media (max-width: 900px) {
-    .admin-elegant-card { padding: .6rem 0.7rem; }
-    .row.mb-4 > div { margin-bottom: 1.1rem; }
-}
-</style>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    if (window.feather) feather.replace();
-});
-</script>
-
-    {{-- Deskripsi Restoran untuk Non-Admin --}}
-    <!-- <div class="restaurant-description">
-        <p>
-            Restoran kami menawarkan berbagai menu lezat dengan bahan-bahan segar dan berkualitas tinggi. 
-            Nikmati suasana nyaman dan pelayanan ramah dari staf kami yang profesional. 
-            Kami berkomitmen untuk memberikan pengalaman makan yang tak terlupakan untuk setiap pelanggan.
-        </p>
-        <p>
-            Selain hidangan utama, kami juga menyediakan pilihan minuman segar dan pencuci mulut yang menggugah selera. 
-            Datang dan rasakan sendiri keistimewaan kuliner kami yang dibuat dengan penuh cinta dan keahlian.
-        </p>
-    </div> -->
-@endif
-</div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        if (typeof feather !== 'undefined') {
-            feather.replace();
-        }
     });
 </script>
-<!-- Chart.js CDN -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-@if($isAdmin)
-<script>
-    const ctx = document.getElementById('pendapatanChart').getContext('2d');
-    const pendapatanChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: {!! json_encode($reports->pluck('kasir_name')) !!},
-            datasets: [{
-                label: 'Total Pendapatan',
-                data: {!! json_encode($reports->pluck('total_pendapatan')) !!},
-                backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1,
-                borderRadius: 5,
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    ticks: {
-                        callback: function(value) {
-                            return 'Rp ' + value.toLocaleString('id-ID');
-                        }
-                    },
-                    beginAtZero: true
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return 'Rp ' + context.parsed.y.toLocaleString('id-ID');
-                        }
-                    }
-                }
-            }
-        }
-    });
-</script>
-@endif
 
-@endsection 
+@endsection

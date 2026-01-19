@@ -1,401 +1,422 @@
 @extends('dashboard.home')
 
-@section('styles')
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
-
-        body,
-        .table,
-        .btn,
-        h2,
-        .card {
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .btn {
-            transition: background-color 0.3s ease, color 0.3s ease;
-            font-weight: 600;
-        }
-
-        .table {
-            border-collapse: separate;
-            border-spacing: 0 10px;
-        }
-
-        .table thead th {
-            background-color: #f1f5f9;
-            color: #000000ff;
-            font-weight: 700;
-            border: none;
-            border-radius: 12px;
-            padding: 1rem 1.2rem;
-        }
-
-        .table tbody tr {
-            background: #fff;
-            box-shadow: 0 3px 8px rgb(0 0 0 / 0.1);
-            border-radius: 12px;
-            transition: transform 0.2s ease;
-        }       
-
-        .table tbody tr:not(.kategori-row):hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 18px rgb(0 0 0 / 0.15);
-        }
-
-        .table tbody tr.kategori-row {
-            background: none; 
-            box-shadow: none; 
-            border-radius: 0;
-            cursor: default;
-            transform: none;
-        }
-
-        .table tbody td {
-            vertical-align: middle;
-            padding: 1rem 1.2rem;
-        }
-
-        .btn-action {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-
-        .btn-action i {
-            font-size: 1.1rem;
-        }
-
-        td img {
-            border-radius: 10px;
-            object-fit: cover;
-            height: 50px;
-            width: 50px;
-            box-shadow: 0 2px 6px rgb(0 0 0 / 0.15);
-            transition: transform 0.3s ease;
-        }
-
-        td img:hover {
-            transform: scale(1.15);
-            box-shadow: 0 6px 14px rgb(0 0 0 / 0.25);
-        }
-
-        .card {
-            border: none;
-            border-radius: 16px;
-            box-shadow: 0 6px 20px rgb(0 0 0 / 0.1);
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-            cursor: pointer;
-            will-change: transform;
-            background: #fff;
-        }
-
-        .card:hover {
-            transform: translateY(-10px) scale(1.05);
-            box-shadow: 0 15px 35px rgb(0 0 0 / 0.2);
-            z-index: 10;
-        }
-
-        .card-img-top {
-            border-radius: 16px 16px 0 0;
-            object-fit: cover;
-        }
-
-        .card-body h5 {
-            font-weight: 700;
-            color: #0d6efd;
-            transition: color 0.3s ease;
-        }
-
-        .card:hover .card-body h5 {
-            color: #000000ff;
-        }
-
-        .card-body p {
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-
-        .card-body .price {
-            font-weight: 700;
-            color: #198754;
-            font-size: 1.1rem;
-        }
-
-        #successToast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 2000;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-
-        #successToast.show {
-            opacity: 1;
-        }
-
-        .stock-indicator {
-            position: relative;
-        }
-
-        .stock-dot {
-            position: absolute;
-            top: -2px;
-            right: -60%;
-            width: 6px;
-            height: 6px;
-            background-color: #dc3545;
-            border-radius: 50%;
-            box-shadow: 0 0 5px rgba(220, 53, 69, 0.7);
-            z-index: 10;
-        }
-    </style>
-@endsection
-
 @section('content')
-    <div class="container pt-1 pb-4">
 
+<style>
+    /* KONSEP: Minimalist Monochrome & Soft Grid */
+    :root {
+        --black: #1a1a1a;
+        --gray-dark: #4a4a4a;
+        --gray-light: #e5e5e5;
+        --off-white: #f5f5f5; /* Background yang lebih soft */
+        --white: #ffffff;
+    }
 
-        <h2 class="fw-semibold text-dark mb-1">📋 Daftar Menu</h2>
-        <p class="text-muted mb-4 fs-6 d-flex align-items-center gap-4 flex-wrap">
-            {{-- Total Menu --}}
-            <span>
-                <i class="bi bi-grid-fill text-danger me-1"></i>
-                Total menu:
-                <span class="badge bg-warning text-dark border border-warning fw-semibold px-3 py-1 rounded-pill shadow-sm">
-                    {{ $menus->count() }}
-                </span>
-            </span>
+    body {
+        color: var(--black);
+        font-family: 'Poppins', sans-serif;
+        background-color: var(--off-white);
+    }
 
-            {{-- Ready Stock --}}
-            <span>
-                <i class="bi bi-check-circle-fill text-success me-1"></i>
-                Ready stock:
-                <span
-                    class="badge bg-light text-success border border-success fw-semibold px-3 py-1 rounded-pill shadow-sm">
-                    {{ $menus->where('stok', '>', 0)->count() }}
-                </span>
-            </span>
+    .page-title {
+        font-weight: 700;
+        color: var(--black);
+        letter-spacing: -0.5px;
+    }
 
-            {{-- Stok Kosong (klik untuk detail) --}}
-            <span>
-                <i class="bi bi-x-circle-fill text-danger me-1"></i>
-                Stok kosong:
-                <button
-                    class="badge bg-light text-danger border border-danger fw-semibold px-3 py-1 rounded-pill shadow-sm position-relative"
-                    data-bs-toggle="modal" data-bs-target="#stokKosongModal">
-                    {{ $menus->where('stok', '<=', 0)->count() }}
+    /* --- Statistik Boxes (Header) --- */
+    .stat-box {
+        /* Perubahan: Border lebih tipis, radius lebih besar, dan shadow halus */
+        border: none; 
+        background-color: var(--white);
+        padding: 1rem 1.5rem;
+        border-radius: 12px; /* Lebih Bulat */
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Bayangan modern */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-width: 150px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .stat-box:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    }
+    .stat-label {
+        font-size: 0.7rem; /* Sedikit lebih kecil */
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--gray-dark);
+        margin-bottom: 0.3rem;
+    }
+    .stat-value {
+        font-size: 1.8rem; /* Sedikit lebih besar */
+        font-weight: 700;
+        line-height: 1;
+    }
+    
+    /* Tombol Peringatan Stok Kosong (Link Style) */
+    .stat-box.alert-mode {
+        cursor: pointer;
+    }
+    .stat-box.alert-mode:hover {
+        background-color: #fff8f8;
+    }
+    .indicator-dot {
+        height: 8px; width: 8px; background: var(--black); border-radius: 50%; display: inline-block; margin-left: 5px;
+    }
 
-                    @if($menus->where('stok', '<=', 0)->count() > 0)
-                        <span style="
-                                            position: absolute;
-                                            top: -2px;      /* dekat pojok atas */
-                                            right: -2px;    /* dekat pojok kanan */
-                                            width: 8px;
-                                            height: 8px;
-                                            background-color: #dc3545; /* merah bootstrap */
-                                            border-radius: 50%;
-                                            box-shadow: 0 0 5px rgba(220, 53, 69, 0.7);
-                                        "></span>
-                    @endif
-                </button>
-            </span>
-        </p>
+    /* --- Buttons --- */
+    .btn-monochrome {
+        background-color: var(--black);
+        color: #fff;
+        border: 1px solid var(--black);
+        border-radius: 4px; /* Sudut lebih lembut */
+        font-weight: 500;
+        padding: 0.6rem 1.5rem;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .btn-monochrome:hover {
+        background-color: #fff;
+        color: var(--black);
+        box-shadow: 0 0 0 1px var(--black) inset;
+    }
 
-        <!-- Modal -->
-        <div class="modal fade" id="stokKosongModal" tabindex="-1" aria-labelledby="stokKosongLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content shadow rounded-4">
-                    <div class="modal-header bg-danger text-white rounded-top-4">
-                        <h5 class="modal-title" id="stokKosongLabel"><i class="bi bi-exclamation-circle me-2"></i>Menu Stok
-                            Kosong</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        @php
-                            $kosongMenus = $menus->where('stok', '<=', 0);
-                        @endphp
+    .btn-outline-mono {
+        background: transparent;
+        border: 1px solid var(--gray-light);
+        color: var(--black);
+        padding: 0.4rem 1rem;
+        font-size: 0.85rem;
+        border-radius: 4px;
+        transition: all 0.2s;
+    }
+    .btn-outline-mono:hover {
+        border-color: var(--black);
+        background: var(--black);
+        color: #fff;
+    }
 
-                        @if($kosongMenus->isEmpty())
-                            <p class="text-muted text-center">Semua menu tersedia 🎉</p>
-                        @else
-                            <ul class="list-group list-group-flush">
-                                @foreach($kosongMenus as $menu)
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        <span>
-                                            {{ $menu->nama_menu }}
-                                            <span class="badge bg-danger ms-2">Stok: {{ $menu->stok }}</span>
-                                        </span>
+    /* --- Table Container (Card Minimal) --- */
+    .card-minimal {
+        background-color: var(--white);
+        border: none; /* Menghilangkan border tebal */
+        border-radius: 12px; /* Lebih Bulat */
+        overflow: hidden; 
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); /* Bayangan halus */
+    }
+    /* --- Table Styling (Admin) --- */
+    .table-minimal {
+        background-color: var(--white);
+    }
+    .table-minimal thead th {
+        background-color: var(--white);
+        color: var(--black);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        border-bottom: 1px solid var(--gray-light); /* Lebih tipis */
+        padding: 1rem 0.75rem;
+    }
+    .table-minimal tbody td {
+        vertical-align: middle;
+        padding: 1rem 0.75rem;
+        border-bottom: 1px solid var(--gray-light);
+    }
+    .table-minimal tbody tr:last-child td {
+        border-bottom: none;
+    }
+    /* Baris kategori */
+    .table-minimal .bg-light {
+        background-color: var(--off-white) !important;
+        border-bottom: 1px solid var(--gray-light);
+    }
+    .menu-thumb {
+        width: 50px; height: 50px; object-fit: cover; border: 1px solid var(--gray-light); border-radius: 4px;
+    }
+    .action-link {
+        font-size: 0.85rem; color: var(--gray-dark); text-decoration: none; margin: 0 5px; cursor: pointer; border: none; background: none;
+    }
+    .action-link:hover { color: var(--black); text-decoration: underline; }
 
-                                        {{-- FORM/BUTTON TAMBAH STOK --}}
-                                        <form action="{{ route('menus.update.stok', $menu->id) }}" method="POST"
-                                            class="form-add-stok d-flex align-items-center gap-2">
-                                            @csrf
-                                            @method('PUT')
+    /* --- Card Styling (User View) --- */
+    .menu-card {
+        border: 1px solid transparent; 
+        background: #fff;
+        transition: all 0.3s ease;
+        height: 100%;
+        position: relative;
+        border-radius: 12px; /* Lebih Bulat */
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    .menu-card:hover {
+        border-color: var(--gray-light);
+        transform: translateY(-5px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+    .card-img-wrapper {
+        border-radius: 12px 12px 0 0; /* Hanya di atas */
+        position: relative;
+        overflow: hidden;
+        aspect-ratio: 1/1; 
+        background: var(--off-white);
+    }
+    .menu-card-img {
+        width: 100%; height: 100%; object-fit: cover;
+        transition: transform 0.5s ease;
+        filter: grayscale(10%); 
+    }
+    .menu-card:hover .menu-card-img {
+        transform: scale(1.05);
+        filter: grayscale(0%); 
+    }
+    .sold-out-overlay {
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(255,255,255,0.8);
+        display: flex; justify-content: center; align-items: center;
+        z-index: 2;
+    }
+    .sold-out-text {
+        border: 2px solid var(--black);
+        color: var(--black);
+        padding: 0.5rem 1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        background: #fff;
+        border-radius: 4px;
+    }
+    .card-info {
+        padding: 1rem; /* Tambah padding sedikit */
+        text-align: center;
+    }
+    .menu-cat {
+        font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--gray-dark);
+    }
+    .menu-title {
+        font-size: 1.1rem; font-weight: 600; margin: 0.4rem 0; color: var(--black);
+    }
+    .menu-price {
+        font-weight: 500; color: var(--black); font-size: 1rem;
+    }
 
-                                            {{-- Tombol (Awal) / Input (Aktif) --}}
-                                            <button type="button"
-                                                class="btn btn-danger btn-sm rounded-pill btn-action btn-initial-stok"
-                                                data-menu-id="{{ $menu->id }}" title="Klik untuk Tambah Stok">
-                                                <i class="bi bi-box-seam me-1"></i> Tambah Stok
-                                            </button>
+    /* --- Modal Monochrome --- */
+    .modal-content { border-radius: 8px; border: none; } /* Lebih lembut */
+    .modal-header { border-bottom: 1px solid var(--gray-light); background: #fff; color: var(--black); }
+    .modal-title { font-weight: 700; letter-spacing: -0.5px; }
+    .list-group-item { border-color: var(--gray-light); }
+</style>
 
-                                            {{-- Input Jumlah Stok (Tersembunyi Awalnya) --}}
-                                            <input type="number" name="stok_tambahan" placeholder="Jumlah"
-                                                class="form-control form-control-sm rounded-pill text-center input-stok-tambah d-none"
-                                                style="width: 80px;" min="1">
-
-                                            {{-- Tombol Submit Tambah (Tersembunyi Awalnya) --}}
-                                            <button type="submit" class="btn btn-success btn-sm rounded-pill d-none btn-submit-stok"
-                                                title="Konfirmasi Tambah">
-                                                <i class="bi bi-check2-circle"></i> OK
-                                            </button>
-                                        </form>
-                                    </li>
-                                @endforeach
-                            </ul>
+<div class="container py-4">
+    
+    {{-- Header & Stats DIBUNGKUS DALAM TAG <header> --}}
+    <header class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-5 gap-4">
+        <div>
+            <h2 class="page-title mb-1">Daftar Menu</h2>
+            <div style="width: 40px; height: 3px; background: #000; margin-bottom: 2rem;"></div>
+            
+            {{-- Statistik Minimalis (3 Kotak/Widget) --}}
+            <div class="d-flex flex-wrap gap-3">
+                <div class="stat-box">
+                    <span class="stat-label">Total Item</span>
+                    <span class="stat-value">{{ $menus->count() }}</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">Tersedia</span>
+                    <span class="stat-value">{{ $menus->where('stok', '>', 0)->count() }}</span>
+                </div>
+                {{-- Tombol Trigger Modal --}}
+                <div class="stat-box alert-mode" data-bs-toggle="modal" data-bs-target="#stokKosongModal">
+                    <span class="stat-label text-danger">Stok Habis</span>
+                    <div class="d-flex align-items-center">
+                        <span class="stat-value text-danger">{{ $menus->where('stok', '<=', 0)->count() }}</span>
+                        @if($menus->where('stok', '<=', 0)->count() > 0)
+                            <span class="indicator-dot ms-2 bg-danger"></span>
                         @endif
                     </div>
                 </div>
             </div>
         </div>
-        @if (session('success') && auth()->user()->role != 'user')
-            <div id="successToast" class="alert alert-success shadow-sm rounded">
-                <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
-            </div>
-        @endif
 
         @if (auth()->user()->role != 'user')
+            <a href="{{ route('menus.create') }}" class="btn-monochrome shadow-sm">
+                <i class="bi bi-plus-lg"></i> Tambah Menu
+            </a>
+        @endif
+    </header>
+    {{-- AKHIR TAG </header> --}}
 
-            <div class="mb-3 d-flex justify-content-end">
-                <a href="{{ route('menus.create') }}" class="btn btn-success rounded-pill shadow-sm px-4 btn-action">
-                    <i class="bi bi-plus-circle"></i> Tambah Menu
-                </a>
-            </div>
+    {{-- Alert Minimalis --}}
+    @if(session('success'))
+        <div id="successToast" class="alert bg-white border border-dark rounded-4 mb-4 d-flex align-items-center" role="alert" style="color: #000;">
+            <i class="bi bi-check-circle me-3"></i>
+            <div>{{ session('success') }}</div>
+        </div>
+    @endif
 
-            <div class="table-responsive shadow-sm rounded">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light text-center">
+    {{-- KONTEN UTAMA --}}
+    @if (auth()->user()->role != 'user')
+        
+        {{-- TAMPILAN ADMIN (TABEL BERSIH) DIBUNGKUS CARD MODERN --}}
+        <div class="card card-minimal">
+            <div class="table-responsive">
+                <table class="table table-minimal w-100 mb-0">
+                    <thead>
                         <tr>
-                            <th>No</th>
-                            <th>Kategori</th>
-                            <th class="text-start">Nama Menu</th>
-                            <th>Deskripsi</th>
-                            <th>Harga</th>
-                            <th>Stok</th>
-                            <th>Gambar</th>
-                            <th style="width: 20%;">Aksi</th>
+                            <th class="text-center" width="5%">No</th>
+                            <th width="10%">Gambar</th>
+                            <th width="15%">Kategori</th>
+                            <th width="25%">Nama Menu</th>
+                            <th width="15%">Harga</th>
+                            <th class="text-center" width="10%">Stok</th>
+                            <th class="text-end pe-4" width="20%">Opsi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @php
-
                             $groupedMenus = $menus->groupBy(fn($menu) => $menu->kategori->nama_kategori ?? 'Tanpa Kategori');
                         @endphp
 
                         @foreach ($groupedMenus as $kategori => $menusByKategori)
-                            {{-- Judul kategori --}}
+                            {{-- Header Kategori dalam Tabel --}}
                             <tr>
-                                <td colspan="8" class="fw-semibold text-dark bg-light" style="border-top: 2px solid #000000ff;">
+                                <td colspan="7" class="bg-light fw-bold text-uppercase fs-7 py-2 ps-3" style="letter-spacing: 1px;">
                                     {{ $kategori }}
                                 </td>
                             </tr>
 
-                            {{-- Loop menu per kategori --}}
                             @foreach ($menusByKategori as $menu)
-                                <tr>
-                                    <td class="text-center">{{ $loop->iteration }}</td>
-                                    <td>{{ $menu->kategori->nama_kategori ?? '-' }}</td>
-                                    <td class="text-start">{{ $menu->nama_menu }}</td>
-                                    <td>{{ Str::limit($menu->deskripsi, 40, '...') }}</td>
-                                    <td class="text-end">Rp{{ number_format($menu->harga, 0, ',', '.') }}</td>
-                                    <td class="text-center fw-bold">
-                                        @if ($menu->stok <= 0)
-                                            <span class="text-danger stock-indicator">
-                                                {{ $menu->stok }}
-                                                <span class="stock-dot"></span>
-                                            </span>
-                                        @else
-                                            {{ $menu->stok }}
-                                        @endif
-                                    </td>
-                                    <td class="text-center">
-                                        @if ($menu->gambar)
-                                            <img src="{{ asset('storage/' . $menu->gambar) }}" alt="Menu Image" />
-                                        @else
-                                            -
-                                        @endif
-                                    </td>
-                                    <td class="text-center">
-                                        @if ($menu->stok <= 0)
-                                            <div class="d-inline-flex gap-2">
-                                                <a href="{{ route('menus.edit', $menu->id) }}"
-                                                class="btn btn-warning btn-sm rounded-pill px-3 btn-action">
-                                                <i class="bi bi-pencil-square"></i> Edit
-                                            </a>
-                                                <form action="{{ route('menus.destroy', $menu->id) }}" method="POST"
-                                                    class="delete-form d-inline m-0">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="button"
-                                                        class="btn btn-danger btn-sm rounded-pill px-3 btn-action delete-button">
-                                                        <i class="bi bi-trash"></i> Hapus
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        @else
-                                            <a href="{{ route('menus.edit', $menu->id) }}"
-                                                class="btn btn-warning btn-sm rounded-pill px-3 btn-action">
-                                                <i class="bi bi-pencil-square"></i> Edit
-                                            </a>
-                                            <form action="{{ route('menus.destroy', $menu->id) }}" method="POST"
-                                                class="delete-form d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="button"
-                                                    class="btn btn-danger btn-sm rounded-pill px-3 btn-action delete-button">
-                                                    <i class="bi bi-trash"></i> Hapus
-                                                </button>
-                                            </form>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-
-                            {{-- Spasi antar kategori --}}
                             <tr>
-                                <td colspan="8" style="padding-top: 1rem;"></td>
+                                <td class="text-center text-muted">{{ $loop->iteration }}</td>
+                                <td>
+                                    @if ($menu->gambar)
+                                        <img src="{{ asset('storage/' . $menu->gambar) }}" class="menu-thumb" alt="img">
+                                    @else
+                                        <div class="menu-thumb d-flex align-items-center justify-content-center bg-light text-muted small">N/A</div>
+                                    @endif
+                                </td>
+                                <td class="text-muted small text-uppercase">{{ $menu->kategori->nama_kategori ?? '-' }}</td>
+                                <td class="fw-bold">{{ $menu->nama_menu }}</td>
+                                <td>Rp{{ number_format($menu->harga, 0, ',', '.') }}</td>
+                                <td class="text-center">
+                                    @if($menu->stok <= 0)
+                                        <span class="badge bg-dark rounded-1">HABIS</span>
+                                    @else
+                                        {{ $menu->stok }}
+                                    @endif
+                                </td>
+                                <td class="text-end pe-4">
+                                    <a href="{{ route('menus.edit', $menu->id) }}" class="action-link">Edit</a>
+                                    <span class="text-muted mx-1">|</span>
+                                    <form action="{{ route('menus.destroy', $menu->id) }}" method="POST" class="d-inline delete-form">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" class="action-link delete-button">Hapus</button>
+                                    </form>
+                                </td>
                             </tr>
+                            @endforeach
                         @endforeach
                     </tbody>
+                </table>
             </div>
-        @else
-            {{-- Untuk User --}}
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4" id="menuCards">
-                @forelse ($menus as $menu)
-                    <div class="col">
-                        <div class="card h-100 shadow-sm rounded-4 fade-in">
-                            @if ($menu->gambar)
-                                <img src="{{ asset('storage/' . $menu->gambar) }}" class="card-img-top rounded-top-4"
-                                    style="height: 200px;" alt="Menu Image">
+        </div>
+
+    @else
+        
+        {{-- TAMPILAN USER (GRID MINIMALIS) --}}
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" id="menuCards">
+            @forelse ($menus as $menu)
+                <div class="col">
+                    <div class="menu-card">
+                        <div class="card-img-wrapper">
+                            @if($menu->stok <= 0)
+                                <div class="sold-out-overlay">
+                                    <div class="sold-out-text">Sold Out</div>
+                                </div>
                             @endif
-                            <div class="card-body text-center">
-                                <h5 class="card-title">{{ $menu->nama_menu }}</h5>
-                                <p class="text-muted mb-2">{{ $menu->kategori->nama_kategori ?? '-' }}</p>
-                                <p class="price">Rp{{ number_format($menu->harga, 0, ',', '.') }}</p>
-                            </div>
+                            
+                            @if ($menu->gambar)
+                                <img src="{{ asset('storage/' . $menu->gambar) }}" class="menu-card-img" alt="{{ $menu->nama_menu }}">
+                            @else
+                                <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light text-muted">
+                                    <i class="bi bi-image fs-1 opacity-25"></i>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="card-info">
+                            <div class="menu-cat">{{ $menu->kategori->nama_kategori ?? 'Umum' }}</div>
+                            <h5 class="menu-title">{{ $menu->nama_menu }}</h5>
+                            <div class="menu-price">Rp {{ number_format($menu->harga, 0, ',', '.') }}</div>
+                            @if($menu->stok > 0)
+                                <small class="text-muted" style="font-size: 0.75rem;">Stok: {{ $menu->stok }}</small>
+                            @endif
                         </div>
                     </div>
-                @empty
-                    <div class="col">
-                        <div class="alert alert-info text-center w-100">Belum ada menu tersedia.</div>
-                    </div>
-                @endforelse
+                </div>
+            @empty
+                <div class="col-12 text-center py-5">
+                    <p class="text-muted">Belum ada menu yang tersedia saat ini.</p>
+                </div>
+            @endforelse
+        </div>
+
+    @endif
+</div>
+
+{{-- MODAL STOK KOSONG (RE-STYLED) --}}
+<div class="modal fade" id="stokKosongModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header">
+                <h5 class="modal-title">Stok Kosong</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-        @endif
+            <div class="modal-body p-0">
+                @php $kosongMenus = $menus->where('stok', '<=', 0); @endphp
+
+                @if($kosongMenus->isEmpty())
+                    <div class="p-4 text-center text-muted">Semua stok aman. Tidak ada item kosong.</div>
+                @else
+                    <ul class="list-group list-group-flush">
+                        @foreach($kosongMenus as $menu)
+                            <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                <div>
+                                    <span class="fw-bold d-block">{{ $menu->nama_menu }}</span>
+                                    <small class="text-muted">Current: {{ $menu->stok }}</small>
+                                </div>
+
+                                {{-- FORM TAMBAH STOK (Logika dipertahankan, Style diubah) --}}
+                                <form action="{{ route('menus.update.stok', $menu->id) }}" method="POST" class="form-add-stok d-flex align-items-center gap-2">
+                                    @csrf
+                                    @method('PUT')
+
+                                    <button type="button" class="btn-outline-mono btn-initial-stok" title="Klik untuk Tambah">
+                                        + Isi Stok
+                                    </button>
+
+                                    <input type="number" name="stok_tambahan" placeholder="Qty" 
+                                        class="form-control form-control-sm text-center input-stok-tambah d-none" 
+                                        style="width: 70px; border-radius: 4px; border-color: #000;" min="1">
+
+                                    <button type="submit" class="btn btn-dark btn-sm d-none btn-submit-stok rounded-1">
+                                        OK
+                                    </button>
+                                </form>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+            </div>
+        </div>
     </div>
+</div>
+
 @endsection
 
 @section('scripts')
@@ -403,8 +424,9 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            
+            // --- Logic Form Stok Kosong (Sama seperti sebelumnya, disesuaikan selector) ---
             const initialStokButtons = document.querySelectorAll('.btn-initial-stok');
-
             initialStokButtons.forEach(button => {
                 button.addEventListener('click', function () {
                     const form = this.closest('.form-add-stok');
@@ -412,7 +434,6 @@
                     const submitBtn = form.querySelector('.btn-submit-stok');
 
                     this.classList.add('d-none');
-
                     input.classList.remove('d-none');
                     submitBtn.classList.remove('d-none');
                     input.focus();
@@ -420,145 +441,90 @@
                 });
             });
 
+            // --- AJAX Submit Stok (Dipertahankan) ---
             const stokForms = document.querySelectorAll('.form-add-stok');
-
             stokForms.forEach(form => {
                 form.addEventListener('submit', function (e) {
                     e.preventDefault();
-
                     const formData = new FormData(form);
                     const url = form.getAttribute('action');
                     const submitButton = form.querySelector('button[type="submit"]');
                     const originalButtonHtml = submitButton.innerHTML;
-
                     const stokInput = form.querySelector('.input-stok-tambah');
+
                     if (stokInput.value === '' || parseInt(stokInput.value) <= 0) {
-                        Swal.fire('Perhatian', 'Jumlah stok harus diisi dan lebih dari 0.', 'warning');
+                        Swal.fire({ title: 'Invalid', text: 'Jumlah harus > 0', icon: 'warning', confirmButtonColor: '#000' });
                         return;
                     }
 
                     submitButton.disabled = true;
-                    submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+                    submitButton.innerHTML = '...';
 
                     fetch(url, {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
+                        method: 'POST', body: formData, headers: { 'X-Requested-With': 'XMLHttpRequest' }
                     })
-                        .then(response => {
-                            if (!response.ok) {
-                                if (response.status === 422) {
-                                    return response.json().then(data => { throw new Error(data.message || 'Validasi gagal.'); });
-                                }
-                                throw new Error('Gagal menambah stok. Status: ' + response.status);
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Stok Berhasil Ditambah!',
-                                text: data.message || 'Stok menu telah berhasil diperbarui.',
-                                showConfirmButton: false,
-                                timer: 2000
-                            }).then(() => {
-
-                                const modalElement = document.getElementById('stokKosongModal');
-                                const modal = bootstrap.Modal.getInstance(modalElement);
-                                if (modal) {
-                                    modal.hide();
-                                }
-                                setTimeout(() => {
-                                    window.location.reload();
-                                }, 50);
-                            });
-                        })
-                        .catch(error => {
-
-                            console.error('AJAX Error:', error);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Gagal!',
-                                text: 'Terjadi kesalahan: ' + error.message,
-                            });
-
-                            const initialBtn = form.querySelector('.btn-initial-stok');
-                            const input = form.querySelector('.input-stok-tambah');
-                            const submitBtn = form.querySelector('.btn-submit-stok');
-
-                            initialBtn.classList.remove('d-none');
-                            input.classList.add('d-none');
-                            submitBtn.classList.add('d-none');
-                            input.required = false;
-                            input.value = '';
-
-                        })
-                        .finally(() => {
-
-                            submitButton.disabled = false;
-                            submitButton.innerHTML = originalButtonHtml;
+                    .then(response => {
+                        if (!response.ok) throw new Error('Gagal update.');
+                        return response.json();
+                    })
+                    .then(data => {
+                        Swal.fire({
+                            icon: 'success', title: 'Berhasil', text: 'Stok diperbarui',
+                            showConfirmButton: false, timer: 1500, iconColor: '#000'
+                        }).then(() => {
+                             window.location.reload();
                         });
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        Swal.fire({ icon: 'error', title: 'Error', text: 'Gagal update stok', confirmButtonColor: '#000' });
+                    })
+                    .finally(() => {
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = originalButtonHtml;
+                    });
                 });
             });
 
-
-            const toast = document.getElementById('successToast');
-            if (toast) {
-                toast.classList.add('show');
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                }, 3500);
-            }
-
-            const cards = document.querySelectorAll('#menuCards .card');
-            cards.forEach((card, i) => {
-                card.style.opacity = 0;
-                card.style.transform = 'translateY(15px)';
-                setTimeout(() => {
-                    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                    card.style.opacity = 1;
-                    card.style.transform = 'translateY(0)';
-                }, i * 150);
-            });
-
+            // --- SweetAlert Delete (Monochrome Style) ---
             const deleteButtons = document.querySelectorAll('.delete-button');
-
-            if (deleteButtons.length === 0) {
-                console.warn('Tidak ditemukan tombol dengan class .delete-button');
-            }
+            const swalMono = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-dark px-4 py-2 rounded-1 mx-1',
+                    cancelButton: 'btn btn-outline-secondary px-4 py-2 rounded-1 mx-1'
+                },
+                buttonsStyling: false
+            });
 
             deleteButtons.forEach(button => {
                 button.addEventListener('click', function (e) {
                     e.preventDefault();
-
                     const form = this.closest('form');
-
-                    if (!form) {
-                        console.error('Form tidak ditemukan untuk tombol hapus ini');
-                        return;
-                    }
-
-                    Swal.fire({
-                        title: 'Yakin ingin menghapus menu ini?',
-                        text: 'Data yang dihapus tidak bisa dikembalikan!',
+                    swalMono.fire({
+                        title: 'Hapus Menu?',
+                        text: 'Data tidak bisa dikembalikan.',
                         icon: 'warning',
+                        iconColor: '#333',
                         showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#3085d6',
-                        confirmButtonText: 'Ya, hapus!',
-                        cancelButtonText: 'Batal'
+                        confirmButtonText: 'Ya, Hapus',
+                        cancelButtonText: 'Batal',
+                        reverseButtons: true
                     }).then((result) => {
-                        if (result.isConfirmed) {
-                            console.log('Mengirim form...');
-                            form.submit();
-                        } else {
-                            console.log('Penghapusan dibatalkan');
-                        }
+                        if (result.isConfirmed) form.submit();
                     });
                 });
+            });
+
+            // --- Animation Fade In Card ---
+            const cards = document.querySelectorAll('#menuCards .menu-card');
+            cards.forEach((card, i) => {
+                card.style.opacity = 0;
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'opacity 0.6s ease, transform 0.6s ease, box-shadow 0.3s';
+                    card.style.opacity = 1;
+                    card.style.transform = 'translateY(0)';
+                }, i * 100);
             });
         });
     </script>

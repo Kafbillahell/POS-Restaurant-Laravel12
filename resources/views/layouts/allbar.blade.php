@@ -42,7 +42,50 @@
 
             <div class="navbar-collapse collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav float-left mr-auto ml-3 pl-1">
-                </ul>
+    <li class="nav-item d-none d-md-block">
+        <div class="nav-link" style="display: flex; align-items: center; height: 100%;">
+            <div class="clock-wrapper" style="
+                background: linear-gradient(135deg, #f6f7ff 0%, #ffffff 100%);
+                border: 1px solid #e8eaff;
+                padding: 6px 16px;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            ">
+                <div style="
+                    background: #795548;
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: white;
+                ">
+                    <i data-feather="clock" style="width: 16px; height: 16px;"></i>
+                </div>
+                <div style="display: flex; flex-direction: column; justify-content: center; line-height: 1.2;">
+                    <span id="clock-time" style="
+                        font-weight: 700;
+                        font-size: 15px;
+                        color: #2c3e50;
+                        font-family: 'Courier New', monospace;
+                        letter-spacing: 0.5px;
+                    ">--:--:--</span>
+                    <span id="clock-date" style="
+                        font-size: 11px;
+                        color: #7c8798;
+                        font-weight: 500;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                    ">---, -- --- ----</span>
+                </div>
+            </div>
+        </div>
+    </li>
+</ul>
 
                 <ul class="navbar-nav float-right">
                     <li class="nav-item dropdown position-relative">
@@ -88,70 +131,81 @@
         <div class="scroll-sidebar" data-sidebarbg="skin6">
             <nav class="sidebar-nav">
                 <ul id="sidebarnav">
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ route('dashboard.index') }}" aria-expanded="false">
-                            <i data-feather="home" class="feather-icon"></i>
-                            <span class="hide-menu">Dashboard</span>
-                        </a>
-                    </li>
+    <li class="sidebar-item">
+        <a class="sidebar-link" href="{{ route('dashboard.index') }}" aria-expanded="false">
+            <i data-feather="home" class="feather-icon"></i>
+            <span class="hide-menu">Dashboard</span>
+        </a>
+    </li>
 
-                    <li class="list-divider"></li>
-                    <li class="nav-small-cap"><span class="hide-menu">Applications</span></li>
+    <li class="list-divider"></li>
+    <li class="nav-small-cap"><span class="hide-menu">Applications</span></li>
 
-                    @php $role = auth()->user()->role; @endphp
+    @php $role = auth()->user()->role; @endphp
 
-                    @if($role === 'admin')
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="{{ route('users.index') }}">
-                                <i data-feather="users" class="feather-icon"></i>
-                                <span class="hide-menu">User</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="{{ route('reports.index') }}">
-                                <i data-feather="bar-chart-2" class="feather-icon"></i>
-                                <span class="hide-menu">Report</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="{{ route('kategoris.index') }}">
-                                <i data-feather="layers" class="feather-icon"></i>
-                                <span class="hide-menu">Kategori</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="{{ route('menus.index') }}">
-                                <i data-feather="book-open" class="feather-icon"></i>
-                                <span class="hide-menu">Menus</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="{{ route('settings.kitchen.index') }}">
-                                <i data-feather="settings" class="feather-icon"></i>
-                                <span class="hide-menu">Kitchen Setting</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="{{ route('promo.index') }}">
-                                <i data-feather="tag" class="feather-icon"></i>
-                                <span class="hide-menu">Pengaturan Promo</span>
-                            </a>
-                        </li>
-                    @elseif($role === 'kasir')
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="{{ route('orders.index') }}">
-                                <i data-feather="shopping-cart" class="feather-icon"></i>
-                                <span class="hide-menu">Order</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="{{ route('detail_orders.index') }}">
-                                <i data-feather="file-text" class="feather-icon"></i>
-                                <span class="hide-menu">Detail Order</span>
-                            </a>
-                        </li>
-                    @endif
-                </ul>
+    @if($role === 'admin')
+        {{-- MENU BARU: Pengeluaran (Hanya Admin) --}}
+        <li class="sidebar-item">
+            {{-- Tambahkan class 'active' jika rute saat ini adalah pengeluaran.index --}}
+            <a class="sidebar-link {{ request()->routeIs('pengeluaran.index') ? 'active' : '' }}" 
+               href="{{ route('pengeluaran.index') }}" aria-expanded="false">
+                <i data-feather="dollar-sign" class="feather-icon"></i> 
+                <span class="hide-menu">Pengeluaran</span>
+            </a>
+        </li>
+        {{-- MENU LAINNYA UNTUK ADMIN --}}
+        <li class="sidebar-item">
+            <a class="sidebar-link {{ request()->routeIs('users.index') ? 'active' : '' }}" href="{{ route('users.index') }}">
+                <i data-feather="users" class="feather-icon"></i>
+                <span class="hide-menu">User</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
+            <a class="sidebar-link {{ request()->routeIs('reports.index') ? 'active' : '' }}" href="{{ route('reports.index') }}">
+                <i data-feather="bar-chart-2" class="feather-icon"></i>
+                <span class="hide-menu">Report</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
+            <a class="sidebar-link {{ request()->routeIs('kategoris.index') ? 'active' : '' }}" href="{{ route('kategoris.index') }}">
+                <i data-feather="layers" class="feather-icon"></i>
+                <span class="hide-menu">Kategori</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
+            <a class="sidebar-link {{ request()->routeIs('menus.index') ? 'active' : '' }}" href="{{ route('menus.index') }}">
+                <i data-feather="book-open" class="feather-icon"></i>
+                <span class="hide-menu">Menus</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
+            <a class="sidebar-link {{ request()->routeIs('settings.kitchen.index') ? 'active' : '' }}" href="{{ route('settings.kitchen.index') }}">
+                <i data-feather="settings" class="feather-icon"></i>
+                <span class="hide-menu">Kitchen Setting</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
+            <a class="sidebar-link {{ request()->routeIs('promo.index') ? 'active' : '' }}" href="{{ route('promo.index') }}">
+                <i data-feather="tag" class="feather-icon"></i>
+                <span class="hide-menu">Pengaturan Promo</span>
+            </a>
+        </li>
+    @elseif($role === 'kasir')
+        {{-- MENU UNTUK KASIR --}}
+        <li class="sidebar-item">
+            <a class="sidebar-link {{ request()->routeIs('orders.index') ? 'active' : '' }}" href="{{ route('orders.index') }}">
+                <i data-feather="shopping-cart" class="feather-icon"></i>
+                <span class="hide-menu">Order</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
+            <a class="sidebar-link {{ request()->routeIs('detail_orders.index') ? 'active' : '' }}" href="{{ route('detail_orders.index') }}">
+                <i data-feather="file-text" class="feather-icon"></i>
+                <span class="hide-menu">Detail Order</span>
+            </a>
+        </li>
+    @endif
+</ul>
             </nav>
         </div>
     </aside>
@@ -163,6 +217,41 @@
     <script src="{{ asset('assets/js/sweetalert2.min.js') }}"></script>
 
     <script>
+        // --- Script Jam Realtime (WIB) ---
+    function updateClock() {
+        const timeElement = document.getElementById('clock-time');
+        const dateElement = document.getElementById('clock-date');
+        
+        if (timeElement && dateElement) {
+            const now = new Date();
+            
+            // Format Time
+            const timeOptions = {
+                timeZone: 'Asia/Jakarta',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            };
+            const timeFormatter = new Intl.DateTimeFormat('id-ID', timeOptions);
+            timeElement.innerText = timeFormatter.format(now).replace(/\./g, ':') + ' WIB';
+
+            // Format Date
+            const dateOptions = {
+                timeZone: 'Asia/Jakarta',
+                weekday: 'long',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            };
+            const dateFormatter = new Intl.DateTimeFormat('id-ID', dateOptions);
+            dateElement.innerText = dateFormatter.format(now);
+        }
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+
         document.addEventListener('DOMContentLoaded', function () {
             const logoutBtn = document.getElementById('logout-btn');
 
