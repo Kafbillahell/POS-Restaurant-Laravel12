@@ -47,6 +47,11 @@
         .category-sidebar {
             position: sticky;
             top: 100px;
+            background: white;
+            border: 1px solid #d7ccc8;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
         }
 
         .category-item {
@@ -375,7 +380,7 @@
             <!-- Column 1: Categories (Sidebar) -->
             <div class="col-lg-2 col-md-3 d-none d-md-block">
                 <div class="category-sidebar">
-                    <h5 class="mb-3 fw-bold" style="color: var(--dark-brown); padding-left: 10px;">Categories</h5>
+                    <h5 class="mb-3 fw-bold" style="color: var(--dark-brown);">Categories</h5>
                     
                     <button class="category-item active" onclick="filterCategory('')">
                         <i class="bi bi-grid-fill"></i> All Menu
@@ -395,7 +400,7 @@
                 <!-- Search Bar (Simplified) -->
                 <div class="mb-4">
                     <div class="row g-2 align-items-center">
-                        <div class="col-12 col-md-9">
+                        <div class="col-12 col-md-7">
                             <div class="input-group shadow-sm" style="border-radius: 12px; overflow: hidden; border: 1px solid #e0e0e0;">
                                 <span class="input-group-text bg-white border-0 text-muted ps-3">
                                     <i class="bi bi-search"></i>
