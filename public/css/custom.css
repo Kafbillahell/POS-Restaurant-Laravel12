@@ -1,0 +1,76 @@
+:root {
+    --primary-brown: #795548;
+    --dark-brown: #4e342e;
+    --light-brown: #d7ccc8;
+    --bg-beige: #fdfbf7;
+    --text-dark: #3e2723;
+    --card-shadow: 0 4px 20px rgba(121, 85, 72, 0.08);
+    --card-hover-shadow: 0 8px 30px rgba(121, 85, 72, 0.15);
+}
+
+body {
+    background-color: var(--bg-beige);
+    font-family: 'Outfit', 'Segoe UI', sans-serif;
+}
+
+/* --- Global Theme Utilities --- */
+.text-brown {
+    color: var(--primary-brown) !important;
+}
+
+.text-dark-brown {
+    color: var(--dark-brown) !important;
+}
+
+.bg-brown {
+    background-color: var(--primary-brown) !important;
+}
+
+.btn-brown {
+    background: linear-gradient(135deg, var(--primary-brown), var(--dark-brown));
+    color: white;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-brown:hover {
+    background: linear-gradient(135deg, var(--dark-brown), var(--primary-brown));
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(121, 85, 72, 0.3);
+}
+
+.btn-outline-brown {
+    color: var(--primary-brown);
+    border: 2px solid var(--primary-brown);
+    background: transparent;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-brown:hover {
+    background: var(--primary-brown);
+    color: white;
+}
+
+.card-brown {
+    border: none;
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.card-brown:hover {
+    box-shadow: var(--card-hover-shadow);
+}
+
+.form-control-brown:focus {
+    border-color: var(--primary-brown);
+    box-shadow: 0 0 0 0.25rem rgba(121, 85, 72, 0.25);
+}
+
+.page-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    color: var(--dark-brown);
+}
