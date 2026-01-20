@@ -17,6 +17,7 @@ class Order extends Model
         'nama_pemesan',
         'jumlah_bayar', 
         'nama_kasir',
+        'status',
         'user_id', 
          'kembalian',// ✅ tambahkan ini
     ];

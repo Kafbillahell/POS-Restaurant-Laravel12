@@ -132,3 +132,5 @@ Route::post('/orders/cart/sync-price', [OrderController::class, 'syncPrice'])->n
 Route::put('/menus/{menu}/update-stok', [MenuController::class, 'updateStok'])->name('menus.update.stok');
 
 Route::resource('pengeluaran', PengeluaranController::class);
+
+Route::post('/telegram/webhook', [OrderController::class, 'handleTelegramWebhook']);

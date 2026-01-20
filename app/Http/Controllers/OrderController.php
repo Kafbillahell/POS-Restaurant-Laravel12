@@ -366,7 +366,7 @@ class OrderController extends Controller
                 $message .= "===============================\n";
                 $message .= "*SEGERA DIPROSES!*";
 
-                $this->sendTelegramNotification($telegramChatId, $message);
+                $this->sendTelegramNotification($telegramChatId, $message, $order);
             } else {
                 Log::warning('Telegram Kitchen Chat ID is not set in settings table.');
             }
@@ -735,7 +735,7 @@ class OrderController extends Controller
                 $message .= "===============================\n";
                 $message .= "*SEGERA DIPROSES!*";
 
-                $this->sendTelegramNotification($telegramChatId, $message);
+                $this->sendTelegramNotification($telegramChatId, $message, $order);
             }
         }
 
@@ -784,42 +784,102 @@ class OrderController extends Controller
             return response()->json(['status' => 'success', 'message' => 'Harga sudah sinkron.']);
         }
 
+        
         return response()->json(['status' => 'success', 'message' => 'Menu tidak ditemukan di keranjang.']);
     }
 
-    private function sendTelegramNotification(string $chatId, string $message): bool
-    {
-        // Ganti dengan konstanta BOT_TOKEN
-        $token = self::TELEGRAM_BOT_TOKEN;
 
-        try {
-            $url = "https://api.telegram.org/bot{$token}/sendMessage";
+private function sendTelegramNotification(string $chatId, string $message, $order = null): bool
+{
+    $token = self::TELEGRAM_BOT_TOKEN;
 
-            $payload = [
-                'chat_id' => $chatId,
-                'text' => $message,
-                'parse_mode' => 'Markdown',
+    try {
+        $url = "https://api.telegram.org/bot{$token}/sendMessage";
+
+        $payload = [
+            'chat_id' => $chatId,
+            'text' => $message,
+            'parse_mode' => 'Markdown',
+        ];
+
+        // Cek apakah ada objek order yang dikirim
+        if ($order) {
+            $orderId = $order->id;
+            $payload['reply_markup'] = [
+                'inline_keyboard' => [
+                    [
+                        ['text' => '👨‍🍳 Proses', 'callback_data' => "order_prosess_{$orderId}"],
+                        ['text' => '✅ Selesai', 'callback_data' => "order_done_{$orderId}"],
+                    ],
+                    [
+                        ['text' => '❌ Tolak', 'callback_data' => "order_reject_{$orderId}"],
+                    ]
+                ]
             ];
-
-            $res = Http::withHeaders([
-                'Content-Type' => 'application/json',
-                'User-Agent' => 'order-notification',
-            ])
-                ->timeout(10)
-                ->post($url, $payload);
-
-            Log::info('Order Telegram Notification', [
-                'status' => $res->status(),
-                'body' => $res->body(),
-                'chat_id' => $chatId
-            ]);
-
-            return $res->successful();
-        } catch (\Throwable $e) {
-            Log::error('Order Telegram Notification exception: ' . $e->getMessage());
-            return false;
         }
+
+        $res = Http::withHeaders([
+            'Content-Type' => 'application/json',
+            'User-Agent' => 'order-notification',
+        ])->timeout(10)->post($url, $payload);
+
+        return $res->successful();
+    } catch (\Throwable $e) {
+        Log::error('Order Telegram Notification exception: ' . $e->getMessage());
+        return false;
     }
+}
+
+    public function handleTelegramWebhook(Request $request)
+{
+    $callbackQuery = $request->input('callback_query');
+    if (!$callbackQuery) return response()->json(['status' => 'ok']);
+
+    $callbackData = $callbackQuery['data']; // Contoh: "order_prosess_123"
+    $chatId = $callbackQuery['message']['chat']['id'];
+    $messageId = $callbackQuery['message']['message_id'];
+    $textLama = $callbackQuery['message']['text'];
+
+    // Pecah data: action dan orderId
+    $parts = explode('_', $callbackData);
+    $action = $parts[1]; // prosess, done, atau reject
+    $orderId = $parts[2];
+
+    $order = Order::find($orderId);
+    if (!$order) return response()->json(['status' => 'error']);
+
+    // Update Status di Database
+    $statusText = "";
+    if ($action == 'prosess') {
+        $order->update(['status' => 'processing']);
+        $statusText = "🟡 SEDANG DIPROSES";
+    } elseif ($action == 'done') {
+        $order->update(['status' => 'done']);
+        $statusText = "🟢 SELESAI";
+    } elseif ($action == 'reject') {
+        $order->update(['status' => 'rejected']);
+        $statusText = "🔴 DITOLAK";
+    }
+
+    // Edit pesan di Telegram agar statusnya berubah secara visual
+    $newText = $textLama . "\n\nUpdate: *{$statusText}* oleh Kitchen";
+    
+    Http::post("https://api.telegram.org/bot".self::TELEGRAM_BOT_TOKEN."/editMessageText", [
+        'chat_id' => $chatId,
+        'message_id' => $messageId,
+        'text' => $newText,
+        'parse_mode' => 'Markdown',
+        // Jika status belum 'Selesai', kita bisa kirim tombolnya lagi (opsional)
+    ]);
+
+    // Beri notifikasi kecil di atas layar Telegram
+    Http::post("https://api.telegram.org/bot".self::TELEGRAM_BOT_TOKEN."/answerCallbackQuery", [
+        'callback_query_id' => $callbackQuery['id'],
+        'text' => "Pesanan #{$orderId} diupdate ke {$statusText}",
+    ]);
+
+    return response()->json(['status' => 'ok']);
+}
 
 
 }
