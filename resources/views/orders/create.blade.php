@@ -3,7 +3,7 @@
 @section('content')
 
 @if(auth()->check() && in_array(auth()->user()->role, ['kasir', 'user']))
-    <h1>Checkout Pesanan dari Keranjang</h1>
+    <h1 class="page-title mb-4">Checkout Pesanan</h1>
 
     @php
         $totalHargaFaktur = $totalBayar ?? 0;
@@ -25,24 +25,25 @@
             </div>
         @endif
 
-        <form id="checkoutForm" action="{{ route('orders.store') }}" method="POST">
+        <div class="card card-brown mb-4 p-4">
+            <form id="checkoutForm" action="{{ route('orders.store') }}" method="POST">
             @csrf
 
             {{-- Nama Kasir --}}
             <div class="form-group mb-3">
-                <label for="nama_kasir">Nama Kasir</label>
-                <input type="text" class="form-control" value="{{ auth()->user()->name }}" readonly>
+                <label for="nama_kasir" class="fw-bold text-dark-brown">Nama Kasir</label>
+                <input type="text" class="form-control form-control-brown rounded-3" value="{{ auth()->user()->name }}" readonly>
                 <input type="hidden" name="nama_kasir" value="{{ auth()->user()->name }}">
             </div>
 
             {{-- Nama Pemesan --}}
             <div class="form-group mb-3">
-                <label for="nama_pemesan">Nama Pemesan</label>
-                <input type="text" name="nama_pemesan" id="nama_pemesan" class="form-control" required value="{{ old('nama_pemesan') }}">
+                <label for="nama_pemesan" class="fw-bold text-dark-brown">Nama Pemesan</label>
+                <input type="text" name="nama_pemesan" id="nama_pemesan" class="form-control form-control-brown rounded-3" required value="{{ old('nama_pemesan') }}">
             </div>
 
             {{-- Daftar Pesanan --}}
-            <h3>Pesanan Anda</h3>
+            <h3 class="text-dark-brown mt-4 mb-3">Pesanan Anda</h3>
             <table class="table table-bordered">
                 <thead>
                     <tr>
@@ -105,11 +106,11 @@
 
             {{-- Jumlah Bayar --}}
             <div class="form-group mb-3">
-                <label for="jumlah_bayar">Jumlah Bayar</label>
+                <label for="jumlah_bayar" class="fw-bold text-dark-brown">Jumlah Bayar</label>
                 <input type="number" 
                         name="jumlah_bayar" 
                         id="jumlah_bayar" 
-                        class="form-control" 
+                        class="form-control form-control-brown rounded-3" 
                         placeholder="Masukkan jumlah bayar" 
                         min="{{ $totalHargaFaktur }}"
                         value="{{ old('jumlah_bayar') ?? $totalHargaFaktur }}"> 
@@ -117,13 +118,17 @@
 
             {{-- Kembalian --}}
             <div class="form-group mb-3">
-                <label for="kembalian_display">Kembalian</label>
-                <input type="text" id="kembalian_display" class="form-control" readonly>
+                <label for="kembalian_display" class="fw-bold text-dark-brown">Kembalian</label>
+                <input type="text" id="kembalian_display" class="form-control form-control-brown rounded-3" readonly>
                 <input type="hidden" name="kembalian" id="kembalian">
             </div>
             
-            <button type="submit" class="btn btn-success mt-3">Checkout</button>
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{{ route('orders.index') }}" class="btn btn-outline-brown rounded-pill px-4"><i class="bi bi-arrow-left"></i> Kembali</a>
+                <button type="submit" class="btn btn-brown rounded-pill px-4"><i class="bi bi-check-circle"></i> Checkout</button>
+            </div>
         </form>
+        </div>
 
         <script>
             const form = document.getElementById('checkoutForm');

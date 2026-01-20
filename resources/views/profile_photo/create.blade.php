@@ -21,13 +21,13 @@
                 <img id="profile-photo" src="{{ $profilePhotoPath }}"
                     alt="Foto Profil"
                     class="rounded-circle shadow avatar-main-img"
-                    style="width: 170px; height: 170px; object-fit: cover; box-shadow: 0 4px 16px rgba(13,110,253,0.12); transition: box-shadow .3s;">
+                    style="width: 170px; height: 170px; object-fit: cover; box-shadow: 0 4px 16px rgba(121, 85, 72, 0.12); transition: box-shadow .3s;">
                 <button type="button" 
                         class="btn btn-light shadow edit-btn position-absolute bottom-0 end-0 rounded-circle d-flex align-items-center justify-content-center"
-                        style="width: 44px; height: 44px; border: 2.5px solid #f8f9fa; box-shadow: 0 2px 8px rgba(13,110,253,0.16); font-size: 1.5rem; background: #fff; transition: box-shadow .2s;"
+                        style="width: 44px; height: 44px; border: 2.5px solid #f8f9fa; box-shadow: 0 2px 8px rgba(121, 85, 72, 0.16); font-size: 1.5rem; background: #fff; transition: box-shadow .2s;"
                         data-bs-toggle="modal" data-bs-target="#uploadChoiceModal"
                         aria-label="Edit Foto Profil">
-                    <i class="bi bi-pencil-fill" style="color: #0d6efd;"></i>
+                    <i class="bi bi-pencil-fill" style="color: #795548;"></i>
                 </button>
             </div>
         </div>
@@ -37,7 +37,7 @@
 <!-- Modal Pilihan Upload -->
 <div class="modal fade neumorph-modal" id="uploadChoiceModal" tabindex="-1" aria-labelledby="uploadChoiceModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 p-2" style="background: #f8f9fa; border: none; box-shadow: 0 8px 32px rgba(13,110,253,0.08);">
+        <div class="modal-content rounded-4 p-2" style="background: #f8f9fa; border: none; box-shadow: 0 8px 32px rgba(121, 85, 72, 0.08);">
             <div class="modal-header border-0 pb-2">
                 <h5 class="modal-title" style="font-family: 'Inter', sans-serif;">Pilih Metode Upload</h5>
                 <button type="button" class="btn-close rounded-circle" style="background: #e9ecef;" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -59,7 +59,7 @@
 <!-- Modal Kamera -->
 <div class="modal fade neumorph-modal" id="cameraModal" tabindex="-1" aria-labelledby="cameraModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4" style="background: #f8f9fa; border: none; box-shadow: 0 8px 32px rgba(13,110,253,0.08);">
+        <div class="modal-content rounded-4" style="background: #f8f9fa; border: none; box-shadow: 0 8px 32px rgba(121, 85, 72, 0.08);">
             <div class="modal-header border-0">
                 <h5 class="modal-title">Ambil Foto</h5>
                 <button type="button" class="btn-close rounded-circle" style="background: #e9ecef;" data-bs-dismiss="modal" id="closeCameraModal" aria-label="Close"></button>
@@ -67,7 +67,7 @@
             <div class="modal-body text-center">
                 <video id="video" autoplay playsinline style="width: 100%; border-radius: 1rem; background: #000; max-height:340px;"></video>
                 <canvas id="canvas" style="display:none;"></canvas>
-                <button id="captureBtn" class="btn btn-primary mt-3 rounded-3 px-4" style="box-shadow: 0 2px 8px rgba(13,110,253,0.10); font-weight: 600;">Ambil Foto</button>
+                <button id="captureBtn" class="btn btn-brown mt-3 rounded-3 px-4" style="box-shadow: 0 2px 8px rgba(121, 85, 72, 0.10); font-weight: 600;">Ambil Foto</button>
             </div>
         </div>
     </div>
@@ -76,7 +76,7 @@
 <!-- Modal Crop Gambar -->
 <div class="modal fade neumorph-modal" id="cropModal" tabindex="-1" aria-labelledby="cropModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content rounded-4" style="background: #f8f9fa; border: none; box-shadow: 0 8px 32px rgba(13,110,253,0.10);">
+        <div class="modal-content rounded-4" style="background: #f8f9fa; border: none; box-shadow: 0 8px 32px rgba(121, 85, 72, 0.10);">
             <div class="modal-header border-0">
                 <h5 class="modal-title">Crop Foto</h5>
                 <button type="button" class="btn-close rounded-circle" style="background: #e9ecef;" data-bs-dismiss="modal" id="closeCropModal" aria-label="Close"></button>
@@ -88,7 +88,7 @@
             </div>
             <div class="modal-footer border-0 pt-0">
                 <button type="button" class="btn btn-secondary rounded-3" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-primary rounded-3 px-4" id="cropAndUploadBtn" style="font-weight: 600;">Crop & Upload</button>
+                <button type="button" class="btn btn-brown rounded-3 px-4" id="cropAndUploadBtn" style="font-weight: 600;">Crop & Upload</button>
             </div>
         </div>
     </div>
@@ -103,7 +103,7 @@
 
 <!-- Tombol Kembali -->
 <a href="{{ session('previous_url', url()->previous()) }}" 
-   class="btn btn-outline-secondary position-fixed shadow rounded-3"
+   class="btn btn-outline-brown position-fixed shadow rounded-3"
    style="bottom: 20px; right: 20px; z-index: 1050; width: 120px; background: #fff; border: 1.5px solid #dee2e6; font-weight: 500;">
    ← Kembali
 </a>
@@ -122,34 +122,34 @@
     background: #f8f9fa;
     border: none;
     box-shadow: 4px 4px 12px #e2e6ea, -4px -4px 12px #fff;
-    color: #0d6efd;
+    color: #795548;
     font-weight: 600;
     transition: box-shadow .18s, background .18s;
 }
 .btn-neumorph:hover, .btn-neumorph:focus {
-    box-shadow: 2px 2px 8px #e2e6ea, -2px -2px 8px #fff, 0 0 0 2px #0d6efd33;
+    box-shadow: 2px 2px 8px #e2e6ea, -2px -2px 8px #fff, 0 0 0 2px rgba(121, 85, 72, 0.2);
     background: #e9ecef;
-    color: #0a58ca;
+    color: #5d4037;
 }
 
 .avatar-main-img {
     transition: box-shadow .3s, transform .2s;
 }
 .avatar-main-img:hover, .avatar-hover-group:hover .avatar-main-img {
-    box-shadow: 0 6px 28px 0 #0d6efd40;
+    box-shadow: 0 6px 28px 0 rgba(121, 85, 72, 0.25);
     transform: scale(1.03);
 }
 
 .edit-btn {
     background: #f8f9fa;
-    color: #0d6efd;
+    color: #795548;
     border: 2.5px solid #f8f9fa;
     transition: box-shadow .18s, background .18s;
 }
 .edit-btn:hover, .edit-btn:focus {
     background: #e9ecef;
-    box-shadow: 0 2px 8px #0d6efd33;
-    color: #084298;
+    box-shadow: 0 2px 8px rgba(121, 85, 72, 0.2);
+    color: #5d4037;
 }
 
 .neumorph-modal .modal-dialog {

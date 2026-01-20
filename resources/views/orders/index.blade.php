@@ -2,20 +2,11 @@
 
 @section('content')
     <style>
-        :root {
-            --primary-brown: #795548;
-            --dark-brown: #4e342e;
-            --light-brown: #d7ccc8;
-            --bg-beige: #fdfbf7;
-            --text-dark: #3e2723;
-            --card-shadow: 0 4px 20px rgba(121, 85, 72, 0.08);
-            --card-hover-shadow: 0 8px 30px rgba(121, 85, 72, 0.15);
-        }
+    <style>
+        /* Theme variables moved to custom.css */
 
-        body {
-            background-color: var(--bg-beige);
-            font-family: 'Outfit', 'Segoe UI', sans-serif;
-        }
+        /* --- Header & Search --- */
+
 
         /* --- Header & Search --- */
         .page-header {

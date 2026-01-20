@@ -34,7 +34,7 @@
                 </div>
 
                 <a class="topbartoggler d-block d-md-none waves-effect waves-light" href="javascript:void(0)"
-                    data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
                     <i class="ti-more"></i>
                 </a>
@@ -89,7 +89,7 @@
 
                 <ul class="navbar-nav float-right">
                     <li class="nav-item dropdown position-relative">
-                        <a class="nav-link dropdown-toggle" href="javascript:void(0)" data-toggle="dropdown"
+                        <a class="nav-link dropdown-toggle" href="javascript:void(0)" data-bs-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">
                             @php
                                 $profilePhotoPath = Auth::user()->profilePhoto->photo_path ?? null;

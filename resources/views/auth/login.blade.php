@@ -51,8 +51,8 @@
         }
 
         .custom-bg .text-center lottie-player {
-            width: 150px !important;
-            height: 150px !important;
+            width: 250px !important;
+            height: 250px !important;
             margin: 0 auto;
             display: block;
         }
@@ -121,7 +121,7 @@
                 <div class="text-center">
                     <script src="{{ asset('js/lottie-player.js') }}"></script>
                     <lottie-player src="{{ asset('animations/lotie.json') }}" background="transparent" speed="1"
-                        style="width: 120px; height: 120px; margin: 0 auto;" loop autoplay>
+                        style="width: 250px; height: 250px; margin: 0 auto;" loop autoplay>
                     </lottie-player>
                 </div>
 
